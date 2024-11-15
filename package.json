@@ -30,5 +30,9 @@
     "webpack": "^5.95.0",
     "webpack-cli": "^5.1.4",
     "webpack-dev-server": "^5.1.0"
+  },
+  "dependencies": {
+    "@yeying-community/yeying-next": "^1.0.0",
+    "@yeying-community/yeying-web3": "^0.0.5"
   }
 }
