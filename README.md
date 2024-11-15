@@ -1,13 +1,29 @@
-# yeying-test
+# portal_vue
 
-reference doc: https://gist.github.com/bradtraversy/1c93938c1fe4f10d1e5b0532ae22e16a
+This template should help get you started developing with Vue 3 in Vite.
 
-# Install dependency
+## Recommended IDE Setup
+
+[VSCode](https://code.visualstudio.com/) + [Volar](https://marketplace.visualstudio.com/items?itemName=Vue.volar) (and disable Vetur).
+
+## Customize configuration
+
+See [Vite Configuration Reference](https://vite.dev/config/).
+
+## Project Setup
+
+```sh
 npm install
+```
 
-# Compile
+### Compile and Hot-Reload for Development
+
+```sh
+npm run dev
+```
+
+### Compile and Minify for Production
+
+```sh
 npm run build
-
-# Start locally
-npm start
-
+```
