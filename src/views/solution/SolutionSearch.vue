@@ -1,8 +1,11 @@
 <script setup>
 import {ref} from 'vue'
+import { useSolutionStore } from '@/stores/index'
+const solutionStore = useSolutionStore()
+
 const searchVal = ref()
 const search = () => {
-    console.log("search", searchVal)
+    solutionStore.getSolutionList(searchVal.value)
 }
 </script>
 

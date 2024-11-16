@@ -30,12 +30,16 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { ref, onMounted, toRefs, computed } from 'vue'
+// import { storeToRefs } from 'pinia'
 import { RadioGroup, RadioGroupOption } from '@headlessui/vue'
 import { CheckIcon } from '@heroicons/vue/20/solid'
 import Contact from '@/components/Contact.vue'
+import { useSolutionStore } from '@/stores/index'
 const open = ref(false)
 const RefContact = ref()
+const solutionStore = useSolutionStore()
+const { solutionList } = toRefs(solutionStore)
 const openContact = () => {
     open.value = true
     RefContact.value.openModal()
@@ -43,75 +47,7 @@ const openContact = () => {
 const close = () => {
     open.value = false
 }
-const solutionList = [
-  {
-    code: "1",
-    title:"Sliding puzzle solution",
-    desc:"Smooth and high-quality user experience. You only need to slide the puzzle lightly to complete the security verification. It supports a variety of front-end and back-end integration solutions, including trigger, embedded, and pop-up. The delivery form can be private delivery or cloud service.",
-    list:[{
-        name: '云服务定制版本',
-        code: 's1',
-        price: '¥4800',
-        items: [
-            {name:"可用ID",value:"5个"},
-            {name:"并发量",value:"100Q/s"},
-            {name:"验证量",value:"3500次/小时"},
-            {name:"底图",value:"无Logo"},
-        ]
-        },
-        {
-            name: '私有化定制版本',
-            code: 's2',
-            price: '¥9600',
-            items: [
-                {name:"可用ID",value:"5个"},
-                {name:"并发量",value:"100Q/s"},
-                {name:"验证量",value:"3500次/小时"},
-                {name:"底图",value:"无Logo"},
-                {name:"包含夜莺logo",value:""},
-            ]
-        },
-        {
-            name: '私有化定制版本',
-            code: 's2',
-            price: '¥9600',
-            items: [
-                {name:"可用ID",value:"5个"},
-                {name:"并发量",value:"100Q/s"},
-                {name:"验证量",value:"3500次/小时"},
-                {name:"底图",value:"无Logo"},
-            ]
-        },
-    ]
-  },
-  {
-    code: "2",
-    title:"2Sliding puzzle solution",
-    desc:"2Smooth and high-quality user experience. You only need to slide the puzzle lightly to complete the security verification. It supports a variety of front-end and back-end integration solutions, including trigger, embedded, and pop-up. The delivery form can be private delivery or cloud service.",
-    list:[{
-        name: '云服务定制版本',
-        code: 's1',
-        price: '¥4800',
-        items: [
-            {name:"可用ID",value:"5个"},
-            {name:"并发量",value:"100Q/s"},
-            {name:"验证量",value:"3500次/小时"},
-            {name:"底图",value:"无Logo"},
-        ]
-        },
-        {
-            name: '私有化定制版本',
-            code: 's2',
-            price: '¥9600',
-            items: [
-                {name:"可用ID",value:"5个"},
-                {name:"并发量",value:"100Q/s"},
-                {name:"验证量",value:"3500次/小时"},
-                {name:"底图",value:"无Logo"},
-            ]
-        }
-    ]
-  },
-]
-
+onMounted(()=>{
+    solutionStore.getSolutionList()
+})
 </script>
