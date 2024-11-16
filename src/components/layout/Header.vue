@@ -13,7 +13,7 @@
           </button>
         </div>
         <div class="hidden lg:flex lg:gap-x-12 font-normal text-base">
-          <RouterLink v-for="item in navigation" :key="item.name" :to="item.to">{{ item.name }}</RouterLink>
+          <RouterLink :class="item.name==selectName?'text-blue-600':''" v-for="item in navigation" :key="item.title" :to="item.to">{{ item.title }}</RouterLink>
         </div>
         <div class="hidden lg:flex lg:flex-1 lg:justify-end">
             <button type="button" class="rounded-full bg-white px-8 py-2.5 text-xl font-semibold text-blue-900 shadow-sm ring-1 ring-inset ring-blue-300 hover:bg-blue-50">Register</button>
@@ -49,17 +49,27 @@
     </header>
 </template>
 <script setup>
-import { ref } from 'vue'
+import { ref,watch } from 'vue'
 import { Bars3Icon, XMarkIcon } from '@heroicons/vue/24/outline'
 import { Dialog, DialogPanel } from '@headlessui/vue'
-import { RouterLink } from 'vue-router'
-
+import { RouterLink,useRoute } from 'vue-router'
+const route = useRoute();
+const selectName = ref("home")
+// 监听路由变化
+    watch(
+      () => route,
+      (newRoute, oldRoute) => {
+        if(newRoute?.name){
+            selectName.value = newRoute.name
+        }
+      },{deep:true}
+    );
 const navigation = [
-  { name: '应用商店', to: '/' },
-  { name: '解决方案', to: '/solution' },
-  { name: '文档', to: '#' },
-  { name: '博客', to: '#' },
-  { name: '关于我们', to: '#' },
+  { title: '应用商店', to: '/', name:"home" },
+  { title: '解决方案', to: '/solution', name:"solution" },
+  { title: '文档', to: '#' },
+  { title: '博客', to: '#' },
+  { title: '关于我们', to: '#' },
 ]
 const mobileMenuOpen = ref(false)
 </script>
