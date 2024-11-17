@@ -1,6 +1,8 @@
 <script setup>
 import Contact from '@/components/Contact.vue'
-import { ref } from 'vue'
+import { ref,getCurrentInstance } from 'vue'
+const { proxy } = getCurrentInstance();
+const {$t}=proxy
 const open = ref(false)
 const RefContact = ref()
 const openContact = () => {
@@ -22,9 +24,9 @@ const close = () => {
                 type="button" 
                 @click="openContact"
                 class="rounded-full bg-white px-3 sm:px-8 py-2.5 text-sm sm:text-xl font-semibold text-blue-900 shadow-sm ring-1 ring-inset ring-blue-300 hover:bg-blue-50">
-                Contact Us
+                {{$t["btn_contact"]}}
             </button>
-            <button type="button" class="mx-2.5 rounded-full bg-blue-600 px-3 sm:px-8 py-2.5 py-2.5 text-sm sm:text-xl font-semibold text-white shadow-sm hover:bg-blue-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600">Get Started for Free</button>
+            <button type="button" class="mx-2.5 rounded-full bg-blue-600 px-3 sm:px-8 py-2.5 py-2.5 text-sm sm:text-xl font-semibold text-white shadow-sm hover:bg-blue-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600">{{$t["btn_start"]}}</button>
           </div>
         </div>
         <Contact :isOpen="open" ref="RefContact"/>

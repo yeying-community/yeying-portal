@@ -1,6 +1,8 @@
 <script setup>
-import {ref} from 'vue'
+import {ref,getCurrentInstance} from 'vue'
 import { useSolutionStore } from '@/stores/index'
+const { proxy } = getCurrentInstance();
+const {$t}=proxy
 const solutionStore = useSolutionStore()
 
 const searchVal = ref()
@@ -17,8 +19,8 @@ const search = () => {
                 class="block w-full rounded-none rounded-l-md border-0 py-3 pl-3 text-gray-900 ring-1 ring-inset ring-gray-300 placeholder:text-gray-400  sm:text-sm/6" placeholder="请输入搜索关键字" />
             <button type="button" 
                 @click="search"
-                class="w-20 mx-2.5 -ml-px inline-flex items-center rounded-r-md px-1 sm:px-4 text-base font-semibold text-white ring-1 ring-inset ring-blue-300 bg-blue-600 hover:bg-blue-500">
-                搜 索
+                class="w-20 mx-2.5 -ml-px inline-flex items-center rounded-r-md pl-4 sm:pl-5 text-base font-semibold text-white ring-1 ring-inset ring-blue-300 bg-blue-600 hover:bg-blue-500">
+                {{$t["btn_search"]}}
             </button>
         </div>
     </div>

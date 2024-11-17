@@ -2,9 +2,14 @@
 <div class="bg-white p-6 rounded-md">
     <div v-for="(item,index) in solutionList" :key="'solute:'+item.code">
         <hr v-if="index!=0" class="my-6">
-        <div class="text-2xl font-medium">{{item.title}}</div>
+        <div class="flex justify-between">
+            <div class="text-2xl font-medium">{{item.title}}</div>
+            <div :class="['iconfont','text-gray-400','items-center', 'cursor-pointer',item.isShow?'icon-up':'icon-down']" @click="()=>changeShow(item)"></div>
+        </div>
         <div class="text-base font-normal text-blak-600 mt-3 opacity-65	">{{item.desc}}</div>
-        <div class="flex items-center gap-6 isolate mx-auto mt-6 grid max-w-md grid-cols-1 md:max-w-2xl md:grid-cols-2 lg:max-w-4xl xl:mx-0 xl:max-w-none xl:grid-cols-4 ">
+        <div class="flex items-center gap-6 isolate mx-auto mt-6 grid max-w-md grid-cols-1 md:max-w-2xl md:grid-cols-2 lg:max-w-4xl xl:mx-0 xl:max-w-none xl:grid-cols-4 "
+            :class="[item.isShow?'hidden':'']"
+        >
             <div 
                 v-for="fitem in item.list" 
                 :key="'solute:'+fitem.code" 
@@ -33,7 +38,6 @@
 import { ref, onMounted, toRefs, computed } from 'vue'
 // import { storeToRefs } from 'pinia'
 import { RadioGroup, RadioGroupOption } from '@headlessui/vue'
-import { CheckIcon } from '@heroicons/vue/20/solid'
 import Contact from '@/components/Contact.vue'
 import { useSolutionStore } from '@/stores/index'
 const open = ref(false)
@@ -46,6 +50,9 @@ const openContact = () => {
 }
 const close = () => {
     open.value = false
+}
+const changeShow = (item) => {
+    item.isShow = !item.isShow
 }
 onMounted(()=>{
     solutionStore.getSolutionList()

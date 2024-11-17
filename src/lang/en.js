@@ -1,0 +1,18 @@
+export default {
+    name:"china",
+    h_shop:"Application Shop",
+    h_solution:"Solution",
+    h_doc:"Document",
+    h_blog:"Blog",
+    h_about:"About Us",
+    h_top:"YeYing",
+    btn_search:"Search",
+    btn_reg:"Register",
+    btn_apply:"Apply",
+    btn_contact:"Contact US",
+    btn_start:"Get Started for Free",
+    ph_search:"Please Input Keyword",
+    ph_input:"Please Input",
+    f_c_email:"Email",
+    f_c_type:"Question Type",
+}

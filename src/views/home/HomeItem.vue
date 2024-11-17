@@ -4,7 +4,8 @@
         <dl class="grid px-2 mt-11 grid-cols-1 gap-x-6 gap-y-6 lg:max-w-none lg:grid-cols-2">
             <div v-for="feature in itemList" :key="feature.title" class="flex flex-col rounded-[calc(theme(borderRadius.xl)+theme(spacing.2))] shadow-sm ring-1 ring-black/5 p-6">
                 <dt class="flex items-center gap-x-3 font-semibold text-gray-900">
-                    <component :is="feature.icon" class="size-14 flex-none text-indigo-600" aria-hidden="true" />
+                     <span :class="['text-indigo-600','iconfont','icon-'+feature.icon]" style="transform:scale(2.7) translateX(20%)"></span>
+                    <!-- <component :is="feature.icon" class="size-14 flex-none text-indigo-600" aria-hidden="true" /> -->
                 </dt>
                 <dd class="mt-5 flex flex-auto flex-col text-2xl font-medium">
                     {{ feature.title }}
@@ -17,28 +18,26 @@
     </div>
 </template>
 <script setup>
-import { WrenchIcon, AdjustmentsVerticalIcon,ShieldCheckIcon } from '@heroicons/vue/24/outline'
-
 const itemList = [
     { 
         title: "Self-Controllable", 
         desc: "The user's own number is the sum of the numbers and the amount is completely controlled and owned.",
-        icon: WrenchIcon
+        icon: "vertical"
     },
     { 
         title: "Privacy Protection", 
         desc: "In order to protect the number of exchanges, it is necessary to maintain public safety and to protect the private security of non-public numbers.",
-        icon: WrenchIcon
+        icon: "qa"
     },
     { 
         title: "individual", 
         desc: "You can use it based on your own academic needs, work methods, and lifestyle preferences.",
-        icon: WrenchIcon
+        icon: "crown"
     },
     { 
         title: "Productivity Tools", 
         desc: "Established personal knowledge, used AI technology, constructed numbers worldwide, high production, work efficiency.",
-        icon: WrenchIcon
+        icon: "set"
     },
 ]
 </script>
