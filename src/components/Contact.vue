@@ -78,7 +78,7 @@
 </template>
 
 <script setup>
-import { ref,reactive,defineProps, defineEmits, onMounted, defineExpose,getCurrentInstance } from 'vue'
+import { ref,reactive, onMounted,getCurrentInstance } from 'vue'
 import { Dialog, DialogPanel, DialogTitle, TransitionChild, TransitionRoot } from '@headlessui/vue'
 const { proxy } = getCurrentInstance();
 const {$t}=proxy

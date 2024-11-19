@@ -1,10 +1,10 @@
 <template>
     <header class="inset-x-0 top-0 z-50 flex justify-center">
-      <nav class="flex items-center justify-between py-4 w-full px-2 xl:w-9/12	" aria-label="Global">
-        <div class="flex lg:flex-1 items-center">
+      <nav class="flex items-center justify-between py-4 w-full px-2 xl:w-5/6	" aria-label="Global">
+        <div class="flex lg:flex-1 items-center cursor-pointer" @click="changeRouter('/')">
           <img class="w-6 h-6 mr-2" src="../../assets/img/logo.svg"/>
           <!-- <a href="#" class="-m-1.5 p-1.5 text-sm font-extrabold"> -->
-          <span class="text-sm font-extrabold">{{$t["h_top"]}}</span>
+          <span class="text-base font-medium family_sans text-black	opacity-85">{{$t["h_top"]}}</span>
           <!-- </a> -->
         </div>
         <div class="flex lg:hidden">
@@ -14,12 +14,12 @@
             <!-- <Bars3Icon class="size-6" aria-hidden="true" /> -->
           </button>
         </div>
-        <div class="hidden lg:flex lg:gap-x-12 font-normal text-base">
-          <RouterLink :class="item.name==selectName?'text-blue-600':''" v-for="item in navigation" :key="item.title" :to="item.to">{{ item.title }}</RouterLink>
+        <div class="hidden lg:flex lg:gap-x-12 font-normal text-base family_puhui">
+          <span class="cursor-pointer hover:text-gray-500" :class="item.name==selectName?'text-blue-600':''" v-for="item in navigation" :key="item.title" @click="changeRouter(item.to)">{{ item.title }}</span>
         </div>
-        <div class="hidden lg:flex lg:flex-1 lg:justify-end">
-            <button type="button" class="rounded-full bg-white px-8 py-2.5 text-xl font-semibold text-blue-900 shadow-sm ring-1 ring-inset ring-blue-300 hover:bg-blue-50">{{$t["btn_reg"]}}</button>
-            <button type="button" class="mx-2.5 rounded-full bg-blue-600 px-8 py-2.5 text-xl font-semibold text-white shadow-sm hover:bg-blue-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600">
+        <div class="hidden lg:flex lg:flex-1 lg:justify-end ml-3">
+            <button type="button" class="family_puhui rounded-full bg-white px-8 py-2.5 text-xl font-normal	 text-blue-900 shadow-sm ring-1 ring-inset ring-blue-300 hover:bg-blue-50">{{$t["btn_reg"]}}</button>
+            <button type="button" class="family_puhui mx-2.5 rounded-full bg-blue-600 px-8 py-2.5 text-xl font-normal	 text-white shadow-sm hover:bg-blue-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600">
               {{$t["btn_apply"]}}
             </button>
         </div>
@@ -43,7 +43,7 @@
               <div class="space-y-2 py-6">
                 <span href="#" @click="()=>changeRouter(item.to)" 
                   v-for="item in navigation" :key="item.name" 
-                  class="-mx-3 block rounded-lg px-3 py-2 text-base/7 font-semibold text-gray-900 hover:bg-gray-50"
+                  class=" block px-3 py-2 text-base/7 font-normal family_puhui text-gray-900 hover:bg-gray-50"
                   :style="{color:item.name==selectName?'blue':''}"
                 >{{ item.title }}</span>
               </div>
@@ -78,10 +78,10 @@ watch(
     if(newRoute?.name){
         selectName.value = newRoute.name
     }
-  },{deep:true}
+  },{deep:true,immediate:true}
 );
 const navigation = [
-  { title: $t["h_shop"], to: '/', name:"home" },
+  { title: $t["h_shop"], to: '' },
   { title: $t["h_solution"], to: '/solution', name:"solution" },
   { title: $t["h_doc"], to: '' },
   { title: $t["h_blog"], to: '' },
@@ -90,7 +90,7 @@ const navigation = [
 const mobileMenuOpen = ref(false)
 const changeRouter = (url) => {
   router.push(url)
-  if(url){
+  if(url && mobileMenuOpen.value){
     mobileMenuOpen.value = false
   }
 }

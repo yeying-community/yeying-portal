@@ -1,6 +1,6 @@
 export default {
     name:"china",
-    h_shop:"Application Shop",
+    h_shop:"App Store",
     h_solution:"Solution",
     h_doc:"Document",
     h_blog:"Blog",
@@ -11,8 +11,12 @@ export default {
     btn_apply:"Apply",
     btn_contact:"Contact US",
     btn_start:"Get Started for Free",
+    btn_ok:"Confirm",
+    btn_cancel:"Cancel",
     ph_search:"Please Input Keyword",
     ph_input:"Please Input",
+    ph_select:"Please Select",
     f_c_email:"Email",
     f_c_type:"Question Type",
+    f_c_desc:"Describe",
 }

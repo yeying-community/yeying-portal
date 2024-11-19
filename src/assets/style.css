@@ -1,3 +1,13 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+.family_sans{
+    font-family: "Alibaba Sans";
+}
+.family_puhui{
+    font-family: "Alibaba PuHuiTi";
+}
+.family_neue{
+    font-family: "Helvetica Neue";
+}
+

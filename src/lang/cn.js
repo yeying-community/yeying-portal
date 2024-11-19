@@ -19,5 +19,4 @@ export default {
     f_c_email:"邮箱",
     f_c_type:"问题类型",
     f_c_desc:"描述",
-
 }
