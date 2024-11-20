@@ -22,7 +22,7 @@ const  background = {
 </script>
 <style scoped>
 .layout_bg{
-  background:url('../../assets/img/bg.png') white 0px 0px / 100% 100% no-repeat;
+  background:url('../../assets/img/bg.jpg') white 0px 0px / 100% 100% no-repeat;
   background-size:100% 50%; 
 }
 </style>
