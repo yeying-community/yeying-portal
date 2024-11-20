@@ -12,7 +12,7 @@ const app = createApp(App)
 app.use(createPinia())
 app.use(router)
 //国际化
-const key = 'cn'
+const key = 'en'
 app.config.globalProperties.$t = lang[key]
 
 app.mount('#app')

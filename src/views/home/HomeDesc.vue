@@ -15,10 +15,12 @@ const close = () => {
 </script>
 
 <template>
-    <div class="mx-auto pt-10 sm:pt-18 lg:pt-40">
+    <div class="mx-auto pt-10 sm:pt-16 lg:pt-40">
         <div class="text-center">
-          <div class="text-balance max-w-4xl text-2xl font-semibold tracking-tight text-gray-900 sm:text-6xl">Build any smart web3 application freely</div>
-          <div class="mt-10 text-lg font-normal opacity-65">It is a Web3 open source community driven by the community and independent developers, focusing on full-stack technologies related to Web3 and AI, used to build open infrastructure, and provide the ability to DIY various Web3 applications.</div>
+          <div class="text-center flex justify-center">
+            <div class="text-balance max-w-4xl text-2xl font-semibold tracking-tight text-gray-900 sm:text-6xl">Build any smart web3 application freely</div>
+          </div>
+          <div class="mt-10 px-5 lg:px-0 text-lg font-normal opacity-65">It is a Web3 open source community driven by the community and independent developers, focusing on full-stack technologies related to Web3 and AI, used to build open infrastructure, and provide the ability to DIY various Web3 applications.</div>
           <div class="mt-14 flex items-center justify-center gap-x-6">
             <button 
                 type="button" 

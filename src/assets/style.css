@@ -1,13 +1,36 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
-.family_sans{
-    font-family: "Alibaba Sans";
+
+@font-face {
+    font-family: "Puhui-Bold";
+    src:url("@/assets/fonts/puhui/AlibabaPuHuiTi-3-85-Bold.ttf") format("truetype");
+    font-display: swap;
 }
-.family_puhui{
-    font-family: "Alibaba PuHuiTi";
+@font-face {
+    font-family: "Puhui-Heavy";
+    src:url("@/assets/fonts/puhui/AlibabaPuHuiTi-3-105-Heavy.ttf") format("truetype");
+    font-display: swap;
 }
-.family_neue{
-    font-family: "Helvetica Neue";
+@font-face {
+    font-family: "Puhui-Regular";
+    src:url("@/assets/fonts/puhui/AlibabaPuHuiTi-3-55-RegularL3.ttf") format("truetype");
+    font-display: swap;
 }
+@font-face {
+    font-family: "Puhui-Light";
+    src:url("@/assets/fonts/puhui/AlibabaPuHuiTi-3-45-Light.ttf") format("truetype");
+    font-display: swap;
+}
+@font-face {
+    font-family: "Puhui-Black";
+    src:url("@/assets/fonts/puhui/AlibabaPuHuiTi-3-115-Black.ttf") format("truetype");
+    font-display: swap;
+}
+@font-face {
+    font-family: "Puhui-Medium";
+    src:url("@/assets/fonts/puhui/AlibabaPuHuiTi-3-65-Medium.ttf") format("truetype");
+    font-display: swap;
+}
+
 

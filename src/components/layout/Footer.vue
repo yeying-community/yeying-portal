@@ -1,6 +1,6 @@
 <template>
   <div class="bg-gray-100 h-72 mt-16">
-        <div class="mx-auto max-w-4xl py-20 px-2 lg:px-0">
+        <div class="mx-auto max-w-4xl py-20 px-5 lg:px-0">
             <div class="flex justify-end items-center">
                 <span class="text-lg font-bold">Contact Us：</span>
                 <span class="text-sm font-normal text-black-400">bryany666@gmail.com</span>
