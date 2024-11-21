@@ -25,10 +25,10 @@ const close = () => {
             <button 
                 type="button" 
                 @click="openContact"
-                class="rounded-full font-puhuiRegular bg-white px-3 sm:px-8 py-2.5 text-sm sm:text-xl text-blue-900 shadow-sm ring-1 ring-inset ring-blue-300 hover:bg-blue-50">
+                class="rounded-full font-puhuiRegular bg-white px-3 sm:px-8 py-2.5 text-lg sm:text-xl text-blue-900 shadow-sm ring-1 ring-inset ring-blue-300 hover:bg-blue-50">
                 {{$t["btn_contact"]}}
             </button>
-            <button type="button" class="mx-2.5 font-puhuiRegular rounded-full bg-blue-600 px-3 sm:px-8 py-2.5 py-2.5 text-sm sm:text-xl text-white shadow-sm hover:bg-blue-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600">{{$t["btn_start"]}}</button>
+            <button type="button" class="mx-2.5 font-puhuiRegular rounded-full bg-blue-600 px-3 sm:px-8 py-2.5 py-2.5 text-lg sm:text-xl text-white shadow-sm hover:bg-blue-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600">{{$t["btn_start"]}}</button>
           </div>
         </div>
         <Contact :isOpen="open" ref="RefContact"/>
