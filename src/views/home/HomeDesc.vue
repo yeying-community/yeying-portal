@@ -18,7 +18,7 @@ const close = () => {
     <div class="mx-auto pt-10 sm:pt-16 lg:pt-40">
         <div class="text-center">
           <div class="text-center flex justify-center">
-            <div class="text-balance max-w-5xl font-puhuiMedium opacity-85 text-2xl tracking-tight text-gray-900 sm:text-6xl">Build any smart <span class="text-blue-600">web3</span> application freely</div>
+            <div class="text-balance max-w-4xl font-puhuiMedium opacity-85 text-3xl tracking-tight text-gray-900 sm:text-6xl">Build any smart <span class="text-blue-600">web3</span> application freely</div>
           </div>
           <div class="mt-10 px-5 lg:px-0 lg:px-0 text-lg font-puhuiRegular">It is a Web3 open source community driven by the community and independent developers, focusing on full-stack technologies related to Web3 and AI, used to build open infrastructure, and provide the ability to DIY various Web3 applications.</div>
           <div class="mt-14 flex items-center justify-center gap-x-6">
