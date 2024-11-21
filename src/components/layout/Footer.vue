@@ -1,18 +1,23 @@
 <template>
-  <div class="bg-gray-100 h-72 mt-16">
-        <div class="mx-auto max-w-4xl py-20 px-5 lg:px-0">
-            <div class="flex justify-end items-center">
-                <span class="text-lg font-bold">Contact Us：</span>
-                <span class="text-sm font-normal text-black-400">bryany666@gmail.com</span>
+  <div class="bg-gray-100 h-96 sm:h-72 mt-16">
+        <div class="mx-auto max-w-6xl py-20 px-5 lg:px-0">
+            <div class="block sm:flex justify-between items-center">
+                <img class="w-28 h-8 mr-2" src="../../assets/img/logo.svg"/>
+                <div class="block sm:flex items-center">
+                    <div class="flex my-5 sm:my-0">
+                        <span class="text-sm font-puhuiBold">Contact Us：</span>
+                        <span class="text-sm text-black-400 font-puhuiRegular">leying.community@gmail.com</span>
+                    </div>
+                    <span class="iconfont icon-GitHub sm:ml-6 self-icon" aria-hidden="true" />
+                    <span class="iconfont icon-xiaohongshu ml-4 self-icon text-red-600" aria-hidden="true" />
+                </div>
+
+
             </div>
-            <div class="flex justify-end mt-3 items-center">
-                <span class="iconfont icon-GitHub" style="transform:scale(1.2)" aria-hidden="true" />
-                <span class="mx-4">|</span>
-                <span class="iconfont icon-GitHub" style="transform:scale(1.2)" aria-hidden="true" />
-            </div>
-            <hr class="mt-3 mb-7 bg-gray-500"/>
-            <div class="text-sm font-normal text-black" >
-                © 2024 Copyright by YXA
+            <hr class="my-10 bg-gray-500"/>
+            <div class="text-sm font-puhuiRegular text-black flex justify-between" >
+                <span>浙ICP备2024126729号-1</span>
+                <span>Copyright © 2024</span>
             </div>
         </div>
   </div>
@@ -21,3 +26,8 @@
 <script setup>
 
 </script>
+<style scoped>
+.self-icon{
+    font-size: 1.875rem;
+}
+</style>

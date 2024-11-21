@@ -6,7 +6,7 @@ import Footer from '@/components/layout/Footer.vue'
 
 <template>
     <div>
-        <div class="mx-auto max-w-5xl py-5 sm:pt-18 lg:pt-16">
+        <div class="mx-auto max-w-6xl py-5 sm:pt-18 lg:pt-16">
             <SolutionSearch/>
             <SolutionItem/>
         </div>
