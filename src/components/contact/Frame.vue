@@ -1,7 +1,7 @@
 <template>
-  <div @click="openContact" class="cursor-pointer bg-white px-3 py-5 frame fixed right-1.5 sm:right-12 top-1/4">
-    <span class="text-blue-600 iconfont icon-phone"/>
-    <span class="text-blue-600 mt-2 text-base font-puhuiRegular">{{$t["btn_contact"]}}</span>
+  <div @click="openContact" class="blue-color cursor-pointer bg-white px-3 py-5 frame fixed right-1.5 sm:right-12 top-1/4">
+    <span class="iconfont icon-phone"/>
+    <span class="mt-2 text-base font-puhuiRegular">{{$t["btn_contact"]}}</span>
     <Contact :isOpen="open" ref="RefContact"/>
   </div>
 </template>
@@ -23,6 +23,7 @@ const close = () => {
 </script>
 <style scoped>
 .frame{
-    writing-mode: vertical-lr;
+  writing-mode: vertical-lr;
+  box-shadow: 0px 0px 8px -2px;
 }
 </style>

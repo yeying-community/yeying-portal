@@ -32,5 +32,8 @@
     src:url("@/assets/fonts/puhui/AlibabaPuHuiTi-3-65-Medium.ttf") format("truetype");
     font-display: swap;
 }
+.blue-color{
+    color:#1677FF;
+}
 
 

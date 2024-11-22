@@ -1,5 +1,5 @@
 <template>
-    <header class="inset-x-0 top-0 z-50 flex justify-center">
+    <header class="inset-x-0 top-0 z-50 flex justify-center header">
       <nav class="flex items-center justify-between py-4 w-full px-5 lg:px-2 xl:w-5/6	" aria-label="Global">
         <div class="flex lg:flex-1 items-center cursor-pointer" @click="changeRouter('/')">
           <img class="w-28 h-8 mr-2" src="../../assets/img/logo.svg"/>
@@ -18,7 +18,7 @@
           <span class="cursor-pointer opacity-85" :class="item.name==selectName?'text-blue-600':''" v-for="item in navigation" :key="item.title" @click="changeRouter(item.to)">{{ item.title }}</span>
         </div>
         <div class="hidden lg:flex lg:flex-1 lg:justify-end ml-3">
-            <button type="button" class="font-puhuiRegular rounded-full bg-white px-8 py-2.5 text-xl text-blue-900 shadow-sm ring-1 ring-inset ring-blue-300 hover:bg-blue-50">{{$t["btn_reg"]}}</button>
+            <button type="button" class="blue-color font-puhuiRegular rounded-full bg-white px-8 py-2.5 text-xl shadow-sm ring-1 ring-inset ring-blue-300 hover:bg-blue-50">{{$t["btn_reg"]}}</button>
             <button type="button" class="font-puhuiRegular mx-2.5 rounded-full bg-blue-600 px-8 py-2.5 text-xl text-white shadow-sm hover:bg-blue-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600">
               {{$t["btn_apply"]}}
             </button>
@@ -61,7 +61,7 @@
 </template>
 <script setup>
 import { ref,watch,getCurrentInstance } from 'vue'
-import { Bars3Icon, XMarkIcon } from '@heroicons/vue/24/outline'
+// import { Bars3Icon, XMarkIcon } from '@heroicons/vue/24/outline'
 import { Dialog, DialogPanel } from '@headlessui/vue'
 import { RouterLink,useRoute,useRouter } from 'vue-router'
 // import logo from '@/assets/img/logo.svg'
@@ -95,3 +95,9 @@ const changeRouter = (url) => {
   }
 }
 </script>
+<style scoped>
+.header{
+  backdrop-filter:blur(10px);
+  position: fixed;
+}
+</style>
