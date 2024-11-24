@@ -5,7 +5,16 @@ export default {
     "./src/**/*.{vue,js,ts,jsx,tsx}",
   ],
   theme: {
-    extend: {},
+    extend: {
+      fontFamily: {
+        puhuiBold: ['Puhui-Bold'],
+        puhuiHeavy: ['Puhui-Heavy'],
+        puhuiRegular: ['Puhui-Regular'],
+        puhuiLight: ['Puhui-Light'],
+        puhuiBlack: ['Puhui-Black'],
+        puhuiMedium: ['Puhui-Medium'],
+      },
+    },
   },
   plugins: [],
 }
