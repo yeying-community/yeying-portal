@@ -10,6 +10,7 @@
   },
   "dependencies": {
     "@headlessui/vue": "^1.7.23",
+    "ant-design-vue": "^4.2.6",
     "pinia": "^2.2.6",
     "vue": "^3.5.12",
     "vue-router": "^4.4.5"
@@ -17,6 +18,7 @@
   "devDependencies": {
     "@vitejs/plugin-vue": "^5.1.4",
     "autoprefixer": "^10.4.20",
+    "babel-plugin-import": "^1.13.8",
     "less": "^4.2.0",
     "postcss": "^8.4.49",
     "tailwindcss": "^3.4.14",
