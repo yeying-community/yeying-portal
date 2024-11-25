@@ -16,9 +16,16 @@
                 </div>
               </TransitionChild>
               <!-- Sidebar component, swap this element with another sidebar if you like -->
-              <div class="flex grow flex-col bg-white px-6 pb-4">
-                
-                phone left
+              <div class="flex grow flex-col bg-white px-6 py-4 text-sm font-normal">
+                  <div v-for="item in navigation" 
+                    :key="item.title" 
+                    @click="changeRouter(item.to)"
+                    class="h-10 leading-10 pl-3.5 cursor-pointer"
+                    :class="selectName==item.name?'active':''"
+                  >
+                    <span class="iconfont" :class="item.icon"/>
+                    <span class="opacity-85 ml-2.5">{{item.title}}</span>
+                  </div>
               </div>
             </DialogPanel>
           </TransitionChild>
@@ -30,13 +37,20 @@
     <div class="hidden border-r lg:inset-y-0 lg:z-50 lg:flex lg:w-52 lg:flex-col">
       <!-- Sidebar component, swap this element with another sidebar if you like -->
       <div class="px-6 p-2 text-sm font-normal">
-        <div>Account</div>
-        <div>Message</div>
+        <div v-for="item in navigation" 
+          :key="item.title" 
+          @click="changeRouter(item.to)"
+          class="h-10 leading-10 pl-3.5 cursor-pointer"
+          :class="selectName==item.name?'active':''"
+        >
+          <span class="iconfont" :class="item.icon"/>
+          <span class="opacity-85 ml-2.5">{{item.title}}</span>
+        </div>
       </div>
     </div>
 
     <div class="flex-1">
-        <div class="lg:hidden sticky top-0 z-40 flex shrink-0 items-center bg-white px-4 lg:px-8">
+        <div class="lg:hidden sticky top-0 flex shrink-0 items-center bg-white px-4 lg:px-8">
             <button type="button" class="-m-2.5 p-2.5 text-gray-700 lg:hidden" @click="sidebarOpen = true">
             <span class="iconfont icon-horizon scale-125"/>
             </button>
@@ -48,22 +62,43 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
-import { RouterView } from 'vue-router'
-
-// import Login from '@/views/login/Index.vue'
-
+import { ref,watch } from 'vue'
+import { RouterView,useRouter,useRoute } from 'vue-router'
 import {
   Dialog,
   DialogPanel,
   TransitionChild,
   TransitionRoot,
 } from '@headlessui/vue'
-
+const router = useRouter();
+const route = useRoute();
+const selectName = ref("")
 const sidebarOpen = ref(false)
+const navigation = [
+  { title: "Account", to: '/user', name: 'user', icon:"icon-account" },
+  { title: "Message", to: '/message', name: 'message', icon:"icon-bell-full" },
+]
+// 监听路由变化
+watch(
+  () => route,
+  (newRoute) => {
+    if(newRoute?.name){
+        selectName.value = newRoute.name
+    }
+  },{deep:true,immediate:true}
+);
+const changeRouter = (url) => {
+  router.push(url)
+  if(url && sidebarOpen.value){
+    sidebarOpen.value = false
+  }
+}
 </script>
 <style scoped>
 .content{
-    height: calc(100vh - 3.5rem);
+  height: calc(100vh - 3.5rem);
+}
+.active{
+  background: rgba(0, 0, 0, 0.03);
 }
 </style>
