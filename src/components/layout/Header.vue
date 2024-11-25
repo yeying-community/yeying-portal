@@ -33,7 +33,7 @@
               <img class="h-8 w-auto" src="../../assets/img/logo.svg" alt="" />
             </a>
             <button type="button" class="-m-2.5 rounded-md p-2.5 text-gray-700" @click="mobileMenuOpen = false">
-              <span class="sr-only">Close menu</span>
+              <!-- <span class="sr-only">Close menu</span> -->
               <span class="iconfont icon-close"/>
               <!-- <XMarkIcon class="size-6" aria-hidden="true" /> -->
             </button>
