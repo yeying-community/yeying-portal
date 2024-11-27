@@ -1,5 +1,5 @@
 <template>
-    <header class="inset-x-0 top-0 z-50 flex justify-center header">
+    <header class="inset-x-0 top-0 z-10 flex justify-center header">
       <nav class="flex items-center justify-between py-4 w-full px-5 lg:px-2 xl:w-5/6	" aria-label="Global">
         <div class="flex lg:flex-1 items-center cursor-pointer" @click="changeRouter('/')">
           <img class="w-28 h-8 mr-2" src="../../assets/img/logo.svg"/>
