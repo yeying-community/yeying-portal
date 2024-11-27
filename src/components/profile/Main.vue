@@ -1,7 +1,7 @@
 <template>
   <div class="content flex">
     <TransitionRoot as="template" :show="sidebarOpen">
-      <Dialog class="relative z-50 lg:hidden" @close="sidebarOpen = false">
+      <Dialog class="relative z-50 lg:hidden" @close="sidebarOpen = false">====
         <TransitionChild as="template" enter="transition-opacity ease-linear duration-300" enter-from="opacity-0" enter-to="opacity-100" leave="transition-opacity ease-linear duration-300" leave-from="opacity-100" leave-to="opacity-0">
           <div class="fixed inset-0 bg-gray-900/80" />
         </TransitionChild>
@@ -20,7 +20,7 @@
                   <div v-for="item in navigation" 
                     :key="item.title" 
                     @click="changeRouter(item.to)"
-                    class="h-10 leading-10 pl-3.5 cursor-pointer"
+                    class="h-10 leading-10 pl-3.5 cursor-pointer opacity-60"
                     :class="selectName==item.name?'active':''"
                   >
                     <span class="iconfont" :class="item.icon"/>
@@ -40,7 +40,7 @@
         <div v-for="item in navigation" 
           :key="item.title" 
           @click="changeRouter(item.to)"
-          class="h-10 leading-10 pl-3.5 cursor-pointer"
+          class="h-10 leading-10 pl-3.5 cursor-pointer opacity-60"
           :class="selectName==item.name?'active':''"
         >
           <span class="iconfont" :class="item.icon"/>
@@ -64,12 +64,6 @@
 <script setup>
 import { ref,watch } from 'vue'
 import { RouterView,useRouter,useRoute } from 'vue-router'
-import {
-  Dialog,
-  DialogPanel,
-  TransitionChild,
-  TransitionRoot,
-} from '@headlessui/vue'
 const router = useRouter();
 const route = useRoute();
 const selectName = ref("")
@@ -100,5 +94,6 @@ const changeRouter = (url) => {
 }
 .active{
   background: rgba(0, 0, 0, 0.03);
+  opacity: 1;
 }
 </style>

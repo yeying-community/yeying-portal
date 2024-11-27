@@ -10,11 +10,7 @@
   },
   "dependencies": {
     "@headlessui/vue": "^1.7.23",
-<<<<<<< HEAD
-    "@heroicons/vue": "^2.2.0",
-=======
     "@yeying-community/yeying-i18n": "^0.0.1",
->>>>>>> b902244fd1638c5fc6f349199348bddb99a3bcd9
     "ant-design-vue": "^4.2.6",
     "pinia": "^2.2.6",
     "slider-verify-v3": "^1.1.12",
