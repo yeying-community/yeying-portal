@@ -9,11 +9,15 @@ import router from '@/router'
 import lang from '@/lang'
 
 const app = createApp(App)
-await setLanguage('zh-CN')
-console.log(t('common.confirm'))
+setLanguage('zh-CN').then(() => {
+  console.log(t('common.confirm'))
+  setLanguage('en-US').then(() => {
+    console.log(t('common.confirm'))
+  })
+})
 
-await setLanguage('en-US')
-console.log(t('common.confirm'))
+const identityManager = new YeYing.IdentityManager()
+const accountManager = new YeYing.AccountManager()
 
 app.use(createPinia())
 app.use(router)
