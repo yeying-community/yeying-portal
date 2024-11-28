@@ -44,7 +44,7 @@ export default defineConfig({
     viteCompression({
       verbose: true,
       disable: false,
-      threshold: 50,
+      threshold: 10240,//超10k压缩
       deleteOriginFile: true,
       algorithm: 'gzip',
       ext: '.gz',
