@@ -39,9 +39,9 @@
                 <div class="text-right pr-4 border-t py-2">
                     <Button class="mr-2"
                         @click="closeModal"
-                        >{{$t["btn_cancel"]}}</button>
+                        >{{$t("common.cancel")}}</button>
                     <Button type="primary" >
-                      {{$t["btn_ok"]}}
+                      {{$t("portal.confirm")}}
                     </button>
                 </div>
             </DialogPanel>

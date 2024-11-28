@@ -9,23 +9,57 @@
     <title>引入需要压缩的ttf文件</title>
     <style>
         @font-face {
-            font-family: 'HeadLineA';
-            src: url('./test.ttf') format('truetype');
+            font-family: 'puhuiBold';
+            src: url('./fonts/puhui/AlibabaPuHuiTi-3-85-Bold.ttf') format('truetype');
+        }
+        @font-face {
+            font-family: 'puhuiMedium';
+            src: url('./fonts/puhui/AlibabaPuHuiTi-3-65-Medium.ttf') format('truetype');
+        }
+        @font-face {
+            font-family: 'puhuiRegular';
+            src: url('./fonts/puhui/AlibabaPuHuiTi-2-55-Regular.ttf') format('truetype');
         }
         body {
             -webkit-text-size-adjust: 100% !important;
         }
-        #app{
-            font-family: HeadLineA;
+        /* .font-bold{
+            font-family: puhuiBold;
+        }
+        .font-medium{
+            font-family: puhuiMedium;
+        } */
+        .font-regular{
+            font-family: puhuiRegular;
         }
     </style>
 </head>
-
+<script>
+    // const str = `
+    //     abcdefghijklmnopqrstuvwxyz
+    //     ABCDEFGHIJKLMNOPQRSTUVWXYZ
+    //     1234567890
+    // `
+    // const boldDom = document.getElementById("font-bold")
+    // boldDom.innerHTML = str
+</script>
 <body>
-    <noscript>
-    <div id="app">
-        abcdefghijklmnopqrstuvwxyz
+    <!-- <div class="font-bold">
+        abcdefghijklmnopqrstuvwxyz Apply
         ABCDEFGHIJKLMNOPQRSTUVWXYZ
+        1234567890
+    </div>
+    <div class="font-medium">
+        abcdefghijklmnopqrstuvwxyz Apply
+        ABCDEFGHIJKLMNOPQRSTUVWXYZ
+        1234567890
+    </div> -->
+    <div class="font-regular">
+        abcdefghijklmnopqrstuvwxyz 
+        Apply
+        y
+        ABCDEFGHIJKLMNOPQRSTUVWXYZ
+        1234567890
     </div>
 </body>
 

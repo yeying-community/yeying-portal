@@ -19,7 +19,7 @@
             <label for="password" class="block text-sm font-normal text-gray-900"><span class="text-red-500 mr-1">*</span>Password</label>
             <div class="mt-2">
                 <input v-model="form.password"
-                    type="password" name="password"  required="" :placeholder="$t['ph_input']"
+                    type="password" name="password"  required="" :placeholder="$t('common.pleaseInput')"
                     class="pl-1.5 block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm/6" />
             </div>
         </div>
@@ -32,7 +32,7 @@
         </div>
         <div class="mt-6 h-10">
             <button type="submit" class="h-10 text-base font-normal	 rounded-md bg-blue-600 w-full py-1 text-sm text-white shadow-sm hover:bg-blue-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600">
-                {{$t["btn_reg"]}}
+                {{$t("portal.register")}}
             </button>
         </div>
         

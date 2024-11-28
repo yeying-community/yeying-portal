@@ -5,7 +5,7 @@
                 <img class="w-28 h-8 mr-2" src="../../assets/img/logo.svg"/>
                 <div class="block sm:flex items-center">
                     <div class="flex my-5 sm:my-0">
-                        <span class="text-sm font-puhuiBold">Contact Us：</span>
+                        <span class="text-sm font-puhuiBold">{{$t("common.contactUs")}}：</span>
                         <span class="text-sm text-black-400 font-puhuiRegular">yeying.community@gmail.com</span>
                     </div>
                     <span class="iconfont icon-GitHub sm:ml-6 self-icon" aria-hidden="true" />

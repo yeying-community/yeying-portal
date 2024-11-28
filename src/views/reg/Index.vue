@@ -12,7 +12,7 @@
             <label for="phone" class="block text-width text-sm font-normal text-gray-900"><span class="text-red-500 mr-1">*</span>Telephone</label>
             <div class="mt-2 flex-1">
                 <input v-model="form.phone"
-                    type="phone" name="phone"  required="" :placeholder="$t['ph_input']"
+                    type="phone" name="phone"  required="" :placeholder="$t('common.pleaseInput')"
                     class="pl-1.5 block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm/6" />
             </div>
         </div>
@@ -20,7 +20,7 @@
             <label for="email" class="block text-width text-sm font-normal text-gray-900"><span class="text-red-500 mr-1">*</span>Email</label>
             <div class="mt-2 relative flex-1">
                 <input v-model="form.email"
-                    type="email" name="email"  required="" :placeholder="$t['ph_input']"
+                    type="email" name="email"  required="" :placeholder="$t('common.pleaseInput')"
                     class="pl-1.5 block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm/6" />
                 <span @click="getMsCode" class="cursor-pointer text-sm font-normal blue-color absolute right-1 top-2">获取验证码</span>
             </div>
@@ -29,7 +29,7 @@
             <label for="mscode" class="block text-width text-sm font-normal text-gray-900"><span class="text-red-500 mr-1">*</span>验证码</label>
             <div class="mt-2 flex-1">
                 <input v-model="form.mscode"
-                    type="text" name="mscode"  required="" :placeholder="$t['ph_input']"
+                    type="text" name="mscode"  required="" :placeholder="$t('common.pleaseInput')"
                     class="pl-1.5 block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm/6" />
             </div>
         </div>
@@ -37,7 +37,7 @@
             <label for="password" class="block text-width text-sm font-normal text-gray-900"><span class="text-red-500 mr-1">*</span>Password</label>
             <div class="mt-2 flex-1">
                 <input v-model="form.password"
-                    type="password" name="password"  required="" :placeholder="$t['ph_input']"
+                    type="password" name="password"  required="" :placeholder="$t('common.pleaseInput')"
                     class="pl-1.5 block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm/6" />
             </div>
         </div>
@@ -45,7 +45,7 @@
             <label for="confirm_pwd" class="block text-width text-sm font-normal text-gray-900"><span class="text-red-500 mr-1">*</span>Confirm Password</label>
             <div class="mt-2 flex-1">
                 <input v-model="form.confirm_pwd"
-                    type="password" name="confirm_pwd"  required="" :placeholder="$t['ph_input']"
+                    type="password" name="confirm_pwd"  required="" :placeholder="$t('common.pleaseInput')"
                     class="pl-1.5 block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm/6" />
             </div>
         </div>
@@ -53,7 +53,7 @@
             <label for="accode" class="block text-width text-sm font-normal text-gray-900"><span class="text-red-500 mr-1">*</span>Account Code</label>
             <div class="mt-2 flex-1">
                 <input v-model="form.accode"
-                    type="text" name="accode"  required="" :placeholder="$t['ph_input']"
+                    type="text" name="accode"  required="" :placeholder="$t('common.pleaseInput')"
                     class="pl-1.5 block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm/6" />
             </div>
         </div>
@@ -61,7 +61,7 @@
             <label for="displayName" class="block text-width text-sm font-normal text-gray-900"><span class="text-red-500 mr-1">*</span>Display Name</label>
             <div class="mt-2 flex-1">
                 <input v-model="form.displayName"
-                    type="text" name="displayName"  required="" :placeholder="$t['ph_input']"
+                    type="text" name="displayName"  required="" :placeholder="$t('common.pleaseInput')"
                     class="pl-1.5 block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm/6" />
             </div>
         </div>
@@ -69,7 +69,7 @@
             <label for="bc_network" class="block text-width text-sm font-normal text-gray-900"><span class="text-red-500 mr-1">*</span>Blockchain Network</label>
             <div class="mt-2">
                 <input v-model="form.bc_network"
-                    type="text" name="bc_network"  required="" :placeholder="$t['ph_input']"
+                    type="text" name="bc_network"  required="" :placeholder="$t('common.pleaseInput')"
                     class="pl-1.5 block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm/6" />
             </div>
         </div>

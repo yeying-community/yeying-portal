@@ -18,8 +18,8 @@ const search = () => {
     <div class="w-4/5 flex lg:w-1/2">
       <input-search
           v-model="searchVal"
-          :placeholder="$t.ph_search"
-          :enter-button="$t.btn_search"
+          :placeholder="$t('common.pleaseSearch')"
+          :enter-button="$t('common.search')"
           size="large"
           @search="search"
       />
