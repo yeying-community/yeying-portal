@@ -20,6 +20,6 @@ app.use(router)
 app.config.globalProperties.$t = t
 // window.$t = t
 
-console.log(t("portal.aboutUs"),t("portal.testMs"))
+console.log(t("portal.aboutUs"),t("portal.AppStore"))
 
 app.mount('#app')

@@ -45,7 +45,7 @@ export default defineConfig({
       verbose: true,
       disable: false,
       threshold: 10240,//超10k压缩
-      deleteOriginFile: true,
+      deleteOriginFile: false,
       algorithm: 'gzip',
       ext: '.gz',
     }),

@@ -1,6 +1,6 @@
 <template>
     <div class="slider-container" :style="{ width: w + 'px' }">
-      <div class="slider-canvas" :style="{ width: w + 'px', height: h + 'px' }">
+      <div class="slider-canvas" :style="{ width: w + 'px', height: h + 'px',display:open?'block':'none' }">
         <!-- 大图 -->
         <canvas :width="w" :height="h" ref="canvas" />
         <!-- 小图 -->
@@ -21,6 +21,8 @@
         <div class="box">
           <div
             class="slider-square-icon"
+            @mouseenter="showImg"
+            @mouseleave="hideImg"
             @mousedown="sliderDown"
             @touchstart="sliderDown"
             :style="{ left: slideInfo.sliderLeft }"
@@ -102,6 +104,7 @@
       const canvasCtx = ref(null); // 大图canvas绘制容器
       const block = ref(null); // 小图ref
       const blockCtx = ref(null); // 小图canvas绘制容器
+      const open = ref(false)
       const { w, h, l, r,sw,sh, sliderText } = props;
       const slideInfo = reactive({
         sliderLeft: 0, // 可拖动滑块的left
@@ -248,7 +251,12 @@
         document.removeEventListener("touchmove", sliderMove);
         document.removeEventListener("touchend", sliderUp);
       });
-  
+      const showImg = () => {
+        open.value = true
+      }
+      const hideImg = () => {
+        open.value = false
+      }
       return {
         canvas,
         canvasCtx,
@@ -261,7 +269,10 @@
         resultMask,
         reset,
         onOk,
-        onFail
+        onFail,
+        open,
+        showImg,
+        hideImg
       };
     },
   };
@@ -290,7 +301,8 @@
     
   }
   .slider-canvas {
-    position: relative;
+    position: absolute;
+    bottom:42px;
   }
   .slider-container {
     position: relative;

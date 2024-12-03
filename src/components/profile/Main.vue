@@ -1,7 +1,7 @@
 <template>
   <div class="content flex">
     <TransitionRoot as="template" :show="sidebarOpen">
-      <Dialog class="relative z-50 lg:hidden" @close="sidebarOpen = false">
+      <Dialog class="relative z-50 lg:hidden" @close="changeProfile(false)">
         <TransitionChild as="template" enter="transition-opacity ease-linear duration-300" enter-from="opacity-0" enter-to="opacity-100" leave="transition-opacity ease-linear duration-300" leave-from="opacity-100" leave-to="opacity-0">
           <div class="fixed inset-0 bg-gray-900/80" />
         </TransitionChild>
@@ -10,13 +10,17 @@
             <DialogPanel class="relative mr-16 flex w-full max-w-35 flex-1">
               <TransitionChild as="template" enter="ease-in-out duration-300" enter-from="opacity-0" enter-to="opacity-100" leave="ease-in-out duration-300" leave-from="opacity-100" leave-to="opacity-0">
                 <div class="absolute left-full top-0 flex w-16 justify-center pt-5">
-                  <button type="button" class="-m-2.5 p-2.5" @click="sidebarOpen = false">
+                  <button type="button" class="-m-2.5 p-2.5" @click="changeProfile(false)">
                     <span class="iconfont icon-close"/>
                   </button>
                 </div>
               </TransitionChild>
               <!-- Sidebar component, swap this element with another sidebar if you like -->
               <div class="flex grow flex-col bg-white px-6 py-4 text-sm font-normal">
+                  <div class="text-right">
+                    <Language class="mr-6"/>
+                    <UserMenu/>
+                  </div>
                   <div v-for="item in navigation" 
                     :key="item.title" 
                     @click="changeRouter(item.to)"
@@ -50,11 +54,11 @@
     </div>
 
     <div class="flex-1">
-        <div class="lg:hidden sticky top-0 flex shrink-0 items-center bg-white px-4 lg:px-8">
+        <!-- <div class="lg:hidden sticky top-0 flex shrink-0 items-center bg-white px-4 lg:px-8">
             <button type="button" class="-m-2.5 p-2.5 text-gray-700 lg:hidden" @click="sidebarOpen = true">
             <span class="iconfont icon-horizon scale-125"/>
             </button>
-        </div>
+        </div> -->
 
         <RouterView />
     </div>
@@ -62,7 +66,7 @@
 </template>
 
 <script setup>
-import { ref,watch } from 'vue'
+import { ref,watch,toRefs } from 'vue'
 import { RouterView,useRouter,useRoute } from 'vue-router'
 import {
   Dialog,
@@ -70,10 +74,16 @@ import {
   TransitionChild,
   TransitionRoot,
 } from '@headlessui/vue'
+import {useProfileStore} from '@/stores/index'
+import Language from '@/components/common/Language.vue'
+import UserMenu from '@/components/common/UserMenu.vue'
+const profileStore = useProfileStore()
 const router = useRouter();
 const route = useRoute();
 const selectName = ref("")
-const sidebarOpen = ref(false)
+const {sidebarOpen} = toRefs(profileStore)
+
+// const sidebarOpen = ref(false)
 const navigation = [
   { title: "Account", to: '/user', name: 'user', icon:"icon-account" },
   { title: "Message", to: '/message', name: 'message', icon:"icon-bell-full" },
@@ -92,6 +102,9 @@ const changeRouter = (url) => {
   if(url && sidebarOpen.value){
     sidebarOpen.value = false
   }
+}
+const changeProfile = (isOpen) => {
+  profileStore.changeSlide(isOpen)
 }
 </script>
 <style scoped>
