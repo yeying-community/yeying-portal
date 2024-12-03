@@ -2,6 +2,8 @@
 import HomeDesc from '@/views/home/HomeDesc.vue'
 import HomeItem from '@/views/home/HomeItem.vue'
 import Footer from '@/components/layout/Footer.vue'
+import ContactModal from '@/components/contact/Frame.vue'
+
 </script>
 
 <template>

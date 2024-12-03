@@ -4,32 +4,17 @@
 
 @font-face {
     font-family: "Puhui-Bold";
-    src:url("@/assets/fonts/puhui/AlibabaPuHuiTi-3-85-Bold.ttf") format("truetype");
-    font-display: swap;
-}
-@font-face {
-    font-family: "Puhui-Heavy";
-    src:url("@/assets/fonts/puhui/AlibabaPuHuiTi-3-105-Heavy.ttf") format("truetype");
+    src:url("@/assets/fonts/puhui/AlibabaPuHuiTi-3-85-Bold.woff2") format("woff2");
     font-display: swap;
 }
 @font-face {
     font-family: "Puhui-Regular";
-    src:url("@/assets/fonts/puhui/AlibabaPuHuiTi-2-55-Regular.ttf") format("truetype");
-    font-display: swap;
-}
-@font-face {
-    font-family: "Puhui-Light";
-    src:url("@/assets/fonts/puhui/AlibabaPuHuiTi-3-45-Light.ttf") format("truetype");
-    font-display: swap;
-}
-@font-face {
-    font-family: "Puhui-Black";
-    src:url("@/assets/fonts/puhui/AlibabaPuHuiTi-3-115-Black.ttf") format("truetype");
+    src:url("@/assets/fonts/puhui/AlibabaPuHuiTi-2-55-Regular.woff2") format("truetype");
     font-display: swap;
 }
 @font-face {
     font-family: "Puhui-Medium";
-    src:url("@/assets/fonts/puhui/AlibabaPuHuiTi-3-65-Medium.ttf") format("truetype");
+    src:url("@/assets/fonts/puhui/AlibabaPuHuiTi-3-65-Medium.woff2") format("truetype");
     font-display: swap;
 }
 .blue-color{

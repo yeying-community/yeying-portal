@@ -1,3 +1,3 @@
-import en from './en'
-import cn from './cn'
-export default {en,cn}
+import enUS from './en-US'
+import zhCN from './zh-CN'
+export default {zhCN,enUS}

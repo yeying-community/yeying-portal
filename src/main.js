@@ -1,29 +1,25 @@
 import '@/assets/style.css'
-
-import {t, setLanguage} from '@yeying-community/yeying-i18n'
+import {t} from '@yeying-community/yeying-i18n'
 import { createApp } from 'vue'
 import { createPinia } from 'pinia'
 
 import App from '@/App.vue'
 import router from '@/router'
-import lang from '@/lang'
+// import lang from '@/lang'
 
 const app = createApp(App)
-setLanguage('zh-CN').then(() => {
-  console.log(t('common.confirm'))
-  setLanguage('en-US').then(() => {
-    console.log(t('common.confirm'))
-  })
-})
 
-const identityManager = new YeYing.IdentityManager()
-const accountManager = new YeYing.AccountManager()
-
+// const identityManager = new YeYing.IdentityManager()
+// const accountManager = new YeYing.AccountManager()
 app.use(createPinia())
 app.use(router)
 //国际化
-const key = 'en'
-app.config.globalProperties.$t = lang[key]
-app.config.globalProperties.$_t = t
+// const key = identityManager?.localCache?.instance?.i18nextLng||'en-US'
+// console.log('lang',key)
+// app.config.globalProperties.$t = lang[key.replace("-","")]
+app.config.globalProperties.$t = t
+// window.$t = t
+
+console.log(t("portal.aboutUs"),t("portal.AppStore"))
 
 app.mount('#app')

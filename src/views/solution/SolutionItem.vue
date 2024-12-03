@@ -31,7 +31,7 @@
         </div>
       </div>
     </div>
-    <ContactModal/>
+    <!-- <ContactModal/> -->
     <!-- <Contact :isOpen="open" ref="RefContact"/> -->
   </div>
 </template>
@@ -39,7 +39,6 @@
 <script setup>
 import {onMounted, ref, toRefs} from 'vue'
 // import { storeToRefs } from 'pinia'
-import ContactModal from '@/components/contact/Frame.vue'
 import {useSolutionStore} from '@/stores/index'
 
 const open = ref(false)
