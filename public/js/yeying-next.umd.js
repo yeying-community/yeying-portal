@@ -54876,7 +54876,7 @@
                   _this.identityMap[did] = identity;
 
                   // 添加到历史账号中
-                  account = _assertClassBrand(_AccountManager_brand, _this, _addAccount).call(_this, identity.metadata.name, identity.metadata.did, identity.metadata.extend.avatar); // 设置当前登陆帐户
+                  account = _assertClassBrand(_AccountManager_brand, _this, _addAccount).call(_this, identity.metadata.name, identity.metadata.did, identity.metadata.avatar); // 设置当前登陆帐户
                   _this.sessionCache.set(_this.loginAccountKey, account);
                   resolve(account);
                 case 20:
