@@ -113,6 +113,7 @@
         bc_network: "",//Bloack chain network
     })
     const handleSubmit = () => {
+        this.$account.create(form.email, form.phone, form.email, form.password, form.confirm_pwd)
         if(isContinue.value){
             isContinue.value = false
         }else{
