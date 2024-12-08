@@ -1,25 +1,23 @@
 import '@/assets/style.css'
 import {t} from '@yeying-community/yeying-i18n'
-import { createApp } from 'vue'
-import { createPinia } from 'pinia'
+import {createApp} from 'vue'
+import {createPinia} from 'pinia'
 
 import App from '@/App.vue'
 import router from '@/router'
-// import lang from '@/lang'
+import identity from '@/plugins/identity.js'
+import account from '@/plugins/account.js'
+
 
 const app = createApp(App)
 
-// const identityManager = new YeYing.IdentityManager()
-// const accountManager = new YeYing.AccountManager()
 app.use(createPinia())
 app.use(router)
-//国际化
-// const key = identityManager?.localCache?.instance?.i18nextLng||'en-US'
-// console.log('lang',key)
-// app.config.globalProperties.$t = lang[key.replace("-","")]
-app.config.globalProperties.$t = t
-// window.$t = t
+app.use(identity, {})
+app.use(account, {})
 
-console.log(t("portal.aboutUs"),t("portal.AppStore"))
+app.config.globalProperties.$t = t
+
+console.log(t('portal.aboutUs'), t('portal.AppStore'))
 
 app.mount('#app')

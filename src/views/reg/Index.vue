@@ -100,7 +100,7 @@
     const loginStore = useLoginStore()
     const { proxy } = getCurrentInstance();
     const isContinue = ref(true)
-    const {$t}=proxy
+    const {$t, $identity, $account}=proxy
     const router = useRouter();
     const form = ref({
         phone: "",
@@ -113,6 +113,7 @@
         bc_network: "",//Bloack chain network
     })
     const handleSubmit = () => {
+        $identity.create(form.email, form.phone, form.email, form.password, form.confirm_pwd)
         if(isContinue.value){
             isContinue.value = false
         }else{

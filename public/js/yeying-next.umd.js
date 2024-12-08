@@ -843,12 +843,13 @@
        */
       proto.yeying.api.common.ApplicationCodeEnum = {
         APPLICATION_CODE_UNKNOWN: 0,
-        APPLICATION_CODE_STORE: 1,
-        APPLICATION_CODE_KNOWLEDGE: 2,
-        APPLICATION_CODE_WAREHOUSE: 3,
-        APPLICATION_CODE_KEEPER: 4,
-        APPLICATION_CODE_SOCIAL: 5,
-        APPLICATION_CODE_WORKBENCH: 6
+        APPLICATION_CODE_PORTAL: 1,
+        APPLICATION_CODE_STORE: 2,
+        APPLICATION_CODE_KNOWLEDGE: 3,
+        APPLICATION_CODE_WAREHOUSE: 4,
+        APPLICATION_CODE_KEEPER: 5,
+        APPLICATION_CODE_SOCIAL: 6,
+        APPLICATION_CODE_WORKBENCH: 7
       };
 
       /**
@@ -892,6 +893,9 @@
     ApplicationCodeEnum$1 = code_pkg.ApplicationCodeEnum,
     CipherTypeEnum$1 = code_pkg.CipherTypeEnum,
     DigitalFormatEnum = code_pkg.DigitalFormatEnum;
+  function getPersonalIdentityCode() {
+    return convertIdentityCodeTo(IdentityCodeEnum.IDENTITY_CODE_PERSONAL);
+  }
   function isServiceIdentity(identityCode) {
     identityCode = typeof identityCode === 'string' ? convertIdentityCodeTo(identityCode) : identityCode;
     return identityCode === IdentityCodeEnum.IDENTITY_CODE_SERVICE;
@@ -964,12 +968,23 @@
       return ApiCodeEnum$1[s] === apiCode;
     });
   }
+  function getAesGcmCipherType() {
+    return convertCipherTypeTo(CipherTypeEnum$1.CIPHER_TYPE_AES_GCM_256);
+  }
   function convertCipherTypeFrom(str) {
     if (str === undefined) {
       return undefined;
     }
     var value = CipherTypeEnum$1[str.toUpperCase()];
     return value === CipherTypeEnum$1.CIPHER_TYPE_UNKNOWN ? undefined : value;
+  }
+  function convertCipherTypeTo(cipherType) {
+    if (cipherType === undefined || cipherType === CipherTypeEnum$1.CIPHER_TYPE_UNKNOWN) {
+      return undefined;
+    }
+    return Object.keys(CipherTypeEnum$1).find(function (s) {
+      return CipherTypeEnum$1[s] === cipherType;
+    });
   }
 
   var grpcWeb = {};
@@ -53790,6 +53805,11 @@
     }]);
   }();
 
+  // 推荐长度为 96比特（12字节），因为这种长度会在性能和安全性之间提供良好的平衡
+  function generateIv() {
+    var len = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 12;
+    return crypto.getRandomValues(new Uint8Array(len));
+  }
   function encryptObject(algorithm, cryptoKey, plain) {
     var plainConvertor = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : undefined;
     var cipherConvertor = arguments.length > 4 && arguments[4] !== undefined ? arguments[4] : undefined;
@@ -54614,26 +54634,25 @@
                   // 查看当前对象里面是否已经缓存了
                   existing = _this8.localCache.get(identity.metadata.did);
                   if (!existing) {
-                    _context8.next = 4;
+                    _context8.next = 3;
                     break;
                   }
-                  console.log("existing=".concat(JSON.stringify(existing), ", identity=").concat(JSON.stringify(identity)));
                   return _context8.abrupt("return", reject(new AlreadyExist("Exist identity=".concat(identity.name))));
-                case 4:
-                  _context8.next = 6;
+                case 3:
+                  _context8.next = 5;
                   return _assertClassBrand(_IdentityManager_brand, _this8, _verifyIdentity).call(_this8, identity);
-                case 6:
+                case 5:
                   isValid = _context8.sent;
                   if (isValid) {
-                    _context8.next = 9;
+                    _context8.next = 8;
                     break;
                   }
                   return _context8.abrupt("return", reject(new DataForgery('Invalid identity!')));
-                case 9:
+                case 8:
                   // 添加身份
                   _this8.localCache.set(identity.metadata.did, identity);
                   resolve(identity);
-                case 11:
+                case 10:
                 case "end":
                   return _context8.stop();
               }
@@ -54857,7 +54876,7 @@
                   _this.identityMap[did] = identity;
 
                   // 添加到历史账号中
-                  account = _assertClassBrand(_AccountManager_brand, _this, _addAccount).call(_this, identity.metadata.name, identity.metadata.did, identity.metadata.extend.avatar); // 设置当前登陆帐户
+                  account = _assertClassBrand(_AccountManager_brand, _this, _addAccount).call(_this, identity.metadata.name, identity.metadata.did, identity.metadata.avatar); // 设置当前登陆帐户
                   _this.sessionCache.set(_this.loginAccountKey, account);
                   resolve(account);
                 case 20:
@@ -55146,7 +55165,7 @@
       value: function get(code) {
         code = typeof code === 'string' ? convertApplicationCodeFrom(code) : code;
         switch (code) {
-          case ApplicationCodeEnum.APPLICATION_CODE_NODE:
+          case ApplicationCodeEnum.APPLICATION_CODE_STORE:
             return new NodeApplication();
           case ApplicationCodeEnum.APPLICATION_CODE_KNOWLEDGE:
             return new KnowledgeApplication();
@@ -55161,6 +55180,11 @@
   exports.ApplicationFactory = ApplicationFactory;
   exports.IdentityManager = IdentityManager;
   exports.ProviderFactory = ProviderFactory;
+  exports.encodeBase64 = encodeBase64;
+  exports.generateIv = generateIv;
+  exports.getAesGcmCipherType = getAesGcmCipherType;
+  exports.getCurrentUtcString = getCurrentUtcString;
+  exports.getPersonalIdentityCode = getPersonalIdentityCode;
 
 }));
 //# sourceMappingURL=yeying-next.umd.js.map
