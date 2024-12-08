@@ -1,6 +1,6 @@
 <template>
     <form
-        class="form w-4/5"
+        class="form w-8/12"
         @submit.prevent="handleSubmit"
         >
         <div class="text-center text-3xl font-semibold opacity-85">Apply a New Account</div>
@@ -128,6 +128,6 @@
 </script>
 <style scoped>
 .text-width{
-    width:8rem;
+    width:9rem;
 }
 </style>
