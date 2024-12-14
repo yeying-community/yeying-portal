@@ -1,4 +1,4 @@
-import {Chain, NetworkType} from '@yeying-community/yeying-web3'
+import {Wallet} from '@yeying-community/yeying-web3'
 
 export default {
   install(app, options) {
@@ -7,7 +7,7 @@ export default {
       manager: new YeYing.IdentityManager(),
 
       create(email, telephone, password) {
-        const blockAddress = Chain.createBlockAddress(NetworkType.YeYing)
+        const blockAddress = Wallet.createRandom(Wallet.NetworkType.YeYing)
         console.log(blockAddress)
         const metadata = {
           parent: '',
