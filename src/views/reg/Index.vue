@@ -117,7 +117,7 @@
             (identity) => {
               console.log(`${JSON.stringify(identity)}`)
             }
-        )
+        ).catch(err => console.error(err));
 
         if(isContinue.value){
             isContinue.value = false
