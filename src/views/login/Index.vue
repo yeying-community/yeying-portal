@@ -44,6 +44,7 @@
     import Captcha from '@/components/common/Captcha.vue'
     import { useLoginStore } from '@/stores/index'
     import { useRouter } from 'vue-router'
+    import $identity from '@/plugins/identity.js'
 
     const router = useRouter();
     const loginStore = useLoginStore()
@@ -55,6 +56,7 @@
         desc: ""
     })
     const handleSubmit = () => {
+        $identity.test_
         loginStore.login(form.value)
     }
     const changeRouter = (url) => {

@@ -97,10 +97,11 @@
     import Captcha from '@/components/common/Captcha.vue'
     import { useLoginStore } from '@/stores/index'
     import { useRouter } from 'vue-router'
+    import $identity from '@/plugins/identity.js'
     const loginStore = useLoginStore()
     const { proxy } = getCurrentInstance();
     const isContinue = ref(true)
-    const {$t, $identity, $account}=proxy
+    const {$t, $account}=proxy
     const router = useRouter();
     const form = ref({
         phone: "",
@@ -122,6 +123,7 @@
         }
     }
     const getMsCode = () => {
+        // console.log("$identity:",$identity)
         alert(1)
     }
     const changeRouter = (url) => {

@@ -59,6 +59,7 @@
           </div>
         </DialogPanel>
       </Dialog>
+      <auto-login ref="RefLogin"/>
     </header>
 </template>
 <script setup>
@@ -67,12 +68,17 @@ import { ref,watch,getCurrentInstance } from 'vue'
 // import { Dialog, DialogPanel } from '@headlessui/vue'
 import { useRoute,useRouter } from 'vue-router'
 import Language from '@/components/common/Language.vue'
+import $account from '@/plugins/account.js'
+// import AutoLogin from '@/components/contact/Modal.vue'
+import AutoLogin from '@/components/common/AutoLogin.vue'
+
 // import logo from '@/assets/img/logo.svg'
 const route = useRoute();
 const selectName = ref("home")
 const { proxy } = getCurrentInstance();
 const {$t}=proxy
 const router = useRouter();
+const RefLogin = ref()
 
 // 监听路由变化
 watch(
@@ -91,7 +97,21 @@ const navigation = [
   { title: $t("portal.aboutUs"), to: ''},
 ]
 const mobileMenuOpen = ref(false)
+/**
+ * 校验是否有登录信息,未登录弹框选择登录方式
+ * */
+const changeLogin = () => {
+  openLogin()
+}
+const openLogin = () => {
+  debugger
+  RefLogin.value.openModal()
+}
 const changeRouter = (url) => {
+  if(url==="/solution"){
+    changeLogin()
+    return
+  }
   router.push(url)
   if(url && mobileMenuOpen.value){
     mobileMenuOpen.value = false

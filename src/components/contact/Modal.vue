@@ -34,7 +34,7 @@
                         <label for="email" class="block text-sm font-normal text-gray-900"><span class="text-red-500 mr-1">*</span>{{$t('common.email')}}</label>
                         <div class="mt-2">
                             <input v-model="form.email"
-                             type="email" required="" @invalid="test" :placeholder="$t('common.pleaseInput')"
+                             type="email" required="" :placeholder="$t('common.pleaseInput')"
                              class="pl-1.5 block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm/6" />
                         </div>
                     </div>
@@ -87,6 +87,9 @@
 import { ref,reactive, onMounted,getCurrentInstance } from 'vue'
 import { Dialog, DialogPanel, DialogTitle, TransitionChild, TransitionRoot } from '@headlessui/vue'
 import SelectMenu from '@/components/common/SelectMenu.vue'
+import $account from '@/plugins/account.js'
+import $identity from '@/plugins/identity.js'
+
 const { proxy } = getCurrentInstance();
 const {$t}=proxy
 const props = defineProps( ["isOpen"]);
@@ -123,8 +126,10 @@ const getDetail = () => {
 const changeType = (select) => {
   form.pro_type = select.id
 }
-const handleSubmit = () => {
-    console.log(111,form)
+const handleSubmit = async () => {
+  const info = await $account.createGuest?.()
+  const info2 = await $identity.create?.()
+    console.log(1111111111,info,info2)
 }
 const test = (input) => {
   console.log(input)

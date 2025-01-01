@@ -1,16 +1,18 @@
-export default {
-  install(app, options) {
-    // 创建一个 account 对象
-    app.config.globalProperties.$account = {
-      manager: new YeYing.AccountManager(),
+class $account {
+  constructor() {
+    this.manager = new YeYing.AccountManager()
+    console.log("account:",this.manager)
+  }
+  login(did) {
+    console.log(`${did} has logged in.`)
+  }
 
-      login(did) {
-        console.log(`${did} has logged in.`)
-      },
-
-      logout() {
-        console.log(`${this.manager.getActiveAccount()?.did} has logged out.`)
-      },
-    }
+  logout() {
+    console.log(`${this.manager.getActiveAccount()?.did} has logged out.`)
+  }
+  async createGuest() {
+    const info = await this.manager.createGuest()
+    return info
   }
 }
+export default new $account()
