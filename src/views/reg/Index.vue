@@ -114,8 +114,12 @@
         bc_network: "",//Bloack chain network
     })
     const handleSubmit = () => {
-        console.log("$identity:",$identity)
-        $identity.create(form.email, form.phone, form.email, form.password, form.confirm_pwd)
+        $identity.createPersonal("", form.displayName, "", "", form.password, {email: form.email, telephone: form.phone}).then(
+            (identity) => {
+              console.log(`${JSON.stringify(identity)}`)
+            }
+        ).catch(err => console.error(err));
+
         if(isContinue.value){
             isContinue.value = false
         }else{

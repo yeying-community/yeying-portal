@@ -1,7 +1,8 @@
-import { fileURLToPath, URL } from 'node:url'
-import viteCompression from 'vite-plugin-compression';
-import { defineConfig } from 'vite'
+import {fileURLToPath, URL} from 'node:url'
+import viteCompression from 'vite-plugin-compression'
+import {defineConfig} from 'vite'
 import vue from '@vitejs/plugin-vue'
+import {nodePolyfills} from 'vite-plugin-node-polyfills'
 // import vueDevTools from 'vite-plugin-vue-devtools'
 
 // https://vite.dev/config/
@@ -19,28 +20,29 @@ export default defineConfig({
         manualChunks(id) {
           if (id.includes('node_modules')) {
             // 将node_modules中的模块单独打包
-            return id.toString().split('node_modules/')[1].split('/')[0].toString();
+            return id.toString().split('node_modules/')[1].split('/')[0].toString()
           }
         },
-        chunkFileNames: "static/js/[name]-[hash].js",
-        entryFileNames: "static/js/[name]-[hash].js",
+        chunkFileNames: 'static/js/[name]-[hash].js',
+        entryFileNames: 'static/js/[name]-[hash].js',
         assetFileNames(assetInfo) {
           if (assetInfo.name.endsWith('.css')) {
-            return "static/css/[name]-[hash].[ext]"
+            return 'static/css/[name]-[hash].[ext]'
           }
-          if (["png", "jpg", "svg", "PNG"].some(ext => assetInfo.name.endsWith(ext))) {
-            return "static/img/[name]-[hash].[ext]"
+          if (['png', 'jpg', 'svg', 'PNG'].some(ext => assetInfo.name.endsWith(ext))) {
+            return 'static/img/[name]-[hash].[ext]'
           }
-          if (["ttf", "woff", "woff2"].some(ext => assetInfo.name.endsWith(ext))) {
-            return "static/fonts/[name]-[hash].[ext]"
+          if (['ttf', 'woff', 'woff2'].some(ext => assetInfo.name.endsWith(ext))) {
+            return 'static/fonts/[name]-[hash].[ext]'
           }
-          return "static/css/[name]-[hash].[ext]"
+          return 'static/css/[name]-[hash].[ext]'
         }
 
       },
     },
   },
   plugins: [
+    nodePolyfills({globals: {Buffer: true}}),
     viteCompression({
       verbose: true,
       disable: false,
