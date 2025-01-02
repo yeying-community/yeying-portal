@@ -1,6 +1,7 @@
+import {AccountManager} from '@yeying-community/yeying-next'
 class $account {
   constructor() {
-    this.manager = new YeYing.AccountManager()
+    this.manager = new AccountManager()
     console.log("account:",this.manager)
   }
   login(did) {
@@ -10,8 +11,21 @@ class $account {
   logout() {
     console.log(`${this.manager.getActiveAccount()?.did} has logged out.`)
   }
+  // 根据did判断是否登录
+  isLogin() {
+    const did = localStorage.getItem("did");
+    if(did){
+      const check = this.manager.isLogin(did)
+      return !!check
+    }
+    return false
+  }
+  // 创建游客身份
   async createGuest() {
     const info = await this.manager.createGuest()
+    // 登录
+    const did = info.metadata.did
+    localStorage.setItem("did", did)
     return info
   }
 }

@@ -101,16 +101,19 @@ const mobileMenuOpen = ref(false)
  * 校验是否有登录信息,未登录弹框选择登录方式
  * */
 const changeLogin = () => {
-  openLogin()
-}
-const openLogin = () => {
-  debugger
-  RefLogin.value.openModal()
+  const isLogin = $account.isLogin()
+  if(isLogin){
+    return true
+  }else{
+    RefLogin.value.openModal()
+  }
+  return false
 }
 const changeRouter = (url) => {
   if(url==="/solution"){
-    changeLogin()
-    return
+    if(!changeLogin()){
+      return
+    }
   }
   router.push(url)
   if(url && mobileMenuOpen.value){

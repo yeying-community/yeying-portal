@@ -35,7 +35,7 @@
                         <div class="mt-2">
                             <input v-model="form.email"
                              type="email" required="" :placeholder="$t('common.pleaseInput')"
-                             class="pl-1.5 block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm/6" />
+                             class="pl-1.5 block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus-visible:outline-0 focus-visible:outline-offset-0 sm:text-sm/6" />
                         </div>
                     </div>
                     <div class="px-6 mt-6 relative">
@@ -44,7 +44,7 @@
                         @change="changeType"
                         :selectId="form.pro_type"
                         :selectList="pro_type_list"/>
-                        <input type="text" class="absolute" style="left:10%;bottom:10%;z-index:-1" required v-model="form.pro_type"/>
+                        <input type="text" class="absolute focus-visible:outline-0 focus-visible:outline-offset-0" style="left:10%;bottom:10%;z-index:-1" required v-model="form.pro_type"/>
                         <!-- <div class="mt-2">
                             <select v-model="form.pro_type" required=""
                                 id="pro_type"  
@@ -62,7 +62,7 @@
                                 required="" 
                                 id="desc"
                                 :placeholder="$t('common.pleaseInput')"
-                                class="pl-1.5 block w-full rounded-md border-0 py-1.5 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm/6" />
+                                class="pl-1.5 block w-full rounded-md border-0 py-1.5 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus-visible:outline-0 focus-visible:outline-offset-0 sm:text-sm/6" />
                         </div>
                     </div>
                     <hr class="my-6"/>
@@ -88,7 +88,7 @@ import { ref,reactive, onMounted,getCurrentInstance } from 'vue'
 import { Dialog, DialogPanel, DialogTitle, TransitionChild, TransitionRoot } from '@headlessui/vue'
 import SelectMenu from '@/components/common/SelectMenu.vue'
 import $account from '@/plugins/account.js'
-import $identity from '@/plugins/identity.js'
+import $surpport from '@/plugins/surpport.js'
 
 const { proxy } = getCurrentInstance();
 const {$t}=proxy
@@ -127,8 +127,7 @@ const changeType = (select) => {
   form.pro_type = select.id
 }
 const handleSubmit = async () => {
-  const info = await $account.createGuest?.()
-  const info2 = await $identity.create?.()
+  const info = await $surpport?.handleContact?.(form)
     console.log(1111111111,info,info2)
 }
 const test = (input) => {

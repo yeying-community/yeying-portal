@@ -3,19 +3,40 @@
     <span class="iconfont icon-phone"/>
     <span class="mt-2 text-base font-puhuiRegular">{{$t("common.contactUs")}}</span>
     <Contact :isOpen="open" ref="RefContact"/>
+    <auto-login ref="RefLogin"/>
   </div>
 </template>
 
 <script setup>
 import {ref,getCurrentInstance} from 'vue'
 import Contact from '@/components/contact/Modal.vue'
+import $account from '@/plugins/account.js'
+import AutoLogin from '@/components/common/AutoLogin.vue'
+
 const open = ref(false)
+const RefLogin = ref()
 const RefContact = ref()
 const { proxy } = getCurrentInstance();
 const {$t}=proxy
+
+/**
+ * 校验是否有登录信息,未登录弹框选择登录方式
+ * */
+const changeLogin = () => {
+  const isLogin = $account.isLogin()
+  if(isLogin){
+    return true
+  }else{
+    RefLogin.value.openModal()
+  }
+  return false
+}
 const openContact = () => {
-    open.value = true
-    RefContact.value.openModal()
+  if(!changeLogin()){
+    return
+  }
+  open.value = true
+  RefContact.value.openModal()
 }
 const close = () => {
     open.value = false

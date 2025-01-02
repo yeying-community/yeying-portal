@@ -5,14 +5,12 @@ import {createPinia} from 'pinia'
 
 import App from '@/App.vue'
 import router from '@/router'
-import identity from '@/plugins/identity.js'
 
 
 const app = createApp(App)
 
 app.use(createPinia())
 app.use(router)
-app.use(identity, {})
 
 app.config.globalProperties.$t = t
 
