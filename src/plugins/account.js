@@ -4,13 +4,6 @@ class $account {
     this.manager = new AccountManager()
     console.log("account:",this.manager)
   }
-  login(did) {
-    console.log(`${did} has logged in.`)
-  }
-
-  logout() {
-    console.log(`${this.manager.getActiveAccount()?.did} has logged out.`)
-  }
   // 根据did判断是否登录
   isLogin() {
     const did = localStorage.getItem("did");
@@ -25,6 +18,7 @@ class $account {
     const info = await this.manager.createGuest()
     // 登录
     const did = info.metadata.did
+    this.manager.login(did)
     localStorage.setItem("did", did)
     return info
   }
