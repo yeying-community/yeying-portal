@@ -16,7 +16,7 @@ index=1
 echo -e "\nstep $index -- get latest code from branch[$default_branch]"
 pushd "${CODE_PATH}" || exit 2
 git checkout  -- .
-#git pull origin "$default_branch"
+git pull origin "$default_branch"
 
 echo -e "show latest 3 git commits-------->>>>>>>>"
 git log -3 | cat
