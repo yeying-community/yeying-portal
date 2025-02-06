@@ -1,6 +1,6 @@
 <script setup>
 // import { RouterLink, RouterView } from 'vue-router'
-import Profile from '@/components/profile/index.vue'
+import Profile from '@/components/profile/Index.vue'
 
 </script>
 
