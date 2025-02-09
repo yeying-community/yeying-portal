@@ -1,0 +1,62 @@
+name: Build on Release Published
+
+on:
+  release:
+    types: [published]
+
+jobs:
+  build-and-publish:
+    runs-on: ubuntu-24.04
+
+    steps:
+      # Extract version from tag
+      - name: Extract version
+        id: extract_version
+        run: echo "VERSION=${GITHUB_REF#refs/tags/v}" >> $GITHUB_ENV
+
+      # 打印版本号
+      - name: Show version
+        run: echo "Version is $VERSION"
+
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4  
+        with:
+          node-version: '20'  # 配置Node.js版本
+
+      # 安装依赖
+      - name: Install dependencies
+        run: npm install
+
+      # 构建项目
+      - name: Build project
+        run: npm run build
+
+      # 运行打包脚本
+      - name: Run package script
+        run: bash script/package.sh $VERSION
+
+      # 确保打包文件存在
+      - name: Verify packaged file
+        run: |
+          if [ ! -f "output/yeying-portal-$VERSION.tar.gz" ]; then
+            echo "Packaged file not found: output/yeying-portal-$VERSION.tar.gz" >> $GITHUB_STEP_SUMMARY
+            exit 1
+          fi
+
+      - name: Get Release ID and Upload URL
+        id: get_release_id
+        run: |
+          echo "UPLOAD_URL=${{ github.event.release.upload_url }}" >> $GITHUB_ENV
+
+      - name: Upload asset to Release
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ env.UPLOAD_URL }}
+          asset_path: output/yeying-portal-${{ env.VERSION }}.tar.gz
+          asset_name: yeying-portal-${{ env.VERSION }}.tar.gz
+          asset_content_type: application/gzip
