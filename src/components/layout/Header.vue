@@ -101,14 +101,28 @@ const mobileMenuOpen = ref(false)
  * 校验是否有登录信息,未登录弹框选择登录方式
  * */
 const changeLogin = () => {
-  const isLogin = $account.isLogin()
+  const activeAccount = $account.getActiveAccount()
+  let isLogin = false
+  const did = activeAccount && activeAccount.did
+  if(did){
+    isLogin = $account.isLogin(did)
+  }
   if(isLogin){
     return true
   }else{
-    RefLogin.value.openModal()
+    router.push("/toLogin")
+    // RefLogin.value.openModal()
   }
   return false
 }
+  // const isLogin = $account.isLogin()
+  // if(isLogin){
+  //   return true
+  // }else{
+  //   RefLogin.value.openModal()
+  // }
+  // return false
+// }
 const changeRouter = (url) => {
   if(url==="/solution"){
     if(!changeLogin()){

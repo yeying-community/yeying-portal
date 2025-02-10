@@ -1,55 +1,32 @@
 <template>
-  <div class="flex h-screen">
-    <TransitionRoot as="template" :show="sidebarOpen">
-      <Dialog class="relative z-50 lg:hidden" @close="sidebarOpen = false">
-        <TransitionChild as="template" enter="transition-opacity ease-linear duration-300" enter-from="opacity-0" enter-to="opacity-100" leave="transition-opacity ease-linear duration-300" leave-from="opacity-100" leave-to="opacity-0">
-          <div class="fixed inset-0 bg-gray-900/80" />
-        </TransitionChild>
-        <div class="fixed inset-0 flex">
-          <TransitionChild as="template" enter="transition ease-in-out duration-300 transform" enter-from="-translate-x-full" enter-to="translate-x-0" leave="transition ease-in-out duration-300 transform" leave-from="translate-x-0" leave-to="-translate-x-full">
-            <DialogPanel class="relative mr-16 flex w-full max-w-95 flex-1">
-              <TransitionChild as="template" enter="ease-in-out duration-300" enter-from="opacity-0" enter-to="opacity-100" leave="ease-in-out duration-300" leave-from="opacity-100" leave-to="opacity-0">
-                <div class="absolute left-full top-0 flex w-16 justify-center pt-5">
-                  <button type="button" class="-m-2.5 p-2.5" @click="sidebarOpen = false">
-                    <span class="iconfont icon-close"/>
-                  </button>
-                </div>
-              </TransitionChild>
-              <!-- Sidebar component, swap this element with another sidebar if you like -->
-              <div class="flex grow flex-col gap-y-5 overflow-y-auto bg-indigo-600 p-12">
-                <div class=" cursor-pointer" @click="changeRouter('/')">
-                  <img class="w-44 h-12" src="../assets/img/logo.svg"/>
-                </div>
-                phone left
-              </div>
-            </DialogPanel>
-          </TransitionChild>
-        </div>
-      </Dialog>
-    </TransitionRoot>
+  <div class="flex justify-center pt-32 bg">
+    <div class="w-80 bg-white	h-40 pt-8 text-center rounded-md	">
+        <!-- <DialogTitle as="h3" class="text-base font-semibold text-gray-900">登录</DialogTitle> -->
+        <div class="">
+          <p class="text-lg text-gray-500">欢迎来到YeYing</p>
 
-    <!-- Static sidebar for desktop -->
-    <div class="hidden lg:inset-y-0 lg:z-50 lg:flex lg:w-3/6 lg:flex-col">
-      <!-- Sidebar component, swap this element with another sidebar if you like -->
-      <div class="left flex grow flex-col bg-indigo-600 p-12">
-        <div class=" cursor-pointer" @click="changeRouter('/')">
-          <img class="w-44 h-12" src="../assets/img/logo.svg"/>
         </div>
-        <div>pc left</div>
+        <div class="mt-8 text-center flex gap-2 justify-center">
+          <!-- <button type="button" @click="changeRouter('/reg')" class="blue-color ml-2.5 font-puhuiRegular rounded-full bg-white px-8 py-2.5 text-xl shadow-sm ring-1 ring-inset ring-blue-300 hover:bg-blue-50">{{$t("common.register")}}</button>
+          <button type="button" @click="changeRouter('/login')" class="font-puhuiRegular mx-2.5 rounded-full bg-blue-600 px-8 py-2.5 text-xl text-white shadow-sm hover:bg-blue-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600">
+            {{$t("common.apply")}}
+          </button> -->
+          <button type="button" @click="go('/login')" class="font-puhuiRegular mx-2.5 rounded-md bg-blue-600 px-4 py-1 text-sm text-white shadow-sm hover:bg-blue-500 focus-visible:outline focus-visible:outline-0 focus-visible:outline-offset-0 focus-visible:outline-blue-600">
+            登录
+          </button>
+          <button type="button" @click="go('/reg')" class="font-puhuiRegular mx-2.5 rounded-md bg-lime-600 px-4 py-1 text-sm text-white shadow-sm hover:bg-lime-500 focus-visible:outline focus-visible:outline-0 focus-visible:outline-offset-0 focus-lime:outline-indigo-600">
+            创建用户
+          </button>
+          <!-- <button type="button" class="inline-flex w-20 justify-center rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-sm focus-visible:outline-indigo-600 hover:bg-indigo-400" @click="login">登录</button>
+          <button type="button" class="inline-flex w-20 justify-center rounded-md  px-3 py-2 text-sm font-semibold shadow-sm hover:bg-gray-50" @click="login">取消</button> -->
+        </div>
       </div>
-    </div>
-
-    <div class="flex-1">
-        <div class="lg:hidden sticky top-0 z-40 flex h-16 shrink-0 items-center bg-white px-4 lg:px-8">
-            <button type="button" class="-m-2.5 p-2.5 text-gray-700" @click="sidebarOpen = true">
-            <span class="iconfont icon-horizon scale-125"/>
-            </button>
-        </div>
-
-        <div class="flex grow flex-col items-center pt-20">
-            <Login/>
-        </div>
-    </div>
+    <!-- <button type="button" class="-m-2.5 p-2.5 text-gray-700" @click="go('/login')">
+        登录
+    </button>
+    <button type="button" class="-m-2.5 p-2.5 text-gray-700" @click="go('/reg')">
+        注册
+    </button> -->
   </div>
 </template>
 
@@ -65,15 +42,14 @@ import {
 } from '@headlessui/vue'
 const router = useRouter();
 const sidebarOpen = ref(false)
-const changeRouter = (url) => {
+const go = (url) => {
   router.push(url)
-  if(url && sidebarOpen.value){
-    sidebarOpen.value = false
-  }
 }
 </script>
 <style scoped>
-.left{
+.bg{
+  width: 100vw;
+  height: 100vh;
   background: linear-gradient(111deg, #C268DF 1%, #6C8AED 44.4%, #8CCFFA 98.52%);
 }
 </style>

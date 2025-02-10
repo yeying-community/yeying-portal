@@ -44,7 +44,7 @@
                         @change="changeType"
                         :selectId="form.pro_type"
                         :selectList="pro_type_list"/>
-                        <input type="text" class="absolute focus-visible:outline-0 focus-visible:outline-offset-0" style="left:10%;bottom:10%;z-index:-1" required v-model="form.pro_type"/>
+                        <!-- <input type="text" class="absolute focus-visible:outline-0 focus-visible:outline-offset-0" style="left:10%;bottom:10%;z-index:-1" required v-model="form.pro_type"/> -->
                         <!-- <div class="mt-2">
                             <select v-model="form.pro_type" required=""
                                 id="pro_type"  

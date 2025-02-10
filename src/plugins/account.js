@@ -1,7 +1,31 @@
 import {AccountManager} from '@yeying-community/yeying-next'
+import {IdentityCodeEnum, NetworkTypeEnum} from '@yeying-community/yeying-web3'
 class $account {
   constructor() {
     this.manager = new AccountManager()
+    this.codeList = [
+      { id: null, name: '请选择' },
+      {name:"个人",id:1,},
+      {name:"组织",id:2,},
+      {name:"服务",id:3,},
+      {name:"应用",id:4,},
+      {name:"资产",id:5,},
+    ]
+    this.codeMap = {
+      1: IdentityCodeEnum.IDENTITY_CODE_PERSONAL,
+      2: IdentityCodeEnum.IDENTITY_CODE_ORGANIZATION,
+      3: IdentityCodeEnum.IDENTITY_CODE_SERVICE,
+      4: IdentityCodeEnum.IDENTITY_CODE_APPLICATION,
+      5: IdentityCodeEnum.IDENTITY_CODE_ASSET
+    }
+    this.networkList = [
+      { id: null, name: '请选择' },
+      {name:"夜莺网络",id:2020,}
+    ]
+    this.networkMap = {
+      2020: NetworkTypeEnum.NETWORK_TYPE_YEYING
+    }
+    // this.mail = new MailProvider()
     console.log("account:",this.manager)
   }
   // 获取指定 DID 对应的区块链地址。
@@ -10,7 +34,7 @@ class $account {
   }
   // 导出身份信息。
   async exportIdentity(did){
-    const identity = await exportIdentity(did);
+    const identity = await this.manager.exportIdentity(did);
     return identity
   }
   // 登录
@@ -19,7 +43,11 @@ class $account {
     return Account
   }
   // 注册:创建一个新的身份，并在区块链上生成地址。
-  async createIdentity(password, template){
+  async createIdentity(password, pamras){
+    const template = {
+      network: this.networkMap[pamras.network],
+      name: pamras.name,
+      code: this.codeMap[pamras.code],}
     const newIdentity = await this.manager.createIdentity(password, template);
     return newIdentity
   }
