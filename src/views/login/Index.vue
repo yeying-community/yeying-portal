@@ -27,9 +27,9 @@
             <input v-model="form.isAgree" id="remember-me" name="remember-me" type="checkbox" class="size-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-600" />
             <label for="remember-me" class="ml-3 block text-sm/6 text-gray-700">我同意 用户协议 & 政策</label>
         </div>
-        <div class="mt-6">
+        <!-- <div class="mt-6">
             <Captcha/>
-        </div>
+        </div> -->
         <div class="mt-6 h-10">
             <button type="submit" class="h-10 text-base font-normal	 rounded-md bg-blue-600 w-full py-1 text-sm text-white shadow-sm hover:bg-blue-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600">
                 登录
