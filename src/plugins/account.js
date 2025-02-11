@@ -1,8 +1,8 @@
-import {AccountManager} from '@yeying-community/yeying-next'
+import {IdentityManager} from '@yeying-community/yeying-next'
 import {IdentityCodeEnum, NetworkTypeEnum} from '@yeying-community/yeying-web3'
 class $account {
   constructor() {
-    this.manager = new AccountManager()
+    this.manager = new IdentityManager()
     this.codeList = [
       { id: null, name: '请选择' },
       {name:"个人",id:1,},
@@ -58,7 +58,7 @@ class $account {
   }
   // 获取当前激活的账号信息。
   getActiveAccount(){
-    const activeAccount = this.manager.getActiveAccount()
+    const activeAccount = this.manager.getActiveIdentity()
     return activeAccount
   }
   // 根据did判断是否登录

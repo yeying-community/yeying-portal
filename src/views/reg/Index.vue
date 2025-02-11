@@ -139,15 +139,34 @@
                 const did = info && info.metadata && info.metadata.did
                 if(did){
                     const identity = await $account.exportIdentity(did)
-                    message.success("登录成功!")
+                    downloadTextFile("identity", identity)
+                    message.success("注册成功,请保存好你的身份认证文件!")
                     console.log('identity',identity,did); // 输出导出的身份信息
-                    router.push("/login")
+                    // router.push("/login")
                 }
             }catch(e){
                 message.error("注册失败,请联系管理员!")
             }
             // loginStore.register(form.value)
         }
+    }
+    const downloadTextFile = (filename, text) => {
+        // 创建一个 Blob 对象，存储文本数据
+        const blob = new Blob([text], { type: 'text/plain' });
+
+        // 创建一个指向该 Blob 对象的 URL
+        const url = URL.createObjectURL(blob);
+
+        // 创建一个临时的 <a> 标签，用于触发下载
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = filename; // 设置下载文件名
+        document.body.appendChild(a);  // 将 <a> 标签添加到文档中
+        a.click();  // 模拟点击下载
+
+        // 下载完成后移除 <a> 标签和 URL 对象
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url); // 释放 URL 对象
     }
     const changeCode = (select) => {
         form.value.code = select.id

@@ -12,7 +12,7 @@
     "@headlessui/vue": "^1.7.23",
     "@heroicons/vue": "^2.2.0",
     "@yeying-community/yeying-i18n": "^0.0.2",
-    "@yeying-community/yeying-next": "^0.0.17",
+    "@yeying-community/yeying-next": "^0.0.18",
     "ant-design-vue": "^4.2.6",
     "pinia": "^2.2.6",
     "vue": "^3.5.12",

@@ -101,9 +101,9 @@ const mobileMenuOpen = ref(false)
  * 校验是否有登录信息,未登录弹框选择登录方式
  * */
 const changeLogin = () => {
-  const activeAccount = $account.getActiveAccount()
+  const info = $account.getActiveAccount()
   let isLogin = false
-  const did = activeAccount && activeAccount.did
+  const did = info && info.metadata && info.metadata.did
   if(did){
     isLogin = $account.isLogin(did)
   }
