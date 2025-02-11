@@ -142,7 +142,7 @@
                     downloadTextFile("identity", identity)
                     message.success("注册成功,请保存好你的身份认证文件!")
                     console.log('identity',identity,did); // 输出导出的身份信息
-                    // router.push("/login")
+                    router.push("/login")
                 }
             }catch(e){
                 message.error("注册失败,请联系管理员!")
