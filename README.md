@@ -27,3 +27,5 @@ npm run dev
 ```sh
 npm run build
 ```
+### "@yeying-community/yeying-i18n": "^0.0.2",
+### "@yeying-community/yeying-next": "0.0.16",

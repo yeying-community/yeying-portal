@@ -8,7 +8,7 @@
         Already a member? <span class="blue-color cursor-pointer" @click="changeRouter('/login')">Register</span>
         </div>
        
-        <div class="mt-4 block sm:flex items-center gap-1" v-if="isContinue">
+        <!-- <div class="mt-4 block sm:flex items-center gap-1" v-if="isContinue">
             <label for="phone" class="block text-width text-sm font-normal text-gray-900"><span class="text-red-500 mr-1">*</span>Telephone</label>
             <div class="mt-2 flex-1">
                 <input v-model="form.phone"
@@ -32,7 +32,7 @@
                     type="text" name="mscode"  required="" :placeholder="$t('common.pleaseInput')"
                     class="pl-1.5 block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm/6" />
             </div>
-        </div>
+        </div> -->
         <div class="mt-3 sm:flex items-center gap-1" v-if="isContinue">
             <label for="password" class="block text-width text-sm font-normal text-gray-900"><span class="text-red-500 mr-1">*</span>Password</label>
             <div class="mt-2 flex-1">
@@ -52,30 +52,34 @@
         <div class="mt-3 sm:flex items-center gap-1" v-if="isContinue">
             <label for="accode" class="block text-width text-sm font-normal text-gray-900"><span class="text-red-500 mr-1">*</span>Account Code</label>
             <div class="mt-2 flex-1">
-                <input v-model="form.accode"
-                    type="text" name="accode"  required="" :placeholder="$t('common.pleaseInput')"
-                    class="pl-1.5 block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm/6" />
+                <select-menu 
+                    @change="changeCode"
+                    :selectId="form.code"
+                    :selectList="$account.codeList"/> 
+                    <!-- <input type="text" class="absolute focus-visible:outline-0 focus-visible:outline-offset-0" style="left:10%;bottom:10%;z-index:-1" required v-model="form.code"/> -->
             </div>
         </div>
         <div class="mt-3 sm:flex items-center gap-1" v-if="isContinue">
             <label for="displayName" class="block text-width text-sm font-normal text-gray-900"><span class="text-red-500 mr-1">*</span>Display Name</label>
             <div class="mt-2 flex-1">
-                <input v-model="form.displayName"
+                <input v-model="form.name"
                     type="text" name="displayName"  required="" :placeholder="$t('common.pleaseInput')"
                     class="pl-1.5 block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm/6" />
             </div>
         </div>
         <div class="mt-3 sm:flex items-center gap-1" v-if="!isContinue">
-            <label for="bc_network" class="block text-width text-sm font-normal text-gray-900"><span class="text-red-500 mr-1">*</span>Blockchain Network</label>
-            <div class="mt-2">
-                <input v-model="form.bc_network"
-                    type="text" name="bc_network"  required="" :placeholder="$t('common.pleaseInput')"
-                    class="pl-1.5 block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm/6" />
+            <label for="network" class="block text-width text-sm font-normal text-gray-900"><span class="text-red-500 mr-1">*</span>Blockchain Network</label>
+            <div class="mt-2 flex-1">
+                <select-menu 
+                    @change="changeNetwork"
+                    :selectId="form.network"
+                    :selectList="$account.networkList"/> 
+                    <!-- <input type="text" class="absolute focus-visible:outline-0 focus-visible:outline-offset-0" style="left:10%;bottom:10%;z-index:-1" required v-model="form.network"/> -->
             </div>
         </div>
         
         <div class="flex items-center mt-3" v-if="!isContinue">
-            <input id="remember-me" name="remember-me" type="checkbox" class="size-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-600" />
+            <input v-model="form.isAgree" id="remember-me" name="remember-me" type="checkbox" class="size-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-600" />
             <label for="remember-me" class="ml-3 block text-sm/6 text-gray-700">我同意 用户协议 & 政策</label>
         </div>
         <!-- <div class="mt-3" v-if="isContinue">
@@ -98,37 +102,77 @@
     import { useLoginStore } from '@/stores/index'
     import { useRouter } from 'vue-router'
     import $identity from '@/plugins/identity.js'
-    const loginStore = useLoginStore()
+    import $account from '@/plugins/account.js'
+    import { message } from 'ant-design-vue';
+    import SelectMenu from '@/components/common/SelectMenu.vue'
+
     const { proxy } = getCurrentInstance();
     const isContinue = ref(true)
-    const {$t, $account}=proxy
+    const {$t}=proxy
     const router = useRouter();
     const form = ref({
-        phone: "",
-        email: "",
         password: "",
         confirm_pwd: "",
-        mscode: "", //验证码
-        accode: "", //Account code
-        displayName: "", //Display name
-        bc_network: "",//Bloack chain network
+        code: null, //Account code
+        name: "", //Display name
+        network: null,//Bloack chain network
+        isAgree: false,
     })
-    const handleSubmit = () => {
-        $identity.createPersonal("", form.displayName, "", "", form.password, {email: form.email, telephone: form.phone}).then(
-            (identity) => {
-              console.log(`${JSON.stringify(identity)}`)
-            }
-        ).catch(err => console.error(err));
+    const handleSubmit = async () => {
+        // $identity.createPersonal("", form.displayName, "", "", form.password, {email: form.email, telephone: form.phone}).then(
+        //     (identity) => {
+        //       console.log(`${JSON.stringify(identity)}`)
+        //     }
+        // ).catch(err => console.error(err));
 
         if(isContinue.value){
             isContinue.value = false
         }else{
-            loginStore.register(form.value)
+            try{
+                const {isAgree} = form.value
+                if(!isAgree){
+                    message.warning('请勾选我同意用户协议&政策')
+                    return
+                }
+                const info = await $account.createIdentity(form.value.password, {...form.value})
+                console.log('register:',info)
+                const did = info && info.metadata && info.metadata.did
+                if(did){
+                    const identity = await $account.exportIdentity(did)
+                    downloadTextFile("identity", identity)
+                    message.success("注册成功,请保存好你的身份认证文件!")
+                    console.log('identity',identity,did); // 输出导出的身份信息
+                    // router.push("/login")
+                }
+            }catch(e){
+                message.error("注册失败,请联系管理员!")
+            }
+            // loginStore.register(form.value)
         }
     }
-    const getMsCode = () => {
-        // console.log("$identity:",$identity)
-        alert(1)
+    const downloadTextFile = (filename, text) => {
+        // 创建一个 Blob 对象，存储文本数据
+        const blob = new Blob([text], { type: 'text/plain' });
+
+        // 创建一个指向该 Blob 对象的 URL
+        const url = URL.createObjectURL(blob);
+
+        // 创建一个临时的 <a> 标签，用于触发下载
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = filename; // 设置下载文件名
+        document.body.appendChild(a);  // 将 <a> 标签添加到文档中
+        a.click();  // 模拟点击下载
+
+        // 下载完成后移除 <a> 标签和 URL 对象
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url); // 释放 URL 对象
+    }
+    const changeCode = (select) => {
+        form.value.code = select.id
+    }
+    const changeNetwork = (select) => {
+        form.value.network = select.id
     }
     const changeRouter = (url) => {
         router.push(url)

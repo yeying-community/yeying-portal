@@ -12,27 +12,41 @@ import {ref,getCurrentInstance} from 'vue'
 import Contact from '@/components/contact/Modal.vue'
 import $account from '@/plugins/account.js'
 import AutoLogin from '@/components/common/AutoLogin.vue'
+import { useRouter } from 'vue-router'
 
 const open = ref(false)
 const RefLogin = ref()
 const RefContact = ref()
 const { proxy } = getCurrentInstance();
 const {$t}=proxy
+const router = useRouter();
+
 
 /**
  * 校验是否有登录信息,未登录弹框选择登录方式
  * */
-const changeLogin = () => {
-  const isLogin = $account.isLogin()
+const changeLogin = async () => {
+  const did = $account.getActiveDid()
+  let isLogin = false
+  if(did){
+    try{
+      const rst = await $account.login(did)
+      isLogin = $account.isLogin(did)
+    }catch(e){
+      console.error('login failed:',e)
+    }
+  }
   if(isLogin){
     return true
   }else{
-    RefLogin.value.openModal()
+    router.push("/toLogin")
+    // RefLogin.value.openModal()
   }
   return false
 }
-const openContact = () => {
-  if(!changeLogin()){
+const openContact = async () => {
+  const isLogin = await changeLogin()
+  if(!isLogin){
     return
   }
   open.value = true

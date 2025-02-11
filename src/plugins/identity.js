@@ -1,9 +1,9 @@
-import {AccountManager} from '@yeying-community/yeying-next'
+import {IdentityManager} from '@yeying-community/yeying-next'
 import {IdentityCodeEnum, NetworkTypeEnum} from '@yeying-community/yeying-web3'
 
 class $identity {
   constructor() {
-    this.manager = new AccountManager()
+    this.manager = new IdentityManager()
     console.log("identity:",this.manager)
   }
   async createPersonal(parent, name, description, avatar, password, extend) {
