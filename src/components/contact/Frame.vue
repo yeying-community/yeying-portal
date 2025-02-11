@@ -25,12 +25,16 @@ const router = useRouter();
 /**
  * 校验是否有登录信息,未登录弹框选择登录方式
  * */
-const changeLogin = () => {
-  const info = $account.getActiveAccount()
+const changeLogin = async () => {
+  const did = $account.getActiveDid()
   let isLogin = false
-  const did = info && info.metadata && info.metadata.did
   if(did){
-    isLogin = $account.isLogin(did)
+    try{
+      const rst = await $account.login(did)
+      isLogin = $account.isLogin(did)
+    }catch(e){
+      console.error('login failed:',e)
+    }
   }
   if(isLogin){
     return true
@@ -40,8 +44,9 @@ const changeLogin = () => {
   }
   return false
 }
-const openContact = () => {
-  if(!changeLogin()){
+const openContact = async () => {
+  const isLogin = await changeLogin()
+  if(!isLogin){
     return
   }
   open.value = true

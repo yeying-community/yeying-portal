@@ -61,6 +61,11 @@ class $account {
     const activeAccount = this.manager.getActiveIdentity()
     return activeAccount
   }
+  // 获取当前激活的账号信息。
+  getActiveDid(){
+    const did = this.manager.getActiveDid()
+    return did
+  }
   // 根据did判断是否登录
   isLogin(did) {
     const check = this.manager.isLogin(did)
