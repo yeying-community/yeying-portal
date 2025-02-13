@@ -57,7 +57,7 @@ class $account {
     return Identity
   }
   // 获取当前激活的账号信息。
-  getActiveAccount(){
+  getActiveIdentity(){
     const activeAccount = this.manager.getActiveIdentity()
     return activeAccount
   }

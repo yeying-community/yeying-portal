@@ -77,8 +77,8 @@
     const changeRouter = (url) => {
         router.push(url)
     }
-    const getActiveAccount = () => {
-        const info = $account.getActiveAccount()
+    const getActiveIdentity = () => {
+        const info = $account.getActiveIdentity()
         if(info){ // 有身份信息,帐号过期,只用输入密码
             hasAccount.value = true
         }
@@ -95,7 +95,7 @@
         }
     }
     onMounted(()=>{
-        getActiveAccount()
+        getActiveIdentity()
     })
 </script>
 <style scoped>
