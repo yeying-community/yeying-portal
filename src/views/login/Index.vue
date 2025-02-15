@@ -56,10 +56,17 @@
         password: "",
         did: "",
         desc: "",
+        content: "",
         isAgree: false,
     })
     const handleSubmit = async () => {
-        const {did, password, isAgree} = form.value || {}
+        const {password, isAgree, content} = form.value || {}
+        const info = await $account.importIdentity(content, password)
+        const did = info && info.metadata && info.metadata.did
+        if(!did){
+            message.warning('请检查文件信息')
+            return
+        }
         if(!isAgree){
             message.warning('请勾选我同意用户协议&政策')
             return
@@ -77,25 +84,26 @@
     const changeRouter = (url) => {
         router.push(url)
     }
-    const getActiveAccount = () => {
-        const info = $account.getActiveAccount()
+    const getActiveIdentity = () => {
+        const info = $account.getActiveIdentity()
         if(info){ // 有身份信息,帐号过期,只用输入密码
             hasAccount.value = true
         }
         return info
     }
     const changeFile = async (content) => {
-        const info = await $account.importIdentity(content)
-        const did = info && info.metadata && info.metadata.did
-        if(did){
-            form.value.did = did
-            console.log('importIdentity Identity:',info,content)
-        }else{
-            message.warning('请检查文件信息')
-        }
+        form.value.content = content
+        // const info = await $account.importIdentity(content)
+        // const did = info && info.metadata && info.metadata.did
+        // if(did){
+        //     form.value.did = did
+        //     console.log('importIdentity Identity:',info,content)
+        // }else{
+        //     message.warning('请检查文件信息')
+        // }
     }
     onMounted(()=>{
-        getActiveAccount()
+        getActiveIdentity()
     })
 </script>
 <style scoped>

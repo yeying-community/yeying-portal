@@ -52,13 +52,13 @@ class $account {
     return newIdentity
   }
   // 登录导入身份信息。
-  async importIdentity(code){
-    const Identity = await this.manager.importIdentity(code)
+  async importIdentity(code, pwd){
+    const Identity = await this.manager.importIdentity(code, pwd)
     return Identity
   }
   // 获取当前激活的账号信息。
-  getActiveAccount(){
-    const activeAccount = this.manager.getActiveIdentity()
+  async getActiveIdentity(){
+    const activeAccount = await this.manager.getActiveIdentity()
     return activeAccount
   }
   // 获取当前激活的账号信息。

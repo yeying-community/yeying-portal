@@ -26,11 +26,13 @@ const router = useRouter();
  * 校验是否有登录信息,未登录弹框选择登录方式
  * */
 const changeLogin = async () => {
+  const info = await $account.getActiveIdentity()
+  // const did = info && info.metadata && info.metadata.did
   const did = $account.getActiveDid()
   let isLogin = false
   if(did){
     try{
-      const rst = await $account.login(did)
+      // await $account.login(did)
       isLogin = $account.isLogin(did)
     }catch(e){
       console.error('login failed:',e)

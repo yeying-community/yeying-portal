@@ -51,12 +51,12 @@
         </div>
         <div class="mt-3 sm:flex items-center gap-1" v-if="isContinue">
             <label for="accode" class="block text-width text-sm font-normal text-gray-900"><span class="text-red-500 mr-1">*</span>Account Code</label>
-            <div class="mt-2 flex-1">
+            <div class="mt-2 flex-1 relative">
                 <select-menu 
                     @change="changeCode"
                     :selectId="form.code"
                     :selectList="$account.codeList"/> 
-                    <!-- <input type="text" class="absolute focus-visible:outline-0 focus-visible:outline-offset-0" style="left:10%;bottom:10%;z-index:-1" required v-model="form.code"/> -->
+                <input type="text" class="absolute focus-visible:outline-0 focus-visible:outline-offset-0" style="left:10%;bottom:10%;z-index:-1" required v-model="form.code"/>
             </div>
         </div>
         <div class="mt-3 sm:flex items-center gap-1" v-if="isContinue">
@@ -69,12 +69,12 @@
         </div>
         <div class="mt-3 sm:flex items-center gap-1" v-if="!isContinue">
             <label for="network" class="block text-width text-sm font-normal text-gray-900"><span class="text-red-500 mr-1">*</span>Blockchain Network</label>
-            <div class="mt-2 flex-1">
+            <div class="mt-2 flex-1 relative">
                 <select-menu 
                     @change="changeNetwork"
                     :selectId="form.network"
                     :selectList="$account.networkList"/> 
-                    <!-- <input type="text" class="absolute focus-visible:outline-0 focus-visible:outline-offset-0" style="left:10%;bottom:10%;z-index:-1" required v-model="form.network"/> -->
+                    <input type="text" class="absolute focus-visible:outline-0 focus-visible:outline-offset-0" style="left:10%;bottom:10%;z-index:-1" required v-model="form.network"/>
             </div>
         </div>
         
@@ -139,10 +139,11 @@
                 const did = info && info.metadata && info.metadata.did
                 if(did){
                     const identity = await $account.exportIdentity(did)
-                    downloadTextFile("identity", identity)
+                    const fileName = `${form.value.name}.id`
+                    downloadTextFile(fileName, identity)
                     message.success("注册成功,请保存好你的身份认证文件!")
                     console.log('identity',identity,did); // 输出导出的身份信息
-                    router.push("/login")
+                    router.push("/")
                 }
             }catch(e){
                 message.error("注册失败,请联系管理员!")
