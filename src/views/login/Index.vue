@@ -5,7 +5,7 @@
         >
         <div class="text-center text-3xl font-semibold opacity-85">Register to YeYing</div>
         <div class="mt-1 text-center font-normal text-base mt-2 opacity-85">Don't have an account? <span class="blue-color cursor-pointer" @click="changeRouter('/reg')">Apply For</span></div>
-        <div class="mt-9" v-bind="!hasAccount">
+        <div class="mt-9" v-if="!hasAccount">
             <label class="block text-sm font-normal text-gray-900">
                 <span class="text-red-500 mr-1">*</span>
                 身份文件
@@ -84,8 +84,8 @@
     const changeRouter = (url) => {
         router.push(url)
     }
-    const getActiveIdentity = () => {
-        const info = $account.getActiveIdentity()
+    const getActiveIdentity = async () => {
+        const info = await $account.getActiveIdentity()
         if(info){ // 有身份信息,帐号过期,只用输入密码
             hasAccount.value = true
         }
