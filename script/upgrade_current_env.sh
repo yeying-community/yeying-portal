@@ -27,7 +27,7 @@ then
 	FILE_SIZE=$(stat -c%s "$LOG_FILE")
 	if [ "$FILE_SIZE" -gt "$MAX_FILESIZE" ]
 	then
-		echo "" > LOG_FILE
+		echo "" > "$LOG_FILE"
 		echo "Log file was larger than $MAX_FILESIZE. Cleared the log file at $(date)" | tee -a "$LOG_FILE"
 	fi
 else
@@ -35,16 +35,30 @@ else
 	touch $LOG_FILE
 fi
 
-SCRIPT_PATH=$(cd "$(dirname "$0")" || exit;pwd)
-CODE_PATH="$SCRIPT_PATH/.."
+
+CODE_PATH="/root/code/yeying-portal"
+if [ -n "${1:-}" ]; then
+    if [ -d "$1" ]; then
+        CODE_PATH="$1"
+    else
+        echo "Error: The provided directory does not exist: $1"  | tee -a "$LOG_FILE"
+        exit 1
+    fi
+fi
+
 
 index=1
 echo -e "\nstep $index -- This is going to get latest code $(date)" | tee -a  "$LOG_FILE"
+echo -e "Using code path: $CODE_PATH" | tee -a "$LOG_FILE"
 pushd "$CODE_PATH"
 BRANCH_NAME="main"
 git reset --hard HEAD
 git checkout "$BRANCH_NAME"
 git pull origin "$BRANCH_NAME"
+if $? ; then
+	echo -e "pull code failed" | tee -a "$LOG_FILE"
+	exit 1
+fi
 current_status="/tmp/current_status"
 record_version_information "$current_status"
 popd
@@ -53,18 +67,16 @@ flag_upgrade=true
 TARGET_DIR="/opt/deploy"
 if [ -d "${TARGET_DIR}"/yeying-portal ];then
 	deployed_package_version_info=$(find "$TARGET_DIR"/yeying-portal -name "version_information*")
-	echo -e "get deploy package version information as: ${deployed_package_version_info} " | tee -a "$LOG_FILE"
+	echo -e "get deploy package version information as: ${deployed_package_version_info} ----" | tee -a "$LOG_FILE"
 	if [[ -f "$deployed_package_version_info" ]]; then
-		compare_result=$(diff "$deployed_package_version_info" "$current_status")
-		echo -e "version difference is: $compare_result " | tee -a "$LOG_FILE"
-		if [ -z "$compare_result" ]; then
+		if diff "$deployed_package_version_info" "$current_status" > /dev/null; then
 			flag_upgrade=false
 		fi
 	fi
 fi
 
-if [ ! "$flag_upgrade" ]; then
-	echo -e "there is no code update compared with deployed package $(date)" | tee -a "$LOG_FILE"
+if ! "$flag_upgrade"; then
+	echo -e "there is no code update compared with deployed package. operation Finished ==== $(date) ====" | tee -a "$LOG_FILE"
 	exit 0
 fi
 
@@ -128,4 +140,4 @@ echo -e "\nstep $index -- reload nginx service" | tee -a "$LOG_FILE"
 nginx -s reload
 
 
-echo -e "\nThis is the end of upgrade yeying-portal. $(date)" | tee -a "$LOG_FILE"
+echo -e "\nThis is the end of upgrade yeying-portal. ====$(date)====" | tee -a "$LOG_FILE"
