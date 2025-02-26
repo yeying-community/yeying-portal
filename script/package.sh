@@ -1,9 +1,6 @@
 #!/usr/bin/env bash
 
-script_dir=$(
-  cd $(dirname "$0") || exit 1
-  pwd
-)
+script_dir=$(cd "$(dirname "$0")" || exit;pwd)
 
 work_dir=$(
   cd "${script_dir}"/.. || exit 1
@@ -12,12 +9,22 @@ work_dir=$(
 
 version=1.0.0
 
-if [ ! -z "$1" ]; then
+if [ -n "$1" ]; then
   version="$1"
 fi
 
-dist_dir=${work_dir}/dist
 
+function record_version_information() {
+  local recode_file=$1
+  echo -e "\n========branch information:" | tee "$recode_file"
+  git branch --show-current | tee -a "$recode_file"
+  echo -e "\n========commit log information:" >> "$recode_file"
+  git log -3 | grep -v Author | tee -a "$recode_file"
+  echo -e "\n====Finished" | tee -a "$recode_file"
+}
+
+
+dist_dir=${work_dir}/dist
 
 index=1
 echo -e "\nstep $index -- This is going to generate package for yeying-portal"
@@ -42,6 +49,10 @@ if [ ! -d "${dist_dir}" ]; then
   exit 1;
 fi
 cp -rf "${dist_dir}" "${portal_dir}"/
+formatted_date=$(date '+%Y%m%d_%H%M%S')
+VERSION_FILE="version_information_$formatted_date"
+record_version_information "$VERSION_FILE"
+mv "$VERSION_FILE" "${portal_dir}"/
 
 
 sleep 1
