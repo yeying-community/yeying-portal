@@ -54,12 +54,12 @@ TARGET_DIR="/opt/deploy"
 if [ -d "${TARGET_DIR}"/yeying-portal ];then
 	deployed_package_version_info=$(find "$TARGET_DIR"/yeying-portal -name "version_information*")
 	echo -e "get deploy package version information as: ${deployed_package_version_info} " | tee -a "$LOG_FILE"
-    if [[ -f "$deployed_package_version_info" ]]; then
-			compare_result=$(diff "$deployed_package_version_info" "$current_status")
-			echo -e "version difference is: $compare_result " | tee -a "$LOG_FILE"
-			if [ -z "$compare_result" ]; then
-				flag_upgrade=false
-			fi
+	if [[ -f "$deployed_package_version_info" ]]; then
+		compare_result=$(diff "$deployed_package_version_info" "$current_status")
+		echo -e "version difference is: $compare_result " | tee -a "$LOG_FILE"
+		if [ -z "$compare_result" ]; then
+			flag_upgrade=false
+		fi
 	fi
 fi
 
