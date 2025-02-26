@@ -53,8 +53,8 @@ flag_upgrade=true
 TARGET_DIR="/opt/deploy"
 if [ -d "${TARGET_DIR}"/yeying-portal ];then
 	deployed_package_version_info=$(find "$TARGET_DIR"/yeying-portal -name "version_information*")
-	echo -e "get deploy package version information as: deployed_package_version_info " | tee -a "$LOG_FILE"
-    if [[ -f "$deployed_package_version_info" ]]; then
+	echo -e "get deploy package version information as: ${deployed_package_version_info} " | tee -a "$LOG_FILE"
+	if [[ -f "$deployed_package_version_info" ]]; then
 		compare_result=$(diff "$deployed_package_version_info" "$current_status")
 		echo -e "version difference is: $compare_result " | tee -a "$LOG_FILE"
 		if [ -z "$compare_result" ]; then
@@ -70,15 +70,15 @@ fi
 
 
 index=$((index+1))
-echo -e "\nstep $index -- compile yeying-portal package"
+echo -e "\nstep $index -- compile yeying-portal package" | tee -a "$LOG_FILE"
 pushd "$CODE_PATH"
 npm install
 npm run build
-bash script/package.sh
+bash script/package.sh 2>&1 
 popd
 
 index=$((index+1))
-echo -e "\nstep $index -- copy yeying-portal package to /opt/deploy"
+echo -e "\nstep $index -- copy yeying-portal package to /opt/deploy"  | tee -a "$LOG_FILE"
 if [ -d "${TARGET_DIR}"/yeying-portal ]; then
 	rm -rf "${TARGET_DIR}"/yeying-portal
 fi
@@ -94,11 +94,11 @@ fi
 
 
 index=$((index+1))
-echo -e "\nstep $index -- this is going to upgrade yeying-portal package"
+echo -e "\nstep $index -- this is going to upgrade yeying-portal package"  | tee -a "$LOG_FILE"
 pushd "$TARGET_DIR"
 
 filename=$(ls yeying-portal-*.tar.gz)
-echo -e "\nget package file name:$filename"
+echo -e "\nget package file name:$filename"  | tee -a "$LOG_FILE"
 temp=${filename#yeying-portal-}      # 去掉 "yeying-portal-"
 package_version=${temp%.tar.gz}  # 去掉 ".tar.gz"
 echo -e "\nPackage version is:$package_version" | tee -a "$LOG_FILE"
