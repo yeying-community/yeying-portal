@@ -90,7 +90,7 @@ watch(
   },{deep:true,immediate:true}
 );
 const navigation = [
-  { title: $t("portal.AppStore"), to: '' },
+  // { title: $t("portal.AppStore"), to: '' },
   { title: $t("portal.solution"), to: '/solution', name:"solution" },
   { title: $t("portal.document"), to: '' },
   { title: $t("portal.blog"), to: '' },
