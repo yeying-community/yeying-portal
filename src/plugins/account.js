@@ -1,83 +1,87 @@
-import {IdentityManager} from '@yeying-community/yeying-next'
-import {IdentityCodeEnum, NetworkTypeEnum} from '@yeying-community/yeying-web3'
-class $account {
-  constructor() {
-    this.manager = new IdentityManager()
-    this.codeList = [
-      { id: null, name: '请选择' },
-      {name:"个人",id:1,},
-      {name:"组织",id:2,},
-      {name:"服务",id:3,},
-      {name:"应用",id:4,},
-      {name:"资产",id:5,},
+import {IdentityManager, 
+  ServiceManager, 
+  IndexedCache,
+  } 
+from '@yeying-community/yeying-next'
+import {ServiceCodeEnum, 
+  ProviderCodeEnum,
+  SessionProvider, 
+  LlmProvider, 
+  NamespaceProvider, 
+  Uploader,
+  ProviderProvider,
+  UserProvider,
+  LinkProvider,
+} from '@yeying-community/yeying-client-ts'
+import {IdentityCodeEnum,NetworkTypeEnum} from '@yeying-community/yeying-web3'
+// import {IdentityCodeEnum, NetworkTypeEnum} from '@yeying-community/yeying-web3'
+// import {getLocalStorage} from '@/utils/common'
+// import type {CacheTable} from './types'
+import {$account} from '@yeying-community/yeying-wallet';
+
+let namespaceProvider = null;
+let llmManager = null;
+let sessionManager = null;
+let uploader = null;
+let providerProvider = null;
+let userProvider = null;
+let linkProvider = null;
+let indexedCache = null;
+
+async function open(){
+  const table=[{
+    name: 'messageTB',
+    key: "id",
+    autoIncrement: false,
+    indexes: [
+      {keyPath: "sessionId", name: "sessionId", unique: false},
+      {keyPath: "isStar", name: "isStar", unique: false},
     ]
-    this.codeMap = {
-      1: IdentityCodeEnum.IDENTITY_CODE_PERSONAL,
-      2: IdentityCodeEnum.IDENTITY_CODE_ORGANIZATION,
-      3: IdentityCodeEnum.IDENTITY_CODE_SERVICE,
-      4: IdentityCodeEnum.IDENTITY_CODE_APPLICATION,
-      5: IdentityCodeEnum.IDENTITY_CODE_ASSET
-    }
-    this.networkList = [
-      { id: null, name: '请选择' },
-      {name:"夜莺网络",id:2020,}
-    ]
-    this.networkMap = {
-      2020: NetworkTypeEnum.NETWORK_TYPE_YEYING
-    }
-    // this.mail = new MailProvider()
-    console.log("account:",this.manager)
-  }
-  // 获取指定 DID 对应的区块链地址。
-  getBlockAddress(did) {
-    return this.manager.getBlockAddress(did)
-  }
-  // 导出身份信息。
-  async exportIdentity(did){
-    const identity = await this.manager.exportIdentity(did);
-    return identity
-  }
-  // 登录
-  async login(did,password){
-    const Account = await this.manager.login(did,password)
-    return Account
-  }
-  // 注册:创建一个新的身份，并在区块链上生成地址。
-  async createIdentity(password, pamras){
-    const template = {
-      network: this.networkMap[pamras.network],
-      name: pamras.name,
-      code: this.codeMap[pamras.code],}
-    const newIdentity = await this.manager.createIdentity(password, template);
-    return newIdentity
-  }
-  // 登录导入身份信息。
-  async importIdentity(code, pwd){
-    const Identity = await this.manager.importIdentity(code, pwd)
-    return Identity
-  }
-  // 获取当前激活的账号信息。
-  async getActiveIdentity(){
-    const activeAccount = await this.manager.getActiveIdentity()
-    return activeAccount
-  }
-  // 获取当前激活的账号信息。
-  getActiveDid(){
-    const did = this.manager.getActiveDid()
-    return did
-  }
-  // 根据did判断是否登录
-  isLogin(did) {
-    const check = this.manager.isLogin(did)
-    return !!check
-  }
-  // 创建游客身份
-  // async createGuest() {
-  //   const info = await this.manager.createGuest()
-  //   // 登录
-  //   const did = info.metadata.did
-  //   // await this.manager.login(did)
-  //   return info
-  // }
+  }]
+  return await indexedCache.open(table)
 }
-export default new $account()
+// 初始化提供者
+async function initializeProviders() {
+  if(sessionManager||llmManager)return
+  const userInfo = await $account.getActiveIdentity()
+  console.log('userinfo--->22',userInfo)
+  const did = userInfo?.metadata?.did
+  let blockAddress = null
+  if(did){
+    blockAddress = await $account.getBlockAddress(did)
+    console.log('blockAddress--->22',blockAddress)
+  }
+  // const blockAddress = getLocalStorage('blockAddress')
+  if(!blockAddress)return
+  // let proxy = getLocalStorage('proxy')||{}
+  let agent = null
+  let warehouse = null
+  if(blockAddress){
+    agent = await $account.getServicesByCode(ServiceCodeEnum.SERVICE_CODE_AGENT)
+    warehouse = await $account.getServicesByCode(ServiceCodeEnum.SERVICE_CODE_WAREHOUSE)
+  }
+
+  const securityAlgorithm = userInfo?.securityConfig?.algorithm
+  const agentProviderOption = {
+    proxy:agent, blockAddress
+  }
+  const warehouseProviderOption = {
+    proxy:warehouse, blockAddress
+  }
+  sessionManager = new SessionProvider(agentProviderOption)
+  llmManager = new LlmProvider(agentProviderOption)
+  namespaceProvider = new NamespaceProvider(warehouseProviderOption)
+  uploader = new Uploader(warehouseProviderOption, securityAlgorithm);
+  providerProvider = new ProviderProvider(agentProviderOption)
+  userProvider = new UserProvider(agentProviderOption)
+  linkProvider = new LinkProvider(warehouseProviderOption);
+  indexedCache = new IndexedCache("sessionDB",1)
+  open()
+}
+// 页面加载时初始化提供者
+if (typeof window !== 'undefined') {
+  window.addEventListener('load', () => {
+    initializeProviders();
+  });
+}
+export {namespaceProvider,llmManager,sessionManager,uploader,providerProvider,linkProvider,initializeProviders,indexedCache,userProvider}
