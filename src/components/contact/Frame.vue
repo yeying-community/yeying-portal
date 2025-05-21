@@ -2,16 +2,15 @@
   <div @click="openContact" class="blue-color cursor-pointer bg-white px-3 py-5 frame fixed right-1.5 sm:right-12 top-1/4">
     <span class="iconfont icon-phone"/>
     <span class="mt-2 text-base font-puhuiRegular">{{$t("common.contactUs")}}</span>
-    <Contact :isOpen="open" ref="RefContact"/>
-    <auto-login ref="RefLogin"/>
+    <!-- <Contact :isOpen="open" ref="RefContact"/> -->
+    <!-- <auto-login ref="RefLogin"/> -->
   </div>
 </template>
 
 <script setup>
 import {ref,getCurrentInstance} from 'vue'
 import Contact from '@/components/contact/Modal.vue'
-import $account from '@/plugins/account.js'
-import AutoLogin from '@/components/common/AutoLogin.vue'
+import {$account} from '@yeying-community/yeying-wallet';
 import { useRouter } from 'vue-router'
 
 const open = ref(false)

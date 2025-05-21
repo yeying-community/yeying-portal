@@ -87,7 +87,7 @@
 import { ref,reactive, onMounted,getCurrentInstance } from 'vue'
 import { Dialog, DialogPanel, DialogTitle, TransitionChild, TransitionRoot } from '@headlessui/vue'
 import SelectMenu from '@/components/common/SelectMenu.vue'
-import $account from '@/plugins/account.js'
+// import $account from '@/plugins/account.js'
 import $surpport from '@/plugins/surpport.js'
 
 const { proxy } = getCurrentInstance();

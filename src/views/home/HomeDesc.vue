@@ -1,7 +1,9 @@
 <script setup>
 import Contact from '@/components/contact/Modal.vue'
 import {getCurrentInstance, ref} from 'vue'
-import $account from '@/plugins/account.js'
+// import $account from '@/plugins/account.js'
+import {$account} from '@yeying-community/yeying-wallet';
+
 import { useRouter } from 'vue-router'
 
 const {proxy} = getCurrentInstance()
@@ -69,7 +71,7 @@ const close = () => {
         </button>
       </div>
     </div>
-    <Contact :isOpen="open" ref="RefContact"/>
+    <!-- <Contact :isOpen="open" ref="RefContact"/> -->
   </div>
 </template>
 <style scoped>

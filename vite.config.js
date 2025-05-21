@@ -66,4 +66,24 @@ export default defineConfig({
       '@': fileURLToPath(new URL('./src', import.meta.url))
     },
   },
+  // 配置前端服务地址和端口,默认端口是5173 开发机:47.116.193.171:8451 /registry /whoami
+  server: {
+    host: '0.0.0.0',
+    port: 8991,
+    proxy: {
+      // 代理规则示例1：简单路径代理
+      '/registry': {
+        target: 'http://47.116.193.171:8451', // 后端服务器地址
+        changeOrigin: true, // 修改请求头中的 Origin 为目标地址
+        rewrite: (path) => path.replace(/^\/registry/, '/registry') // 路径重写（可选）
+      },
+
+      // 代理规则示例2：复杂路径代理
+      '/whoami': {
+        target: 'http://47.116.193.171:8451',
+        changeOrigin: true,
+        rewrite: (path) => path.replace(/^\/whoami/, '/whoami') // 替换路径
+      }
+    }
+  },
 })

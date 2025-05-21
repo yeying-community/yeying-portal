@@ -59,7 +59,7 @@
           </div>
         </DialogPanel>
       </Dialog>
-      <auto-login ref="RefLogin"/>
+      <!-- <auto-login ref="RefLogin"/> -->
     </header>
 </template>
 <script setup>
@@ -68,9 +68,11 @@ import { ref,watch,getCurrentInstance } from 'vue'
 // import { Dialog, DialogPanel } from '@headlessui/vue'
 import { useRoute,useRouter } from 'vue-router'
 import Language from '@/components/common/Language.vue'
-import $account from '@/plugins/account.js'
+// import $account from '@/plugins/account.js'
+import {$account} from '@yeying-community/yeying-wallet';
+
 // import AutoLogin from '@/components/contact/Modal.vue'
-import AutoLogin from '@/components/common/AutoLogin.vue'
+// import AutoLogin from '@/components/common/AutoLogin.vue'
 
 // import logo from '@/assets/img/logo.svg'
 const route = useRoute();

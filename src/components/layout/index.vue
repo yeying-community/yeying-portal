@@ -2,7 +2,7 @@
   <div class="layout_bg">
     <Header/>
     <RouterView />
-    <ContactModal/>
+    <!-- <ContactModal/> -->
   </div>
 </template>
 
