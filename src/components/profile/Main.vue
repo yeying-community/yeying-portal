@@ -85,8 +85,8 @@ const {sidebarOpen} = toRefs(profileStore)
 
 // const sidebarOpen = ref(false)
 const navigation = [
-  { title: "Account", to: '/user', name: 'user', icon:"icon-account" },
-  { title: "Message", to: '/message', name: 'message', icon:"icon-bell-full" },
+  { title: "Account", to: '/profile/', name: 'user', icon:"icon-account" },
+  { title: "Message", to: '/profile/message', name: 'message', icon:"icon-bell-full" },
 ]
 // 监听路由变化
 watch(
