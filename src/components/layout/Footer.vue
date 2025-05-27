@@ -28,7 +28,8 @@
           href="https://beian.mps.gov.cn/#/query/webSearch?code=33010902004112"
           rel="noreferrer"
           target="_blank"
-          >浙公网安备33010902004112号</a
+          ><span style="margin-right: 10px;">浙公网安备33010902004112号</span>
+          <span>浙ICP备2024126729号-2</span></a
         >
         <span>Copyright © 2024</span>
       </div>
