@@ -42,23 +42,23 @@ export const routes = [
   //   name: 'reg',
   //   component: () => import('../views/RegisterView.vue'),
   // },
-  {
-    path: '/user',
-    name: 'user',
-    component: () => import('../views/UserView.vue'),
-  },
+  // {
+  //   path: '/user',
+  //   name: 'user',
+  //   component: () => import('../views/UserView.vue'),
+  // },
   {
     path: '/profile',
     name: 'profile',
     component: () => import('../views/ProfileView.vue'),
     children:[
       {
-        path: '/user',
+        path: '',
         name: 'user',
         component: () => import('../views/UserView.vue'),
       },
       {
-        path: '/message',
+        path: 'message',
         name: 'message',
         component: () => import('../views/MessageView.vue'),
       },
