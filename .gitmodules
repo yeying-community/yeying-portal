@@ -1,0 +1,3 @@
+[submodule "yeying-app-identity"]
+	path = yeying-app-identity
+	url = git@github.com:yeying-community/yeying-app-identity.git
