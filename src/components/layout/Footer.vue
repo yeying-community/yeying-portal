@@ -25,7 +25,7 @@
                     浙ICP备2024126729号-2
                 </a> -->
         <a
-          href="https://beian.mps.gov.cn/#/query/webSearch?code=33010902004112"
+          href="https://beian.miit.gov.cn/"
           rel="noreferrer"
           target="_blank"
           ><span style="margin-right: 10px;">浙公网安备33010902004112号</span>
