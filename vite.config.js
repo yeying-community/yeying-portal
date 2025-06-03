@@ -4,6 +4,7 @@ import {defineConfig} from 'vite'
 import vue from '@vitejs/plugin-vue'
 import {nodePolyfills} from 'vite-plugin-node-polyfills'
 // import vueDevTools from 'vite-plugin-vue-devtools'
+import { visualizer } from 'rollup-plugin-visualizer'
 
 // https://vite.dev/config/
 export default defineConfig({
@@ -53,6 +54,11 @@ export default defineConfig({
     }),
     vue(),
     // vueDevTools(),
+    visualizer({
+      open: false, // 打包完成后自动打开分析页面
+      gzipSize: true, // 显示gzip压缩后的大小
+      brotliSize: true // 显示brotli压缩后的大小
+    })
   ],
   // css: {
   //   postcss: {
