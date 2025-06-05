@@ -27,7 +27,7 @@ export default defineConfig({
       },
     },
     rollupOptions: {
-      external: ['vm-browserify'], // 排除该模块
+      external: ['vm-browserify','crypto'], // 排除该模块
       output: {
         manualChunks(id) {
           if (id.includes('node_modules')) {
