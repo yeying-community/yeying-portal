@@ -33,7 +33,7 @@ export default defineConfig({
           if (id.includes('node_modules')) {
             const lib = id&&id.split('node_modules/')[1]&&id.split('node_modules/')[1].split('/')[0];
             // 只对实际使用的大库分块
-            if (['@yeying-community', 'element-plus','ant-design-vue','@ant-design','vue'].includes(lib)) {
+            if (['@yeying-community', 'element-plus','ant-design-vue','@ant-design'].includes(lib)) {
               return lib;
             }
             return 'vendor'
