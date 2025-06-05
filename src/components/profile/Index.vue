@@ -1,6 +1,6 @@
 <template>
   <div class="layout_bg">
-    <Header/>
+    <ProHeader/>
     <Main />
   </div>
 </template>
@@ -8,7 +8,7 @@
 <script setup>
 import {ref} from 'vue'
 import { RouterLink, RouterView } from 'vue-router'
-import Header from '@/components/profile/Header.vue'
+import ProHeader from '@/components/profile/ProHeader.vue'
 import Main from '@/components/profile/Main.vue'
 
 </script>
