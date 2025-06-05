@@ -2,27 +2,46 @@ import {fileURLToPath, URL} from 'node:url'
 import viteCompression from 'vite-plugin-compression'
 import {defineConfig} from 'vite'
 import vue from '@vitejs/plugin-vue'
-import {nodePolyfills} from 'vite-plugin-node-polyfills'
+// import {nodePolyfills} from 'vite-plugin-node-polyfills'
 // import vueDevTools from 'vite-plugin-vue-devtools'
 import { visualizer } from 'rollup-plugin-visualizer'
+import { ElementPlusResolver } from 'unplugin-vue-components/resolvers'
+import AutoImport from 'unplugin-auto-import/vite'
+import Components from 'unplugin-vue-components/vite'
+
 
 // https://vite.dev/config/
 export default defineConfig({
   build: {
+    reportCompressedSize: false, // 关闭压缩大小报告（减少内存）
+    cssCodeSplit: false, // 禁用 CSS 代码拆分
     minify: 'terser',
+    sourcemap: false, // 关闭 sourcemap 可以显著减少内存使用
+    emptyOutDir: true, // 清空输出目录
+    chunkSizeWarningLimit: 150000, // 单位是 KB，默认是 500
     terserOptions: { //在生产环境中移除console.log和debugger语句，减少打包后的文件大小。
       compress: {
         drop_console: true,
         drop_debugger: true,
+        defaults: false // 禁用部分压缩优化
       },
     },
     rollupOptions: {
+      external: ['vm-browserify'], // 排除该模块
       output: {
         manualChunks(id) {
           if (id.includes('node_modules')) {
-            // 将node_modules中的模块单独打包
-            return id.toString().split('node_modules/')[1].split('/')[0].toString()
+            const lib = id&&id.split('node_modules/')[1]&&id.split('node_modules/')[1].split('/')[0];
+            // 只对实际使用的大库分块
+            if (['@yeying-community', 'element-plus','ant-design-vue','@ant-design','vue'].includes(lib)) {
+              return lib;
+            }
+            return 'vendor'
           }
+          // if (id.includes('node_modules')) {
+          //   // 将node_modules中的模块单独打包
+          //   return id.toString().split('node_modules/')[1].split('/')[0].toString()
+          // }
         },
         chunkFileNames: 'static/js/[name]-[hash].js',
         entryFileNames: 'static/js/[name]-[hash].js',
@@ -42,8 +61,11 @@ export default defineConfig({
       },
     },
   },
+  optimizeDeps: {
+    exclude: ['vm-browserify'] // 不预构建
+  },
   plugins: [
-    nodePolyfills({globals: {Buffer: true}}),
+    // nodePolyfills({globals: {Buffer: true}}),
     viteCompression({
       verbose: true,
       disable: false,
@@ -55,10 +77,16 @@ export default defineConfig({
     vue(),
     // vueDevTools(),
     visualizer({
-      open: false, // 打包完成后自动打开分析页面
+      open: true, // 打包完成后自动打开分析页面
       gzipSize: true, // 显示gzip压缩后的大小
       brotliSize: true // 显示brotli压缩后的大小
-    })
+    }),
+    AutoImport({
+      resolvers: [ElementPlusResolver()],
+    }),
+    Components({
+      resolvers: [ElementPlusResolver()],
+    }),
   ],
   // css: {
   //   postcss: {
