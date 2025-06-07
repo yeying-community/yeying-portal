@@ -7,6 +7,7 @@ import App from '@/App.vue'
 import { routes,setupRouter } from '@/router'
 import { createRouter, createWebHistory } from 'vue-router'
 import {createAuthApp,sdkRoutes, sdkSetupRouter} from '@yeying-community/yeying-wallet';
+import { initializeProviders } from '@/plugins/account'
 
 const app = createApp(App)
 
