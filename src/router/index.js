@@ -47,23 +47,28 @@ export const routes = [
   //   name: 'user',
   //   component: () => import('../views/UserView.vue'),
   // },
-  // {
-  //   path: '/profile',
-  //   name: 'profile',
-  //   component: () => import('../views/ProfileView.vue'),
-  //   children:[
-  //     {
-  //       path: '',
-  //       name: 'user',
-  //       component: () => import('../views/UserView.vue'),
-  //     },
-  //     {
-  //       path: 'message',
-  //       name: 'message',
-  //       component: () => import('../views/MessageView.vue'),
-  //     },
-  //   ]
-  // },
+  {
+    path: '/market',
+    name: 'market',
+    component: () => import('../views/apply/MarketView.vue'),
+    children:[
+      {
+        path: '',
+        name: 'apply',
+        component: () => import('../views/apply/ApplyView.vue'),
+      },
+      {
+        path: 'service',
+        name: 'service',
+        component: () => import('../views/apply/ServiceView.vue'),
+      },
+      {
+        path: 'approval',
+        name: 'approval',
+        component: () => import('../views/apply/ApprovalView.vue'),
+      },
+    ]
+  },
   
 ]
 export const setupRouter = (router) => {
