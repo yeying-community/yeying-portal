@@ -11,3 +11,5 @@ output
 /dist
 *.lock
 *-lock.json
+.idea
+stats.html
