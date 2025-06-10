@@ -8,7 +8,7 @@
         <el-input
             v-model="searchVal"
             size="large"
-            :placeholder="$t('common.pleaseSearch')"
+            placeholder="支持输入服务名称/服务所有者名称搜索"
             @keyup.enter="search"
           >
             <template #suffix>
@@ -17,25 +17,22 @@
               </el-icon>
             </template>
           </el-input>
-          <el-button type="primary" size="large">创建应用</el-button>
+          <el-button type="primary" size="large" @click="changeRouter('/market/apply-edit')">创建应用</el-button>
       </div>
     </div>
     <div>
       <el-tabs v-model="activeService" class="demo-tabs" @tab-click="handleClick">
         <template v-for="item in tabs" :key="item.name">
           <el-tab-pane :label="item.title" :name="item.name">
-            <div>
-              {{item.title}}
+            <div class="item-group">
+              <template v-for="(app,index) in applicationList" :key="index+app.name">
+                <MarketBlock
+                  :detail="app"
+                />
+              </template>
             </div>
           </el-tab-pane>
         </template>
-        <!-- <el-tab-pane label="应用市场" name="first">
-          <div style="background:gray;">
-            应用市场
-          </div>
-        </el-tab-pane>
-        <el-tab-pane label="我创建的" name="second">我创建的</el-tab-pane>
-        <el-tab-pane label="我申请的" name="third">我申请的</el-tab-pane> -->
       </el-tabs>
     </div>
   </div>
@@ -45,19 +42,24 @@
 import { onMounted, ref } from 'vue'
 import { Search } from '@element-plus/icons-vue'
 import $application from '@/plugins/application'
+import MarketBlock from '@/views/components/MarketBlock.vue'
+import { useRouter } from 'vue-router'
+
 const searchVal = ref()
-const activeService = ref('first')
+const activeService = ref('1')
+const applicationList = ref([])
+const router = useRouter()
 const tabs = [
   {
-    name: 'first',
+    name: '1',
     title: '应用市场',
   },
   {
-    name: 'second',
+    name: '2',
     title: '我创建的',
   },
   {
-    name: 'third',
+    name: '3',
     title: '我申请的',
   },
 ]
@@ -66,7 +68,11 @@ const handleClick = (tab, event) => {
 }
 const search = async () => {
   const rst = await $application.search(1,20)
+  applicationList.value = rst
   console.log('rst---->',rst)
+}
+const changeRouter = (url) => {
+  router.push(url)
 }
 onMounted(() => {
   search()
@@ -79,6 +85,7 @@ onMounted(() => {
 }
 .apply{
   margin: 20px;
+  
   .top-group{
     background: white;
     margin-top: 20px;
@@ -93,6 +100,11 @@ onMounted(() => {
         width:100%;
       }
     }
+  }
+  .item-group{
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 20px;
   }
 }
 </style>

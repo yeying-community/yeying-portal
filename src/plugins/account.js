@@ -6,11 +6,11 @@ import {ServiceCodeEnum,
   // ProviderCodeEnum,
   // SessionProvider, 
   // LlmProvider, 
-  // NamespaceProvider, 
-  // Uploader,
+  NamespaceProvider, 
+  Uploader,
   // ProviderProvider,
   // UserProvider,
-  // LinkProvider,
+  LinkProvider,
   // ApplicationProvider
 } from '@yeying-community/yeying-client-ts'
 // import {ApplicationProvider} from '@yeying-community/yeying-next'
@@ -19,13 +19,13 @@ import {ServiceCodeEnum,
 // import type {CacheTable} from './types'
 import {$account} from '@yeying-community/yeying-wallet';
 
-// let namespaceProvider = null;
+let namespaceProvider = null;
 // let llmManager = null;
 // let sessionManager = null;
-// let uploader = null;
+let uploader = null;
 // let providerProvider = null;
 // let userProvider = null;
-// let linkProvider = null;
+let linkProvider = null;
 // let indexedCache = null;
 let applicationProvider = null;
 
@@ -64,18 +64,18 @@ async function initializeProviders() {
 
   const securityAlgorithm = userInfo?.securityConfig?.algorithm
   const agentProviderOption = {
-    proxy:agent, blockAddress
+    proxy:agent&&agent[0]&&agent[0].proxy, blockAddress
   }
   const warehouseProviderOption = {
-    proxy:warehouse, blockAddress
+    proxy:warehouse&&warehouse[0]&&warehouse[0].proxy, blockAddress
   }
   // sessionManager = new SessionProvider(agentProviderOption)
   // llmManager = new LlmProvider(agentProviderOption)
-  // namespaceProvider = new NamespaceProvider(warehouseProviderOption)
-  // uploader = new Uploader(warehouseProviderOption, securityAlgorithm);
+  namespaceProvider = new NamespaceProvider(warehouseProviderOption)
+  uploader = new Uploader(warehouseProviderOption, securityAlgorithm);
   // providerProvider = new ProviderProvider(agentProviderOption)
   // userProvider = new UserProvider(agentProviderOption)
-  // linkProvider = new LinkProvider(warehouseProviderOption);
+  linkProvider = new LinkProvider(warehouseProviderOption);
   // applicationProvider = new ApplicationProvider(agentProviderOption);
   // indexedCache = new IndexedCache("sessionDB",1)
   // open()
@@ -86,5 +86,5 @@ async function initializeProviders() {
 //     initializeProviders();
 //   });
 // }
-export {applicationProvider,initializeProviders}
+export {applicationProvider,initializeProviders,namespaceProvider,uploader,linkProvider}
 // export {applicationProvider,namespaceProvider,llmManager,sessionManager,uploader,providerProvider,linkProvider,initializeProviders,indexedCache,userProvider}

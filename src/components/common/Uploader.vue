@@ -1,35 +1,54 @@
 <template>
-    <Upload
-        action="https://www.mocky.io/v2/5cc8019d300000980a055e76"
-        :multiple="false"
-        :before-upload="beforeUpload"
-        :max-count="1"
+    <el-upload
+      :file-list="modelValue"
+      @update:file-list="$emit('update:modelValue', $event)"
+      class="upload-demo"
+      :multiple="multiple"
+      :on-change="handleChange"
+      :limit="limit"
+      :auto-upload="false"
+      :show-file-list="showFileList"
+      :accept="accept"
     >
-        <Button class="text-sm">
-            <span class="iconfont icon-upload"/>
-            Upload
-        </Button>
-        <span>
-            {{desc}}
-        </span>
-    </Upload>
-</template>
-<script setup>
-import {Upload,Button} from 'ant-design-vue'
-const emit = defineEmits(['change']);
-const props = defineProps({
-  desc: String
-})
-const beforeUpload = (file) => {
-    const reader = new FileReader();
-    reader.readAsText(file);
-    reader.onload = (e) => {
-        const info = e.target.result;
-        emit("change",info)
-    };
-    
-      // 阻止文件上传到服务器
-    //   emit("change",info)
-      return false;
-}
-</script>
+      <slot/>
+      <template #tip>
+      </template>
+    </el-upload>
+  </template>
+  <script setup>
+  import { ref,watch } from 'vue'
+  
+  const emit = defineEmits(['change','removeAllFile','update:modelValue']);
+  const props = defineProps({
+    desc: String,
+    action: String,
+    multiple: {
+      type: Boolean,
+      default: false,
+    },
+    limit: {
+      type: Number,
+      default: 1,
+    },
+    showFileList: {
+      type: Boolean,
+      default: true,
+    },
+    accept: {
+      type: String,
+      default: "",
+    },
+    modelValue: {
+        type: Array,
+        default: () => []
+    }
+  })
+  const handleChange = (uploadFile) => {
+    emit("change",uploadFile)
+  }
+  const handleRemove = (file, fileList) => {
+    internalFileList.value = fileList;
+  };
+
+  </script>
+  

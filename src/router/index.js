@@ -27,26 +27,6 @@ export const routes = [
     name: 'about',
     component: () => import('../views/AboutView.vue'),
   },
-  // {
-  //   path: '/login',
-  //   name: 'login',
-  //   component: () => import('../views/LoginView.vue'),
-  // },
-  // {
-  //   path: '/toLogin',
-  //   name: 'toLogin',
-  //   component: () => import('../views/ToLoginView.vue'),
-  // },
-  // {
-  //   path: '/reg',
-  //   name: 'reg',
-  //   component: () => import('../views/RegisterView.vue'),
-  // },
-  // {
-  //   path: '/user',
-  //   name: 'user',
-  //   component: () => import('../views/UserView.vue'),
-  // },
   {
     path: '/market',
     name: 'market',
@@ -56,6 +36,16 @@ export const routes = [
         path: '',
         name: 'apply',
         component: () => import('../views/apply/ApplyView.vue'),
+      },
+      {
+        path: 'apply-edit',
+        name: 'applyEdit',
+        component: () => import('../views/apply/ApplyEdit.vue'),
+      },
+      {
+        path: 'apply-detail',
+        name: 'applyDetail',
+        component: () => import('../views/apply/ApplyDetail.vue'),
       },
       {
         path: 'service',

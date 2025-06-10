@@ -8,7 +8,7 @@
           :key="item.title" 
           @click="changeRouter(item.to)"
           class="item"
-          :class="selectName==item.name?'active':''"
+          :class="selectName.includes(item.name)?'active':''"
         >
           <!-- <span class="iconfont" :class="item.icon"/> -->
           <el-icon><component :is="item.icon" /></el-icon>
@@ -63,7 +63,7 @@ const toggleSidebar = () => {
 
 <style scoped lang="less">
 .profile {
-  height: calc(100vh - 3.8rem);
+  min-height: calc(100vh - 3.8rem);
   display: flex;
   .right{
     flex:1;

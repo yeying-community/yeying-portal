@@ -4,28 +4,14 @@
 // import { ProviderCodeEnum } from '@yeying-community/yeying-web3'
 import { applicationProvider,uploader,namespaceProvider,linkProvider } from './account'
 import { setLocalStorage, getLocalStorage } from "@/utils/common";
-
-// 应用编码
-export const codeMap = {
-  1: '社区集市',
-  2: '资产应用',
-  3: '知识库应用',
-  4: '智能管家应用',
-  5: '社交应用',
-  6: '工作台应用',
-  0: '未知',
+export const  ApplyStatusMap = {
+  1: "申请中",
+  2: "已取消",
+  3: "申请通过",
+  4: "申请驳回",
 }
-// 应用依赖的服务编码
-export const serviceCodeMap = {
-  1: '网络节点供应商',
-  2: '仓储服务供应商',
-  3: '智能体供应商',
-  4: '模型上下文供应商',
-  5: '机器人服务供应商',
-  0: '未知',
-}
-class $application {
-  async search(page,pageSize,condition){
+class $service {
+  async searchApply(page,pageSize,condition){
     let params = {}
     params.page = page||1
     params.pageSize = pageSize||10
@@ -100,71 +86,5 @@ class $application {
       resolve(rst)
     })
   }
-  async create(params){
-    // return await applicationProvider.create(params)
-    return new Promise((resolve, reject) => {
-      resolve(params)
-    })
-  }
-  async delete(did,version){
-    // return await applicationProvider.delete(did,version)
-    return new Promise((resolve, reject) => {
-      resolve("success")
-    })
-  }
-  async detail(did,version){
-    // return await applicationProvider.detail(did,version)
-    return new Promise((resolve, reject) => {
-      resolve({
-        address: "1",
-        avatar: "2",
-        code: "3",})
-    })
-  }
-  async offline(did,version){
-    // return await applicationProvider.offline(did,version)
-    return new Promise((resolve, reject) => {
-      resolve("success")
-    })
-  }
-  async online(did,version){
-    // return await applicationProvider.online(did,version)
-    return new Promise((resolve, reject) => {
-      resolve("success")
-    })
-  }
-  async audit(did,version,passed,signature,auditor,comment){
-    // return await applicationProvider.audit(did,version,passed,signature,auditor,comment)
-    return new Promise((resolve, reject) => {
-      resolve("success")
-    })
-  }
-  getNameSpaceId = async () => {
-    let namespaceId = getLocalStorage("namespaceId");
-    if (!namespaceId) {
-      const nameSpace = await this.creatNameSpace("modal");
-      if (nameSpace.uid) {
-        namespaceId = nameSpace.uid;
-        setLocalStorage("namespaceId", namespaceId);
-      }
-    }
-    return namespaceId;
-  };
-  // 创建默认命名空间
-  async creatNameSpace(name){
-    const info = await namespaceProvider.create(name)
-    return info
-  }
-  // 上传文件
-  async uploads(namespace, file){
-    const info = await uploader.upload(namespace, file)
-    return info
-  }
-  // 创建连接
-  async createLink(data){
-    const { namespaceId, name, hash, duration, type, visitors = [], description="" } = data;
-    const info = await linkProvider.create(namespaceId, name, hash, duration, type, visitors, description)
-    return info
-  }
 }
-export default new $application()
+export default new $service()
