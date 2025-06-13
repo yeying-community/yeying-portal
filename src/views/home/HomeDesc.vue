@@ -2,7 +2,7 @@
 import Contact from '@/components/contact/Modal.vue'
 import {getCurrentInstance, ref} from 'vue'
 // import $account from '@/plugins/account.js'
-import {$account} from '@yeying-community/yeying-wallet';
+// import {$account} from '@yeying-community/yeying-wallet';
 
 import { useRouter } from 'vue-router'
 
@@ -13,24 +13,24 @@ const RefContact = ref()
 const router = useRouter();
 
 const changeLogin = async () => {
-  const info = await $account.getActiveIdentity()
-  // const did = info && info.metadata && info.metadata.did
-  const did = $account.getActiveDid()
-  let isLogin = false
-  if(did){
-    try{
-      // await $account.login(did)
-      isLogin = $account.isLogin(did)
-    }catch(e){
-      console.error('login failed:',e)
-    }
-  }
-  if(isLogin){
-    return true
-  }else{
-    router.push("/toLogin")
-    // RefLogin.value.openModal()
-  }
+  // const info = await $account.getActiveIdentity()
+  // // const did = info && info.metadata && info.metadata.did
+  // const did = $account.getActiveDid()
+  // let isLogin = false
+  // if(did){
+  //   try{
+  //     // await $account.login(did)
+  //     isLogin = $account.isLogin(did)
+  //   }catch(e){
+  //     console.error('login failed:',e)
+  //   }
+  // }
+  // if(isLogin){
+  //   return true
+  // }else{
+  //   router.push("/toLogin")
+  //   // RefLogin.value.openModal()
+  // }
   return false
 }
 const openContact = async () => {

@@ -10,7 +10,7 @@
 <script setup>
 import {ref,getCurrentInstance} from 'vue'
 import Contact from '@/components/contact/Modal.vue'
-import {$account} from '@yeying-community/yeying-wallet';
+// import {$account} from '@yeying-community/yeying-wallet';
 import { useRouter } from 'vue-router'
 
 const open = ref(false)
@@ -25,25 +25,25 @@ const router = useRouter();
  * 校验是否有登录信息,未登录弹框选择登录方式
  * */
 const changeLogin = async () => {
-  const info = await $account.getActiveIdentity()
-  // const did = info && info.metadata && info.metadata.did
-  const did = $account.getActiveDid()
-  let isLogin = false
-  if(did){
-    try{
-      // await $account.login(did)
-      isLogin = $account.isLogin(did)
-    }catch(e){
-      console.error('login failed:',e)
-    }
-  }
-  if(isLogin){
-    return true
-  }else{
-    router.push("/toLogin")
-    // RefLogin.value.openModal()
-  }
-  return false
+  // const info = await $account.getActiveIdentity()
+  // // const did = info && info.metadata && info.metadata.did
+  // const did = $account.getActiveDid()
+  // let isLogin = false
+  // if(did){
+  //   try{
+  //     // await $account.login(did)
+  //     isLogin = $account.isLogin(did)
+  //   }catch(e){
+  //     console.error('login failed:',e)
+  //   }
+  // }
+  // if(isLogin){
+  //   return true
+  // }else{
+  //   router.push("/toLogin")
+  //   // RefLogin.value.openModal()
+  // }
+  // return false
 }
 const openContact = async () => {
   const isLogin = await changeLogin()
