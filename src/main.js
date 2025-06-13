@@ -1,4 +1,4 @@
-// import '@/assets/style.css'
+import '@/assets/style.css'
 import {t} from '@yeying-community/yeying-i18n'
 // import '@yeying-community/yeying-wallet/dist/yeying-wallet.css';
 import {createApp} from 'vue'
@@ -6,7 +6,7 @@ import {createPinia} from 'pinia'
 import App from '@/App.vue'
 import { routes } from '@/router'
 import { createRouter, createWebHistory } from 'vue-router'
-// import {createWallet,sdkRoutes} from '@yeying-community/yeying-wallet';
+import {createWallet,sdkRoutes} from '@yeying-community/yeying-wallet';
 import { initializeProviders } from '@/plugins/account'
 
 const app = createApp(App)
@@ -25,14 +25,14 @@ const router = createRouter({
 // setupRouter(router) // 项目路由守卫
 app.use(router)
 // sdk初始化调用
-// createWallet(router,initializeProviders,{
-//   // 登录成功回调
-//   onLoginSuccess: (account) => {
-//     console.log('登录成功',account);
-//   },
-//   // 创建身份成功回调
-//   onCreateSuccess: () => {
-//     console.log('注册成功');
-//   }
-// })
+createWallet(router,initializeProviders,{
+  // 登录成功回调
+  onLoginSuccess: (account) => {
+    console.log('登录成功',account);
+  },
+  // 创建身份成功回调
+  onCreateSuccess: () => {
+    console.log('注册成功');
+  }
+})
 app.mount('#app')
