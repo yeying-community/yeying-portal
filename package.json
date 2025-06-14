@@ -6,7 +6,7 @@
   "scripts": {
     "dev": "vite --host 0.0.0.0",
     "build": "vite build",
-    "build:trace": "VITE_PROFILE=1 node --trace_gc --max-old-space-size=4096 ./node_modules/vite/bin/vite.js build --debug > build.log 2>&1",
+    "build:trace": "VITE_PROFILE=1 node --trace_gc --max-old-space-size=4096 ./node_modules/vite/bin/vite.js build --debug > build-portal.log 2>&1",
     "preview": "vite preview"
   },
   "dependencies": {
