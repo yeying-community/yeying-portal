@@ -13,5 +13,4 @@ dist
 *-lock.json
 .idea
 stats.html
-build.log
-build-portal.log
+*.log
