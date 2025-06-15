@@ -42,12 +42,12 @@
 <script setup>
 import { ref } from "vue";
 import { Menu, MenuButton, MenuItem, MenuItems } from "@headlessui/vue";
-import { setLanguage } from "@yeying-community/yeying-i18n";
+// import { setLanguage } from "@yeying-community/yeying-i18n";
 
 const changeLang = async (code) => {
-  console.log("code", code);
-  await setLanguage(code);
-  location.reload();
+  // console.log("code", code);
+  // await setLanguage(code);
+  // location.reload();
 };
 const menuList = ref([
   { title: "English", code: "en-US" },

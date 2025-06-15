@@ -77,7 +77,7 @@ export default defineConfig({
     vue(),
     // vueDevTools(),
     visualizer({
-      open: false, // 打包完成后自动打开分析页面
+      open: true, // 打包完成后自动打开分析页面
       gzipSize: true, // 显示gzip压缩后的大小
       brotliSize: true // 显示brotli压缩后的大小
     }),

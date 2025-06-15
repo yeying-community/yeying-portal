@@ -1,5 +1,5 @@
 import '@/assets/style.css'
-import {t} from '@yeying-community/yeying-i18n'
+// import {t} from '@yeying-community/yeying-i18n'
 // import '@yeying-community/yeying-wallet/dist/yeying-wallet.css';
 import {createApp} from 'vue'
 import {createPinia} from 'pinia'
@@ -13,7 +13,7 @@ const app = createApp(App)
 
 app.use(createPinia())
 
-app.config.globalProperties.$t = t
+// app.config.globalProperties.$t = t
 
 // 合并路由
 const router = createRouter({
