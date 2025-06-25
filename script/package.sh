@@ -7,10 +7,14 @@ work_dir=$(
   pwd
 )
 
-version=1.0.0
-
+version=$(node -p "require('${work_dir}/package.json').version")
 if [ -n "$1" ]; then
   version="$1"
+fi
+
+if [ -z "${version}" ]; then
+  echo -e "the version couldnot be zero"
+  exit 3
 fi
 
 
@@ -53,6 +57,21 @@ formatted_date=$(date '+%Y%m%d_%H%M%S')
 VERSION_FILE="version_information_$formatted_date"
 record_version_information "$VERSION_FILE"
 mv "$VERSION_FILE" "${portal_dir}"/
+
+
+index=$((index+1))
+echo -e "\nstep $index -- copy submodule file to  ${portal_dir}"
+identity_dir=${work_dir}/yeying-app-identity/output
+if [ ! -d "${identity_dir}" ]; then
+  echo -e "submodule yeying-app-identity is necessary before package!"
+  exit 3;
+fi
+identity_file=${ls yeying-app-identity/output/yeying-*.tar.gz}
+if [ -z "${identity_file}" ]; then
+  echo -e "please generate yeying-app-identity-*.tar.gz before package!"
+  exit 4
+fi
+mv "$identity_file" "${portal_dir}"/
 
 
 sleep 1
