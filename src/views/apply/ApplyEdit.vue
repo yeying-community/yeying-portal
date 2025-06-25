@@ -54,6 +54,9 @@
                   </Uploader>
                   <div class="upload-text">支持图片类型：png, jpg</div>
                 </div>
+                <div v-else>
+                  <img class="mr-1 w-7 h-7 rounded-full" src="../../assets/img/apply_default.png">
+                </div>
               </div>
             </div>
             <div id="part2">
@@ -93,7 +96,7 @@
                   </el-select>
                   <!-- <el-input v-model="detailInfo.serviceCodes" class="input-style" placeholder="请输入应用访问地址"/> -->
                 </el-form-item>
-                <el-form-item label="代码包" prop="codeaaa">
+                <el-form-item label="代码包" prop="codePackagePath">
                   <el-radio-group v-model="codeChk">
                     <el-radio value="1" size="large">下载链接</el-radio>
                     <el-radio value="2" size="large">上传图标</el-radio>
@@ -105,8 +108,8 @@
                   </Uploader>
                   <div class="upload-text">支持文件类型：‌‌.zip ‌.rar  .tar.gz 限制文件数量：1</div>
                 </div>
-                <div v-else class="wrap-cols">
-                  <el-input v-model="detailInfo.codeaaa" class="input-style" placeholder="请输入下载链接"/>
+                <div v-else class="wrap-cols" style="margin-bottom: 18px;">
+                  <el-input v-model="detailInfo.codePackagePath" class="input-style" placeholder="请输入下载链接"/>
                 </div>
                 <el-form-item label="访问地址(URL)" prop="location">
                   <el-input v-model="detailInfo.location" class="input-style" placeholder="请输入应用访问地址"/>
@@ -140,11 +143,14 @@
 </template>
 
 <script setup>
-import { ref, reactive } from 'vue'
+import { ref, reactive, onMounted } from 'vue'
 import $application,{codeMap,serviceCodeMap} from '@/plugins/application'
 import Uploader from '@/components/common/Uploader.vue'
 import { Upload } from '@element-plus/icons-vue'
+import {$account} from '@yeying-community/yeying-wallet';
+import { useRoute } from 'vue-router'
 
+const route = useRoute()
 const containerRef = ref(null)
 const ruleFormRef = ref()
 const avatarChk = ref('2')
@@ -160,7 +166,9 @@ const detailInfo = ref({
   serviceCodes: [],
   avatar: '',
   codeaaa: '',
+  owner: '',
 })
+const userMeta = ref({})
 const handleClick = (e) => {
   e.preventDefault()
 }
@@ -172,23 +180,43 @@ const rules = reactive({
     { required: true, message: '请输入', trigger: 'blur' },
   ],
   avatar: [
-    { required: true, message: '选择', trigger: 'blur' },
+    { required: true, message: '请选择', trigger: 'blur' },
   ],
   codeaaa: [
-    { required: true, message: '选择', trigger: 'blur' },
+    { required: true, message: '请选择', trigger: 'blur' },
   ],
   code: [
-    { required: true, message: '选择', trigger: 'blur' },
+    { required: true, message: '请选择', trigger: 'blur' },
   ],
   serviceCodes: [
-    { required: true, message: '选择', trigger: 'blur' },
+    { required: true, message: '请选择', trigger: 'blur' },
   ],
 })
+const getDetailInfo = async () => {
+  const {did,version} = route.query
+  if(did){
+    const res = await $application.detail(did,version);
+    if(res){
+      detailInfo.value = res.body.application;
+    }
+  }else{
+    await getUserInfo()
+    detailInfo.value.did = userMeta.value.did
+    detailInfo.value.owner = userMeta.value.parent
+    detailInfo.value.address = userMeta.value.address
+    detailInfo.value.network = userMeta.value.network
+    detailInfo.value.version = userMeta.value.version
+  }
+}
 const submitForm = async (formEl) => {
   if (!formEl) return
-  await formEl.validate((valid, fields) => {
+  if(avatarChk.value=='1'){
+    detailInfo.value.avatar = "1";
+  }
+  await formEl.validate(async(valid, fields) => {
     if (valid) {
-      console.log('submit!')
+      const rst = await $application.create(detailInfo.value)
+      console.log('submit!',detailInfo.value,rst)
     } else {
       console.log('error submit!', fields)
     }
@@ -216,25 +244,31 @@ const changeFile = async (fileType,uploadFile) => {
       duration: 3600,
       name: uploader.name,
     };
+   
     const linkInfo = await $application.createLink(params);
     const url = linkInfo && linkInfo.url && linkInfo.url.url;
     if(fileType==1){
       detailInfo.value.avatar = url;
     }else{
-      detailInfo.value.codeaaa = url;
-
+      detailInfo.value.codePackagePath = url;
+      detailInfo.value.hash = uploader.hash;
     }
   }
 }
+const getUserInfo = async () => {
+  const info = await $account.getActiveIdentity()
+  userMeta.value = info.metadata || {}
+}
+onMounted(() => {
+  getDetailInfo()
+  // await getDetailInfo();
+})
 </script>
 <style scoped lang="less">
 .edit {
   margin: 20px;
   .content{
     margin-top: 24px;
-    .wrap-cols{
-      transform: translateY(-15px);
-    }
     .left{
       height: 82vh;
       overflow-y: auto;

@@ -68,7 +68,8 @@ const handleClick = (tab, event) => {
 }
 const search = async () => {
   const rst = await $application.search(1,20)
-  applicationList.value = rst
+  const {applications,page} = rst.body || {}
+  applicationList.value = applications||[]
   console.log('rst---->',rst)
 }
 const changeRouter = (url) => {

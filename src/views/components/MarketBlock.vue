@@ -21,11 +21,11 @@
       </div>
     </div>
     <div class="bottom owner">
-      <div @click="toDetail">
+      <div @click="toDetail" class="cursor">
         详情
       </div>
       <el-divider direction="vertical" />
-      <div @click="handleOffline">
+      <div @click="handleOffline" class="cursor">
         下架应用
       </div>
       <el-divider direction="vertical" />
@@ -66,7 +66,13 @@ const toDelete = () => {
   
 }
 const toEdit = () => {
-
+  router.push({
+    path: '/market/apply-edit',
+    query: {
+      did: props.detail.did,
+      version: props.detail.version
+    }
+  })
 }
 const exportIdentity = () => {
 
@@ -94,6 +100,9 @@ const handleApply = () => {
   background-color: #fff;
   border-radius: 6px;
   padding: 24px;
+  .cursor{
+    cursor: pointer;
+  }
   .top{
     display: flex;
     gap:16px;
