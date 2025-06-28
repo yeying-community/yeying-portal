@@ -144,7 +144,7 @@
 
 <script setup>
 import { ref, reactive, onMounted } from 'vue'
-import $application,{codeMap,serviceCodeMap} from '@/plugins/application'
+import $application,{codeMap,codeMapTrans,serviceCodeMap,serviceCodeMapTrans} from '@/plugins/application'
 import Uploader from '@/components/common/Uploader.vue'
 import { Upload } from '@element-plus/icons-vue'
 import {$account} from '@yeying-community/yeying-wallet';
@@ -204,7 +204,7 @@ const getDetailInfo = async () => {
     detailInfo.value.did = userMeta.value.did
     detailInfo.value.owner = userMeta.value.parent
     detailInfo.value.address = userMeta.value.address
-    detailInfo.value.network = userMeta.value.network
+    detailInfo.value.network = userMeta.value.network+""
     detailInfo.value.version = userMeta.value.version
   }
 }
@@ -215,8 +215,12 @@ const submitForm = async (formEl) => {
   }
   await formEl.validate(async(valid, fields) => {
     if (valid) {
-      const rst = await $application.create(detailInfo.value)
-      console.log('submit!',detailInfo.value,rst)
+      const params = JSON.parse(JSON.stringify(detailInfo.value))
+      delete params.codeaaa
+      params.code = codeMapTrans[params.code]
+      params.serviceCodes = params.serviceCodes.map(item=>serviceCodeMapTrans[item])
+      const rst = await $application.create(params)
+      console.log('submit!',params,rst)
     } else {
       console.log('error submit!', fields)
     }

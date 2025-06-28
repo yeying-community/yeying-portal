@@ -6,6 +6,24 @@ import { applicationProvider,uploader,namespaceProvider,linkProvider } from './a
 import { setLocalStorage, getLocalStorage } from "@/utils/common";
 
 // 应用编码
+export const codeMapTrans = {
+  0:"APPLICATION_CODE_UNKNOWN",
+  1:"APPLICATION_CODE_MARKET",
+  2:"APPLICATION_CODE_ASSET",
+  3:"APPLICATION_CODE_KNOWLEDGE",
+  4:"APPLICATION_CODE_KEEPER",
+  5:"APPLICATION_CODE_SOCIAL",
+  6:"APPLICATION_CODE_WORKBENCH",
+}
+// 应用依赖的服务编码
+export const serviceCodeMapTrans = {
+  0:"SERVICE_CODE_UNKNOWN",
+  1:"SERVICE_CODE_NODE",
+  2:"SERVICE_CODE_WAREHOUSE",
+  3:"SERVICE_CODE_AGENT",
+  4:"SERVICE_CODE_MCP",
+}
+// // 应用编码
 export const codeMap = {
   1: '社区集市',
   2: '资产应用',
@@ -21,7 +39,6 @@ export const serviceCodeMap = {
   2: '仓储服务供应商',
   3: '智能体供应商',
   4: '模型上下文供应商',
-  5: '机器人服务供应商',
   0: '未知',
 }
 class $application {
