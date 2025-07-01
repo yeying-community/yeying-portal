@@ -1,33 +1,41 @@
 #!/usr/bin/env bash
 
+LOGFILE_PATH="/opt/logs"
+LOGFILE_NAME="01-package-yeying-portal.log"
+LOGFILE="$LOGFILE_PATH/$LOGFILE_NAME"
+if [[ ! -d  "$LOGFILE_PATH" ]]
+then
+    mkdir -p "$LOGFILE_PATH"
+fi
+
+touch "$LOGFILE"
+
+filesize=$(stat -c "%s" "$LOGFILE" )
+if [[ "$filesize" -ge 1048576 ]]
+then
+    echo -e "clear old logs at $(date) to avoid log file too big" > "$LOGFILE"
+fi
+
 script_dir=$(cd "$(dirname "$0")" || exit;pwd)
+source "${script_dir}"/functions_package.sh
 
 work_dir=$(
   cd "${script_dir}"/.. || exit 1
   pwd
 )
+service_name=$(basename "$work_dir")
 
-version=1.0.0
+index=1
+echo -e "step $index -- This is the begining of create package for ${service_name} [$(date)] " | tee -a "$LOGFILE"
 
-if [ -n "$1" ]; then
-  version="$1"
+version=$(node -p "require('${work_dir}/package.json').version")
+if [ -z "${version}" ]; then
+  echo -e " ERROR! the version could not be zero! " | tee -a "$LOGFILE"
+  exit 3
 fi
 
 
-function record_version_information() {
-  local recode_file=$1
-  echo -e "\n========branch information:" | tee "$recode_file"
-  git branch --show-current | tee -a "$recode_file"
-  echo -e "\n========commit log information:" >> "$recode_file"
-  git log -3 | grep -v Author | tee -a "$recode_file"
-  echo -e "\n====Finished" | tee -a "$recode_file"
-}
-
-
 dist_dir=${work_dir}/dist
-
-index=1
-echo -e "\nstep $index -- This is going to generate package for yeying-portal"
 output_dir=${work_dir}/output
 if [ -d "${output_dir}" ]; then
   rm -rf "${output_dir}"
@@ -35,17 +43,17 @@ fi
 
 
 index=$((index+1))
-echo -e "\nstep $index -- prepare package files under directroy: ${output_dir}"
-package_name=yeying-portal-${version}
+echo -e "step $index -- prepare package files under directroy: ${output_dir} " | tee -a "$LOGFILE"
+package_name="${service_name}"-"${version}"
 file_name=$package_name.tar.gz
 portal_dir=${output_dir}/${package_name}
 mkdir -p "${portal_dir}"
 
 
 index=$((index+1))
-echo -e "\nstep $index -- copy necessary file to  ${portal_dir}"
+echo -e "step $index -- copy necessary file to  ${portal_dir} " | tee -a "$LOGFILE"
 if [ ! -d "${dist_dir}" ]; then
-  echo -e "please execute 'npm run build' before package!"
+  echo -e "please execute 'npm run build' before package! " | tee -a "$LOGFILE"
   exit 1;
 fi
 cp -rf "${dist_dir}" "${portal_dir}"/
@@ -57,7 +65,7 @@ mv "$VERSION_FILE" "${portal_dir}"/
 
 sleep 1
 index=$((index+1))
-echo -e "\nstep $index -- generate package file"
+echo -e "step $index -- generate package file. " | tee -a "$LOGFILE"
 pushd "${output_dir}" || exit 2
 tar -zcf "${file_name}" "${package_name}"
 rm -rf "${package_name}"
@@ -65,4 +73,4 @@ popd  || exit 2
 
 
 index=$((index+1))
-echo -e "\nstep $index -- package : ${file_name} under [ ${output_dir} ] is ready. $(date)"
+echo -e "step $index -- package : ${file_name} under [ ${output_dir} ] is ready. [$(date)] " | tee -a "$LOGFILE"
