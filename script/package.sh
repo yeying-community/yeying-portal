@@ -1,6 +1,5 @@
 #!/usr/bin/env bash
 
-
 LOGFILE_PATH="/opt/logs"
 LOGFILE_NAME="01-package-yeying-portal.log"
 LOGFILE="$LOGFILE_PATH/$LOGFILE_NAME"
@@ -24,9 +23,10 @@ work_dir=$(
   cd "${script_dir}"/.. || exit 1
   pwd
 )
+service_name=$(basename "$work_dir")
 
 index=1
-echo -e "step $index -- This is begining of create package for yeying-portal [$(date)] " | tee -a "$LOGFILE"
+echo -e "step $index -- This is the begining of create package for ${service_name} [$(date)] " | tee -a "$LOGFILE"
 
 version=$(node -p "require('${work_dir}/package.json').version")
 if [ -z "${version}" ]; then
@@ -44,7 +44,7 @@ fi
 
 index=$((index+1))
 echo -e "step $index -- prepare package files under directroy: ${output_dir} " | tee -a "$LOGFILE"
-package_name=yeying-portal-${version}
+package_name="${service_name}"-"${version}"
 file_name=$package_name.tar.gz
 portal_dir=${output_dir}/${package_name}
 mkdir -p "${portal_dir}"

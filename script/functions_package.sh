@@ -14,5 +14,5 @@ function pull_latest_code() {
 	local branch_name=$1
 	git reset --hard HEAD
 	git checkout "$branch_name"
-	git pull origin "$branch_name" || {exit 1}
+	git pull origin "$branch_name" || { exit 1; }
 }
