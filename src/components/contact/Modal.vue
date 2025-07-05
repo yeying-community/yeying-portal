@@ -87,8 +87,6 @@
 import { ref,reactive, onMounted,getCurrentInstance } from 'vue'
 import { Dialog, DialogPanel, DialogTitle, TransitionChild, TransitionRoot } from '@headlessui/vue'
 import SelectMenu from '@/components/common/SelectMenu.vue'
-// import $account from '@/plugins/account.js'
-import $surpport from '@/plugins/surpport.js'
 
 const { proxy } = getCurrentInstance();
 const {$t}=proxy
@@ -127,7 +125,7 @@ const changeType = (select) => {
   form.pro_type = select.id
 }
 const handleSubmit = async () => {
-  const info = await $surpport?.handleContact?.(form)
+  // const info = await $surpport?.handleContact?.(form)
     console.log(1111111111,info,info2)
 }
 const test = (input) => {

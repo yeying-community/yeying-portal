@@ -8,8 +8,10 @@ node_modules
 # Generated files
 .psci
 output
-/dist
+dist
 *.lock
 *-lock.json
 .idea
 stats.html
+build.log
+
