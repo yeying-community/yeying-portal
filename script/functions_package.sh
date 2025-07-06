@@ -16,3 +16,27 @@ function pull_latest_code() {
 	git checkout "$branch_name"
 	git pull origin "$branch_name" || { exit 1; }
 }
+
+
+can_ssh_login() {
+    local login_user="$1"
+    local login_host="$2"
+
+    if [[ -z "$login_user" || -z "$login_host" ]]; then
+        echo "ERRROR: login user and ip address are necessary" >&2
+        return 1
+    fi
+
+    ssh -o BatchMode=yes \
+        -o ConnectTimeout=10 \
+        -o PreferredAuthentications=publickey \
+        "${login_user}@${login_host}" true &>/dev/null
+
+    local exit_code=$?
+
+    if [[ $exit_code -eq 0 ]]; then
+        return 0
+    else
+        return 1
+    fi
+}

@@ -57,6 +57,7 @@ if [ ! -d "${dist_dir}" ]; then
   exit 1;
 fi
 cp -rf "${dist_dir}" "${portal_dir}"/
+cp -rf "${script_dir}" "${portal_dir}"/
 formatted_date=$(date '+%Y%m%d_%H%M%S')
 VERSION_FILE="version_information_$formatted_date"
 record_version_information "$VERSION_FILE"
