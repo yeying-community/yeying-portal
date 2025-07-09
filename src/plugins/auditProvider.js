@@ -2,15 +2,15 @@
 
 // import { ProviderCodeEnum } from '@yeying-community/yeying-client-ts';
 // import { ProviderCodeEnum } from '@yeying-community/yeying-web3'
-import { auditProvider } from "./account";
+import { auditProvider } from './account'
 
 class $auditProvider {
-  async create(params) {
-    console.log(params, "--params666-");
-    return await auditProvider.create(params);
-    // return new Promise((resolve, reject) => {
-    //   resolve(params)
-    // })
-  }
+    async create(params) {
+        console.log(params, '--params666-')
+        return await auditProvider.create(params)
+        // return new Promise((resolve, reject) => {
+        //   resolve(params)
+        // })
+    }
 }
-export default new $auditProvider();
+export default new $auditProvider()
