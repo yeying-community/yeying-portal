@@ -29,7 +29,7 @@
       <el-tabs
         v-model="activeService"
         class="demo-tabs"
-        @tab-click="handleClick"
+        @tab-click="handleTabClick"
       >
         <template v-for="item in tabs" :key="item.name">
           <el-tab-pane :label="item.title" :name="item.name">
@@ -38,24 +38,41 @@
                 v-for="(app, index) in applicationList"
                 :key="index + app.name"
               >
-                <MarketBlock :detail="app" />
+                <MarketBlock
+                  :detail="app"
+                  :refreshCardList="search"
+                  :userDid="userDid"
+                />
               </template>
             </div>
           </el-tab-pane>
         </template>
       </el-tabs>
     </div>
+    <div class="pagination-wrap">
+      <el-pagination
+        layout="prev, pager, next"
+        :total="pagination.total"
+        :page-size="pagination.pageSize"
+        :current-page="pagination.page"
+        @current-change="handleCurrentChange"
+        @size-change="handleSizeChange"
+      />
+    </div>
   </div>
 </template>
 
 <script setup>
-import { onMounted, ref } from "vue";
+import { onMounted, ref, watch } from "vue";
 import { Search } from "@element-plus/icons-vue";
 import $application from "@/plugins/application";
 import MarketBlock from "@/views/components/MarketBlock.vue";
 import { useRouter } from "vue-router";
+import { userInfo } from "@/plugins/account";
 
-const searchVal = ref();
+const userDid = userInfo?.metadata?.did;
+
+const searchVal = ref("");
 const activeService = ref("1");
 const applicationList = ref([]);
 const router = useRouter();
@@ -73,19 +90,76 @@ const tabs = [
     title: "我申请的",
   },
 ];
-const handleClick = (tab, event) => {
-  console.log(tab, event);
+
+const pagination = ref({
+  pageSize: 10,
+  page: 1,
+  total: 0,
+});
+
+const handleTabClick = (tab) => {
+  activeService.value = tab.name;
+  pagination.value.page = 1; // 切换标签时重置页码
 };
-const search = async (e) => {
-  const inputValue = e?.target?.value || null;
-  const rst = await $application.search(1, 20, { keyword: inputValue });
-  const { applications, page } = rst.body || {};
-  applicationList.value = applications || [];
-  console.log(rst, "---rst-");
+
+const search = async () => {
+  try {
+    // 根据当前激活的标签页传递不同的查询参数
+    let condition = { keyword: searchVal.value };
+
+    if (activeService.value === "2") {
+      condition = { ...condition, owner: userDid }; // 假设当前用户ID可以获取
+    } else if (activeService.value === "3") {
+      condition = { ...condition, applicant: "当前用户ID" }; // 假设当前用户ID可以获取
+    }
+
+    const rst = await $application.search(
+      pagination.value.page,
+      pagination.value.pageSize,
+      condition
+    );
+
+    console.log(rst, "-rst-");
+
+    const { applications, page } = rst.body || {};
+    applicationList.value = applications?.concat(applications) || [];
+    pagination.value.total = page.total || 0;
+  } catch (error) {
+    console.error("获取应用列表失败", error);
+    // 处理错误，如显示提示信息
+  }
 };
+
+const handleCurrentChange = (currentPage) => {
+  pagination.value.page = currentPage;
+};
+
+const handleSizeChange = (pageSize) => {
+  pagination.value = {
+    ...pagination.value,
+    pageSize,
+    page: 1, // 切换每页数量时重置页码
+  };
+};
+
 const changeRouter = (url) => {
   router.push(url);
 };
+
+// 监听分页参数或搜索关键词变化，触发数据请求
+watch(
+  [
+    () => pagination.value.page,
+    () => pagination.value.pageSize,
+    () => searchVal.value,
+    () => activeService.value,
+  ],
+  () => {
+    search();
+  },
+  { immediate: true }
+);
+
 onMounted(() => {
   search();
 });
@@ -117,6 +191,17 @@ onMounted(() => {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
     gap: 20px;
+  }
+
+  .pagination-wrap {
+    width: 100%;
+    display: flex;
+    justify-content: flex-end;
+    margin-top: 24px;
+
+    .el-pagination * {
+      background-color: transparent;
+    }
   }
 }
 </style>

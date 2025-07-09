@@ -16,6 +16,7 @@
     "@yeying-community/yeying-next": "^0.0.46",
     "@yeying-community/yeying-wallet": "^0.1.2",
     "@yeying-community/yeying-web3": "^0.0.36",
+    "dayjs": "^1.11.13",
     "element-plus": "^2.9.11",
     "pinia": "^3.0.1",
     "vue": "^3.5.12",
