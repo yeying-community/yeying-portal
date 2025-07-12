@@ -1,5 +1,11 @@
 <template>
-  <el-dialog v-model="props.modelValue" :title="title" width="430px">
+  <el-dialog
+    v-model="props.modelValue"
+    :title="title"
+    width="430px"
+    :close-on-click-modal="false"
+    @close="props.closeClick()"
+  >
     <el-space
       size="24"
       direction="vertical"
@@ -76,6 +82,10 @@ const props = defineProps({
     default: () => {},
   },
   rightBtnClick: {
+    type: Function,
+    default: () => {},
+  },
+  closeClick: {
     type: Function,
     default: () => {},
   },

@@ -52,7 +52,20 @@
             <div>更多</div>
             <template #dropdown>
               <el-dropdown-menu>
-                <el-dropdown-item @click="toDelete">删除</el-dropdown-item>
+                <el-dropdown-item>
+                  <el-popconfirm
+                    confirm-button-text="确定"
+                    cancel-button-text="取消"
+                    :icon="WarningFilled"
+                    icon-color="#FB9A0E"
+                    title="您确定要删除该应用吗？"
+                    width="220px"
+                    @confirm="toDelete"
+                  >
+                    <template #reference> 删除 </template>
+                  </el-popconfirm>
+                </el-dropdown-item>
+
                 <el-dropdown-item @click="toEdit">编辑</el-dropdown-item>
                 <el-dropdown-item @click="exportIdentity"
                   >导出身份</el-dropdown-item
@@ -82,11 +95,20 @@
             <div>更多</div>
             <template #dropdown>
               <el-dropdown-menu>
-                <el-dropdown-item
-                  v-if="mockLineStatus === 'offline'"
-                  @click="toDelete"
-                  >删除</el-dropdown-item
-                >
+                <el-dropdown-item v-if="mockLineStatus === 'offline'">
+                  <el-popconfirm
+                    confirm-button-text="确定"
+                    cancel-button-text="取消"
+                    :icon="WarningFilled"
+                    icon-color="#FB9A0E"
+                    title="您确定要删除该应用吗？"
+                    width="220px"
+                    @confirm="toDelete"
+                  >
+                    <template #reference> 删除 </template>
+                  </el-popconfirm>
+                </el-dropdown-item>
+
                 <el-dropdown-item
                   v-if="mockLineStatus === 'offline'"
                   @click="toEdit"
@@ -138,13 +160,37 @@
             <div>更多</div>
             <template #dropdown>
               <el-dropdown-menu>
-                <el-dropdown-item
-                  v-if="
-                    mockApplyStatus === 'cancel' || mockApplyStatus === 'reject'
-                  "
-                  @click="toDelete"
-                  >删除</el-dropdown-item
+                <el-popconfirm
+                  confirm-button-text="确定"
+                  cancel-button-text="取消"
+                  :icon="WarningFilled"
+                  icon-color="#FB9A0E"
+                  title="您确定要取消当前应用的申请吗？"
+                  width="220px"
+                  @confirm="cancelApply"
                 >
+                  <template #reference>
+                    <el-dropdown-item
+                      v-if="
+                        mockApplyStatus === 'cancel' ||
+                        mockApplyStatus === 'reject'
+                      "
+                    >
+                      <el-popconfirm
+                        confirm-button-text="确定"
+                        cancel-button-text="取消"
+                        :icon="WarningFilled"
+                        icon-color="#FB9A0E"
+                        title="您确定要删除该应用吗？"
+                        width="220px"
+                        @confirm="toDelete"
+                      >
+                        <template #reference> 删除 </template>
+                      </el-popconfirm>
+                    </el-dropdown-item>
+                  </template>
+                </el-popconfirm>
+
                 <el-dropdown-item
                   v-if="
                     mockApplyStatus === 'cancel' || mockApplyStatus === 'reject'
@@ -154,7 +200,7 @@
                 >
                 <el-dropdown-item
                   v-if="mockApplyStatus === 'success'"
-                  @click="toDelete"
+                  @click="toConfigService"
                   >配置服务</el-dropdown-item
                 >
               </el-dropdown-menu>
@@ -169,7 +215,9 @@
     :dialogVisible="dialogVisible"
     :detail="detail"
     :afterSubmit="afterSubmit"
+    :closeClick="afterSubmit"
   />
+  <ConfigServiceModal :modalVisible="modalVisible" :cancelModal="cancelModal" />
 </template>
 <script setup>
 import { ref } from "vue";
@@ -182,6 +230,7 @@ import { ElMessageBox } from "element-plus";
 import { h } from "vue";
 import Popover from "@/views/components/Popover.vue";
 import ApplyUseModal from "./ApplyUseModal.vue";
+import ConfigServiceModal from "./ConfigServiceModal.vue";
 
 const confirmUnbind = async () => {
   // 执行解绑逻辑
@@ -215,7 +264,7 @@ const StatusInfo = {
 };
 
 const dialogVisible = ref(false);
-const innerVisible = ref(false);
+const modalVisible = ref(false);
 
 import { userInfo } from "@/plugins/account";
 const router = useRouter();
@@ -253,6 +302,14 @@ const toDetail = () => {
       version: props.detail.version,
     },
   });
+};
+
+const toConfigService = () => {
+  modalVisible.value = true;
+};
+
+const cancelModal = () => {
+  modalVisible.value = false;
 };
 
 // 下架应用
@@ -308,6 +365,8 @@ const afterSubmit = () => {
 // const emit = defineEmits(['change']);
 </script>
 <style scoped lang="less">
+/* 强制显示弹窗 */
+
 .tab {
   background-color: #fff;
   border-radius: 6px;
@@ -423,5 +482,9 @@ const afterSubmit = () => {
 
 .mt-1 {
   margin-top: 4px;
+}
+.high-z-index {
+  border: 1px solid red;
+  z-index: 3000 !important; /* 需大于 ElDropdown 的 z-index（通常是 2000+） */
 }
 </style>

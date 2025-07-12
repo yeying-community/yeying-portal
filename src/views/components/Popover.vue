@@ -21,8 +21,11 @@
       </div>
     </div>
     <template #reference>
-      <div v-if="props.show" class="cursor" @click="visible = true">
-        {{ referenceText }}
+      <div v-if="props.show">
+        <div v-if="$slots.btn" @click="visible = true"><slot name="btn" /></div>
+        <div v-else class="cursor" @click="visible = true">
+          {{ referenceText }}
+        </div>
       </div>
     </template>
   </el-popover>

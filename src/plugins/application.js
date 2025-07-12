@@ -186,8 +186,11 @@ class $application {
     return info;
   }
   // 上传文件
-  async uploads(file, namespace) {
-    const info = await uploader.upload(file, namespace);
+  async uploads(file, namespaceId) {
+    const asset = await uploader.createAssetMetadataJson(namespaceId, file);
+    const info = await uploader.upload(file, asset, (r) => {
+      console.log(JSON.stringify(r), "--tt-");
+    });
     return info;
   }
   // 创建连接

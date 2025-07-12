@@ -3,6 +3,8 @@
     v-model="props.dialogVisible"
     :title="props.title || '申请使用'"
     width="430px"
+    :close-on-click-modal="false"
+    @close="props.closeClick()"
   >
     <el-form
       label-position="top"
@@ -42,6 +44,7 @@
     rightBtnText="返回列表"
     :leftBtnClick="toDetail"
     :rightBtnClick="toList"
+    :closeClick="toList"
   >
     <template #icon>
       <el-icon :size="70"><SuccessFilled color="#30A46C" /></el-icon>
@@ -73,6 +76,7 @@ const props = defineProps({
   afterSubmit: Function,
   detail: Object,
   title: String,
+  closeClick: Function,
 });
 
 /**
