@@ -14,6 +14,7 @@ import {
   LinkProvider,
   ApplicationProvider,
   AuditProvider,
+  ServiceProvider,
 } from "@yeying-community/yeying-client-ts";
 // import {ApplicationProvider} from '@yeying-community/yeying-next'
 // import {IdentityCodeEnum, NetworkTypeEnum} from '@yeying-community/yeying-web3'
@@ -32,6 +33,7 @@ let linkProvider = null;
 let applicationProvider = null;
 let userInfo = null;
 let auditProvider = null;
+let serviceCenterProvider = null;
 // async function open(){
 //   const table=[{
 //     name: 'messageTB',
@@ -94,6 +96,7 @@ async function initializeProviders() {
   // indexedCache = new IndexedCache("sessionDB",1)
   // open()
   auditProvider = new AuditProvider(serviceProviderOption);
+  serviceCenterProvider = new ServiceProvider(serviceProviderOption);
 }
 // 页面加载时初始化提供者
 // if (typeof window !== 'undefined') {
@@ -109,5 +112,6 @@ export {
   linkProvider,
   auditProvider,
   userInfo,
+  serviceCenterProvider,
 };
 // export {applicationProvider,namespaceProvider,llmManager,sessionManager,uploader,providerProvider,linkProvider,initializeProviders,indexedCache,userProvider}

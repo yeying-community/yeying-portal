@@ -105,7 +105,7 @@
                     width="220px"
                     @confirm="toDelete"
                   >
-                    <template #reference> 删除 </template>
+                    <template #reference>删除</template>
                   </el-popconfirm>
                 </el-dropdown-item>
 
@@ -114,9 +114,7 @@
                   @click="toEdit"
                   >编辑</el-dropdown-item
                 >
-                <el-dropdown-item @click="exportIdentity"
-                  >导出身份</el-dropdown-item
-                >
+                <el-dropdown-item disabled>加入子网</el-dropdown-item>
               </el-dropdown-menu>
             </template>
           </el-dropdown>
@@ -198,11 +196,6 @@
                   @click="dialogVisible = true"
                   >重新申请</el-dropdown-item
                 >
-                <el-dropdown-item
-                  v-if="mockApplyStatus === 'success'"
-                  @click="toConfigService"
-                  >配置服务</el-dropdown-item
-                >
               </el-dropdown-menu>
             </template>
           </el-dropdown>
@@ -277,7 +270,7 @@ const props = defineProps({
 
 const isOwner = userInfo?.metadata?.did === props.detail?.did;
 
-const mockLineStatus = "online";
+const mockLineStatus = "offline";
 const mockApplyStatus = "success";
 
 // 取消申请
@@ -482,5 +475,9 @@ const afterSubmit = () => {
 
 .mt-1 {
   margin-top: 4px;
+}
+.high-z-index {
+  border: 1px solid red;
+  z-index: 3000 !important; /* 需大于 ElDropdown 的 z-index（通常是 2000+） */
 }
 </style>

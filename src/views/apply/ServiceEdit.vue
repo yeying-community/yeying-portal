@@ -1,14 +1,14 @@
 <template>
   <div class="edit">
     <el-breadcrumb separator="/">
-      <el-breadcrumb-item :to="{ path: '/market/' }"
-        >应用中心</el-breadcrumb-item
+      <el-breadcrumb-item :to="{ path: '/market/service' }"
+        >服务中心</el-breadcrumb-item
       >
       <el-breadcrumb-item
-        >{{ isEdit ? "编辑" : "创建" }}应用身份</el-breadcrumb-item
+        >{{ isEdit ? "编辑" : "创建" }}服务身份</el-breadcrumb-item
       >
     </el-breadcrumb>
-    <BreadcrumbHeader :pageName="isEdit ? '编辑应用身份' : '创建应用身份'" />
+    <BreadcrumbHeader :pageName="isEdit ? '编辑服务身份' : '创建服务身份'" />
     <el-form
       label-position="top"
       label-width="auto"
@@ -20,17 +20,17 @@
         <el-col :span="19" :xs="24">
           <div class="left" ref="containerRef">
             <div id="part1">
-              <div class="title">应用身份信息</div>
+              <div class="title">基本信息</div>
               <el-divider />
               <div class="form">
-                <el-form-item label="应用名称" prop="name">
+                <el-form-item label="服务名称" prop="name">
                   <el-input
                     v-model="detailInfo.name"
                     class="input-style"
                     placeholder="请输入"
                   />
                 </el-form-item>
-                <el-form-item label="应用描述" prop="description">
+                <el-form-item label="服务描述" prop="description">
                   <el-input
                     v-model="detailInfo.description"
                     class="input-style"
@@ -38,7 +38,7 @@
                     type="textarea"
                   />
                 </el-form-item>
-                <el-form-item label="应用图标" prop="avatar">
+                <el-form-item label="服务图标" prop="avatar">
                   <el-radio-group v-model="avatarChk">
                     <el-radio value="1">默认提供</el-radio>
                     <el-radio value="2">上传图标</el-radio>
@@ -53,7 +53,9 @@
                   >
                     <el-button :icon="Upload">上传文件</el-button>
                   </Uploader>
-                  <div class="upload-text">支持图片类型：png, jpg</div>
+                  <div class="upload-text">
+                    支持图片类型：png, jpg,gif,图标大小30*30
+                  </div>
                 </div>
                 <div v-else>
                   <img
@@ -65,10 +67,10 @@
               </div>
             </div>
             <div id="part2">
-              <div class="title">应用信息</div>
+              <div class="title">服务信息</div>
               <el-divider />
               <div class="form">
-                <el-form-item label="应用代号" prop="code">
+                <el-form-item label="服务代码" prop="code">
                   <el-select
                     v-model="detailInfo.code"
                     placeholder="请选择"
@@ -81,9 +83,8 @@
                       :value="value"
                     />
                   </el-select>
-                  <!-- <el-input v-model="detailInfo.code" class="input-style" placeholder="请输入应用访问地址"/> -->
                 </el-form-item>
-                <el-form-item label="绑定服务代号" prop="serviceCodes">
+                <el-form-item label="接口代码" prop="serviceCodes">
                   <el-select
                     v-model="detailInfo.serviceCodes"
                     placeholder="请选择"
@@ -99,49 +100,19 @@
                   </el-select>
                   <!-- <el-input v-model="detailInfo.serviceCodes" class="input-style" placeholder="请输入应用访问地址"/> -->
                 </el-form-item>
-                <el-form-item
-                  label="代码包"
-                  prop="codePackagePath"
-                  style="margin-bottom: 0"
-                >
-                  <el-radio-group v-model="codeChk">
-                    <el-radio value="1" size="large">下载链接</el-radio>
-                    <el-radio value="2" size="large">上传文件</el-radio>
-                  </el-radio-group>
-                </el-form-item>
 
-                <div v-if="codeChk == '2'" class="wrap-cols">
-                  <Uploader
-                    @change="changeFileCode"
-                    v-model="codeList"
-                    accept=".zip,.rar,.tar.gz"
-                  >
-                    <el-button :icon="Upload">上传文件</el-button>
-                  </Uploader>
-                  <div class="upload-text">
-                    支持文件类型：‌‌.zip ‌.rar .tar.gz 限制文件数量：1
-                  </div>
-                </div>
-                <div v-else class="wrap-cols" style="margin-bottom: 18px">
-                  <el-input
-                    v-model="detailInfo.codePackagePath"
-                    class="input-style"
-                    placeholder="请输入下载链接"
-                  />
-                </div>
-                <el-form-item label="访问地址(URL)" prop="location">
+                <el-form-item label="代理地址" prop="location">
                   <el-input
                     v-model="detailInfo.location"
                     class="input-style"
-                    placeholder="请输入应用访问地址"
+                    placeholder="请输入服务代理地址"
                   />
                 </el-form-item>
-                <el-form-item label="代码包Hash" prop="hash">
+                <el-form-item label="服务地址" prop="hash">
                   <el-input
                     v-model="detailInfo.hash"
                     class="input-style"
-                    placeholder="系统默认计算"
-                    disabled
+                    placeholder="请输入输入服务IP：端口（如：192.168.1.1:8080）"
                   />
                 </el-form-item>
               </div>
@@ -171,7 +142,7 @@
             @click="handleClick"
           >
             <el-anchor-link href="#part1" title="基本信息" />
-            <el-anchor-link href="#part2" title="应用信息" />
+            <el-anchor-link href="#part2" title="服务信息" />
           </el-anchor>
         </el-col>
       </el-row>
@@ -182,9 +153,9 @@
     v-model="innerVisible"
     title=""
     :closeIconHidden="true"
-    mainDesc="应用创建成功"
-    subDesc="可返回列表或继续上架当前应用"
-    leftBtnText="上架应用"
+    mainDesc="服务创建成功"
+    subDesc="可返回列表或继续上架当前服务"
+    leftBtnText="上架服务"
     rightBtnText="返回列表"
     :leftBtnClick="toOnlineApply"
     :rightBtnClick="toList"
@@ -217,6 +188,37 @@ const router = useRouter();
 
 const goBack = () => {
   router.back();
+};
+const toList = () => {
+  router.push({
+    path: "/market/service",
+  });
+};
+
+const toOnlineApply = () => {
+  ElMessageBox.confirm("", {
+    message: h("p", null, [
+      h(
+        "div",
+        { style: "font-size:18px;color:rgba(0,0,0,0.85)" },
+        "确定要上架当前服务吗？"
+      ),
+      h(
+        "div",
+        { style: "font-size:14px;font-weight:400;color:rgba(0,0,0,0.85)" },
+        "上架当前服务信息将不可再编辑"
+      ),
+    ]),
+    type: "warning",
+    confirmButtonText: "确定",
+    cancelButtonText: "取消",
+    showClose: false,
+    customClass: "messageBox-wrap",
+  })
+    .then(() => {
+      // 上架接口
+    })
+    .catch(() => {});
 };
 
 const cancelForm = () => {
@@ -321,15 +323,6 @@ const submitForm = async (formEl) => {
     } else {
       console.log("error submit!", fields);
     }
-  });
-};
-
-const toOnlineApply = () => {
-  innerVisible.value = false;
-};
-const toList = () => {
-  router.push({
-    path: "/market",
   });
 };
 const submitFormAndOnline = (formEl) => {

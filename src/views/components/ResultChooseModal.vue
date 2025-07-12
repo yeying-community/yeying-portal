@@ -5,6 +5,7 @@
     width="430px"
     :close-on-click-modal="false"
     @close="props.closeClick()"
+    :close-icon="props.closeIconHidden ? 'null' : null"
   >
     <el-space
       size="24"
@@ -52,6 +53,10 @@ const props = defineProps({
   title: {
     type: String,
     default: "提示",
+  },
+  closeIconHidden: {
+    type: Boolean,
+    default: false,
   },
   mainDesc: {
     type: String,

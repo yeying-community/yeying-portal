@@ -8,10 +8,15 @@ import { routes } from "@/router";
 import { createRouter, createWebHistory } from "vue-router";
 import { createWallet, sdkRoutes } from "@yeying-community/yeying-wallet";
 import { initializeProviders } from "@/plugins/account";
+import ElementPlus from "element-plus";
+import zhCn from "element-plus/dist/locale/zh-cn.mjs";
 
 const app = createApp(App);
 
 app.use(createPinia());
+app.use(ElementPlus, {
+  locale: zhCn,
+});
 
 app.config.globalProperties.$t = t;
 

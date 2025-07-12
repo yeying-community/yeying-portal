@@ -19,8 +19,6 @@
         <el-col :span="16" :xs="24">服务实例</el-col>
       </el-row>
 
-      <!-- 服务代号（value）输入框及验证 -->
-
       <div
         v-for="(domain, index) in dynamicValidateForm.domains"
         :key="domain.key"
@@ -81,7 +79,6 @@
 <script lang="ts" setup>
 import { reactive, ref } from "vue";
 import type { FormInstance } from "element-plus";
-import { Close, Delete, Plus } from "@element-plus/icons-vue";
 const props = defineProps({
   modalVisible: Boolean,
   detail: Object,
