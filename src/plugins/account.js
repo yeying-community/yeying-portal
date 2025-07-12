@@ -1,34 +1,37 @@
 // import {
 //   IndexedCache,
-//   } 
+//   }
 // from '@yeying-community/yeying-next'
-import {ServiceCodeEnum, 
-  // ProviderCodeEnum,
-  // SessionProvider, 
-  // LlmProvider, 
-  NamespaceProvider, 
-  Uploader,
-  // ProviderProvider,
-  // UserProvider,
-  LinkProvider,
-  ApplicationProvider
+import {
+    ServiceCodeEnum,
+    // ProviderCodeEnum,
+    // SessionProvider,
+    // LlmProvider,
+    NamespaceProvider,
+    Uploader,
+    // ProviderProvider,
+    // UserProvider,
+    LinkProvider,
+    ApplicationProvider,
+    AuditProvider
 } from '@yeying-community/yeying-client-ts'
 // import {ApplicationProvider} from '@yeying-community/yeying-next'
 // import {IdentityCodeEnum, NetworkTypeEnum} from '@yeying-community/yeying-web3'
 // import {getLocalStorage} from '@/utils/common'
 // import type {CacheTable} from './types'
-import {$account} from '@yeying-community/yeying-wallet';
+import { $account } from '@yeying-community/yeying-wallet'
 
-let namespaceProvider = null;
+let namespaceProvider = null
 // let llmManager = null;
 // let sessionManager = null;
-let uploader = null;
+let uploader = null
 // let providerProvider = null;
 // let userProvider = null;
-let linkProvider = null;
+let linkProvider = null
 // let indexedCache = null;
-let applicationProvider = null;
-
+let applicationProvider = null
+let userInfo = null
+let auditProvider = null
 // async function open(){
 //   const table=[{
 //     name: 'messageTB',
@@ -43,46 +46,49 @@ let applicationProvider = null;
 // }
 // 初始化提供者
 async function initializeProviders() {
-  // if(sessionManager||llmManager)return
-  const userInfo = await $account.getActiveIdentity()
-  console.log('userinfo--->22',userInfo)
-  const did = userInfo?.metadata?.did
-  let blockAddress = null
-  if(did){
-    blockAddress = await $account.getBlockAddress(did)
-    console.log('blockAddress--->22',blockAddress)
-  }
-  // const blockAddress = getLocalStorage('blockAddress')
-  if(!blockAddress)return
-  // let proxy = getLocalStorage('proxy')||{}
-  // let agent = null
-  let warehouse = null
-  let serviceProvider = null
-  if(blockAddress){
-    serviceProvider = await $account.getServicesByCode(ServiceCodeEnum.SERVICE_CODE_NODE)
-    // agent = await $account.getServicesByCode(ServiceCodeEnum.SERVICE_CODE_AGENT)
-    warehouse = await $account.getServicesByCode(ServiceCodeEnum.SERVICE_CODE_WAREHOUSE)
-  }
-  const securityAlgorithm = userInfo?.securityConfig?.algorithm
-  const serviceProviderOption = {
-    proxy:serviceProvider&&serviceProvider[1]&&serviceProvider[1].proxy, blockAddress
-  }
-  // const agentProviderOption = {
-  //   proxy:agent&&agent[0]&&agent[0].proxy, blockAddress
-  // }
-  const warehouseProviderOption = {
-    proxy:warehouse&&warehouse[0]&&warehouse[0].proxy, blockAddress
-  }
-  // sessionManager = new SessionProvider(agentProviderOption)
-  // llmManager = new LlmProvider(agentProviderOption)
-  namespaceProvider = new NamespaceProvider(warehouseProviderOption)
-  uploader = new Uploader(warehouseProviderOption, securityAlgorithm);
-  // providerProvider = new ProviderProvider(agentProviderOption)
-  // userProvider = new UserProvider(agentProviderOption)
-  linkProvider = new LinkProvider(warehouseProviderOption);
-  applicationProvider = new ApplicationProvider(serviceProviderOption);
-  // indexedCache = new IndexedCache("sessionDB",1)
-  // open()
+    // if(sessionManager||llmManager)return
+    userInfo = await $account.getActiveIdentity()
+    console.log('userinfo--->22', userInfo)
+    const did = userInfo?.metadata?.did
+    let blockAddress = null
+    if (did) {
+        blockAddress = await $account.getBlockAddress(did)
+        console.log('blockAddress--->22', blockAddress)
+    }
+    // const blockAddress = getLocalStorage('blockAddress')
+    if (!blockAddress) return
+    // let proxy = getLocalStorage('proxy')||{}
+    // let agent = null
+    let warehouse = null
+    let serviceProvider = null
+    if (blockAddress) {
+        serviceProvider = await $account.getServicesByCode(ServiceCodeEnum.SERVICE_CODE_NODE)
+        // agent = await $account.getServicesByCode(ServiceCodeEnum.SERVICE_CODE_AGENT)
+        warehouse = await $account.getServicesByCode(ServiceCodeEnum.SERVICE_CODE_WAREHOUSE)
+    }
+    const securityAlgorithm = userInfo?.securityConfig?.algorithm
+    const serviceProviderOption = {
+        proxy: serviceProvider && serviceProvider[1] && serviceProvider[1].proxy,
+        blockAddress
+    }
+    // const agentProviderOption = {
+    //   proxy:agent&&agent[0]&&agent[0].proxy, blockAddress
+    // }
+    const warehouseProviderOption = {
+        proxy: warehouse && warehouse[0] && warehouse[0].proxy,
+        blockAddress
+    }
+    // sessionManager = new SessionProvider(agentProviderOption)
+    // llmManager = new LlmProvider(agentProviderOption)
+    namespaceProvider = new NamespaceProvider(warehouseProviderOption)
+    uploader = new Uploader(warehouseProviderOption, securityAlgorithm)
+    // providerProvider = new ProviderProvider(agentProviderOption)
+    // userProvider = new UserProvider(agentProviderOption)
+    linkProvider = new LinkProvider(warehouseProviderOption)
+    applicationProvider = new ApplicationProvider(serviceProviderOption)
+    // indexedCache = new IndexedCache("sessionDB",1)
+    // open()
+    auditProvider = new AuditProvider(serviceProviderOption)
 }
 // 页面加载时初始化提供者
 // if (typeof window !== 'undefined') {
@@ -90,5 +96,5 @@ async function initializeProviders() {
 //     initializeProviders();
 //   });
 // }
-export {applicationProvider,initializeProviders,namespaceProvider,uploader,linkProvider}
+export { applicationProvider, initializeProviders, namespaceProvider, uploader, linkProvider, auditProvider, userInfo }
 // export {applicationProvider,namespaceProvider,llmManager,sessionManager,uploader,providerProvider,linkProvider,initializeProviders,indexedCache,userProvider}

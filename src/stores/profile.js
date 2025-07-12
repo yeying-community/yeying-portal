@@ -2,10 +2,10 @@ import { ref, computed } from 'vue'
 import { defineStore } from 'pinia'
 
 export const useProfileStore = defineStore('home', () => {
-  const sidebarOpen = ref(false)
-  const changeSlide = (isShow) => {
-    sidebarOpen.value = isShow
-  }
+    const sidebarOpen = ref(false)
+    const changeSlide = (isShow) => {
+        sidebarOpen.value = isShow
+    }
 
-  return { changeSlide,sidebarOpen }
+    return { changeSlide, sidebarOpen }
 })
