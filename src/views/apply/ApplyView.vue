@@ -41,7 +41,7 @@
                 <MarketBlock
                   :detail="app"
                   :refreshCardList="search"
-                  :userDid="userDid"
+                  :pageFrom="activeService"
                 />
               </template>
             </div>
@@ -70,23 +70,23 @@ import MarketBlock from "@/views/components/MarketBlock.vue";
 import { useRouter } from "vue-router";
 import { userInfo } from "@/plugins/account";
 
-const userDid = userInfo?.metadata?.did;
+// const userDid = userInfo?.metadata?.did;
 
 const searchVal = ref("");
-const activeService = ref("1");
+const activeService = ref("market");
 const applicationList = ref([]);
 const router = useRouter();
 const tabs = [
   {
-    name: "1",
+    name: "market",
     title: "应用市场",
   },
   {
-    name: "2",
+    name: "myCreate",
     title: "我创建的",
   },
   {
-    name: "3",
+    name: "myApply",
     title: "我申请的",
   },
 ];
@@ -107,11 +107,11 @@ const search = async () => {
     // 根据当前激活的标签页传递不同的查询参数
     let condition = { keyword: searchVal.value };
 
-    if (activeService.value === "2") {
-      condition = { ...condition, owner: userDid }; // 假设当前用户ID可以获取
-    } else if (activeService.value === "3") {
-      condition = { ...condition, applicant: "当前用户ID" }; // 假设当前用户ID可以获取
-    }
+    // if (activeService.value === "myCreate") {
+    //   condition = { ...condition, owner: userDid }; // 假设当前用户ID可以获取
+    // } else if (activeService.value === "myApply") {
+    //   condition = { ...condition, applicant: "当前用户ID" }; // 假设当前用户ID可以获取
+    // }
 
     const rst = await $application.search(
       pagination.value.page,
@@ -122,7 +122,7 @@ const search = async () => {
     console.log(rst, "-rst-");
 
     const { applications, page } = rst.body || {};
-    applicationList.value = applications?.concat(applications) || [];
+    applicationList.value = applications || [];
     pagination.value.total = page.total || 0;
   } catch (error) {
     console.error("获取应用列表失败", error);

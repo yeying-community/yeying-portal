@@ -186,8 +186,8 @@ class $application {
     return info;
   }
   // 上传文件
-  async uploads(namespace, file) {
-    const info = await uploader.upload(namespace, file);
+  async uploads(file, namespace) {
+    const info = await uploader.upload(file, namespace);
     return info;
   }
   // 创建连接

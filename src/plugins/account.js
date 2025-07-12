@@ -65,6 +65,7 @@ async function initializeProviders() {
     serviceProvider = await $account.getServicesByCode(
       ServiceCodeEnum.SERVICE_CODE_NODE
     );
+
     // agent = await $account.getServicesByCode(ServiceCodeEnum.SERVICE_CODE_AGENT)
     warehouse = await $account.getServicesByCode(
       ServiceCodeEnum.SERVICE_CODE_WAREHOUSE
