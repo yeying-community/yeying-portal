@@ -413,11 +413,9 @@ const changeFile = async (fileType, uploadFile) => {
     }
   }
 }
-const getUserInfo = async (params) => {
-  const info = await $application.createIdentity(template, 'Aa123456')
-
+const getUserInfo = async () => {
+  const info = await $account.getActiveIdentity()
   console.log(info, '-infoinfoinfo-')
-
   userMeta.value = info.metadata || {}
 }
 onMounted(() => {
