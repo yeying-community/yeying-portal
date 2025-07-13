@@ -37,7 +37,7 @@
       <el-row class="part-row">
         <el-col :span="8" :xs="24">应用名称: {{ detailInfo.name }}</el-col>
         <el-col :span="8" :xs="24">创建人: {{ detailInfo.owner }}</el-col>
-        <el-col :span="8" :xs="24">应用状态:{{ "-" }}</el-col>
+        <el-col :span="8" :xs="24">应用状态:{{ '-' }}</el-col>
       </el-row>
       <el-row class="part-row">
         <el-col :span="24">应用名称: {{ detailInfo.createdAt }}</el-col>
@@ -52,7 +52,7 @@
         <el-col :span="8" :xs="24">应用代号: {{ detailInfo.code }}</el-col>
         <el-col :span="8" :xs="24"
           >绑定服务代号:
-          {{ detailInfo.serviceCodes && detailInfo.serviceCodes.join(",") }}
+          {{ detailInfo.serviceCodes && detailInfo.serviceCodes.join(',') }}
         </el-col>
         <el-col :span="8" :xs="24"
           >访问地址(URL): {{ detailInfo.location }}
@@ -76,29 +76,33 @@
 </template>
 
 <script setup>
-import { onMounted, ref } from "vue";
-import BreadcrumbHeader from "@/views/components/BreadcrumbHeader.vue";
-import ApplyStatus from "@/views/components/ApplyStatus.vue";
+import { onMounted, ref } from 'vue'
+import BreadcrumbHeader from '@/views/components/BreadcrumbHeader.vue'
+import ApplyStatus from '@/views/components/ApplyStatus.vue'
 
-import { useRoute } from "vue-router";
-import $application from "@/plugins/application";
-import { Link } from "@element-plus/icons-vue";
-const route = useRoute();
-const urlQuery = ref({});
-const detailInfo = ref({});
-const isonline = ref(false); // 是否已经上架
+import { useRoute } from 'vue-router'
+import $application from '@/plugins/application'
+import { Link } from '@element-plus/icons-vue'
+const route = useRoute()
+const urlQuery = ref({})
+const detailInfo = ref({})
+const isonline = ref(false) // 是否已经上架
 const detail = async () => {
-  const { did = "", version = "" } = route.query || {};
-  const detailRst = await $application.detail(did, version);
-  const { application } = detailRst.body || {};
-  console.log(application, "-detailRst--");
-  detailInfo.value = application || {};
-};
+  const { did = '', version = '', pageFrom = '' } = route.query || {}
+  if (pageFrom !== 'myCreate') {
+    const detailRst = await $application.detail(did, version)
+    const { application } = detailRst.body || {}
+    console.log(application, '-detailRst--')
+    detailInfo.value = application || {}
+  } else {
+    const detailRst = await $application.myApplyDetail(did, version)
+  }
+}
 
 onMounted(() => {
-  urlQuery.value = route.query;
-  detail();
-});
+  urlQuery.value = route.query
+  detail()
+})
 </script>
 
 <style scoped lang="less">

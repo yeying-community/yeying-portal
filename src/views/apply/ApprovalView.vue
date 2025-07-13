@@ -5,10 +5,18 @@
     </el-breadcrumb>
     <div class="content">
       <div class="header">
-        <div :class="{ active: tabIndex == 0 }" @click="changeTab(0)">
+        <div
+          :class="{ active: tabIndex == 0 }"
+          @click="changeTab(0)"
+          style="cursor: pointer"
+        >
           待我审批
         </div>
-        <div :class="{ active: tabIndex == 1 }" @click="changeTab(1)">
+        <div
+          :class="{ active: tabIndex == 1 }"
+          @click="changeTab(1)"
+          style="cursor: pointer"
+        >
           审批完成
         </div>
       </div>

@@ -53,31 +53,31 @@
 </template>
 
 <script setup>
-import { userInfo } from "@/plugins/account";
-import $auditProvider from "@/plugins/auditProvider";
-import ResultChooseModal from "./ResultChooseModal.vue";
-import { ref, reactive } from "vue";
-import { useRouter } from "vue-router";
-import { SuccessFilled } from "@element-plus/icons-vue";
-const innerVisible = ref(false);
-const formRef = ref(null);
+import { userInfo } from '@/plugins/account'
+import $auditProvider from '@/plugins/auditProvider'
+import ResultChooseModal from './ResultChooseModal.vue'
+import { ref, reactive } from 'vue'
+import { useRouter } from 'vue-router'
+import { SuccessFilled } from '@element-plus/icons-vue'
+const innerVisible = ref(false)
+const formRef = ref(null)
 const form = reactive({
-  reason: "",
-});
-const router = useRouter();
+  reason: '',
+})
+const router = useRouter()
 
-const emits = defineEmits(["update:dialogVisible"]);
+const emits = defineEmits(['update:dialogVisible'])
 
 const rules = reactive({
-  reason: [{ required: true, message: "请输入申请原因", trigger: "blur" }],
-});
+  reason: [{ required: true, message: '请输入申请原因', trigger: 'blur' }],
+})
 const props = defineProps({
   dialogVisible: Boolean,
   afterSubmit: Function,
   detail: Object,
   title: String,
   closeClick: Function,
-});
+})
 
 /**
  * 表单提交
@@ -85,38 +85,38 @@ const props = defineProps({
 const submitForm = () => {
   formRef.value.validate(async (valid) => {
     if (valid) {
-      const applyReason = form.reason;
+      const applyReason = form.reason
       const params = {
         sourceDid: userInfo?.metadata?.did,
         reason: applyReason,
-      };
+      }
       // todo 调用接口成功后的操作
-      innerVisible.value = true;
+      innerVisible.value = true
       // props.afterSubmit();
       try {
-        const auditCreate = await $auditProvider.create(params);
-        console.log(auditCreate, "--auditCreate-");
+        const auditCreate = await $auditProvider.create(params)
+        console.log(auditCreate, '--auditCreate-')
       } catch (e) {
-        console.log(e, "-eee-");
+        console.log(e, '-eee-')
       }
     } else {
-      ElMessage.error("请先填写申请原因");
-      return false;
+      ElMessage.error('请先填写申请原因')
+      return false
     }
-  });
-};
+  })
+}
 
 const toDetail = () => {
   router.push({
-    path: "/market/apply-detail",
+    path: '/market/apply-detail',
     query: {
       did: props.detail.did,
       version: props.detail.version,
     },
-  });
-};
+  })
+}
 
 const toList = () => {
-  innerVisible.value = false;
-};
+  innerVisible.value = false
+}
 </script>

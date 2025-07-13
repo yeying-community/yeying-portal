@@ -5,7 +5,7 @@
         >应用中心</el-breadcrumb-item
       >
       <el-breadcrumb-item
-        >{{ isEdit ? "编辑" : "创建" }}应用身份</el-breadcrumb-item
+        >{{ isEdit ? '编辑' : '创建' }}应用身份</el-breadcrumb-item
       >
     </el-breadcrumb>
     <BreadcrumbHeader :pageName="isEdit ? '编辑应用身份' : '创建应用身份'" />
@@ -81,14 +81,14 @@
                       :value="value"
                     />
                   </el-select>
-                  <!-- <el-input v-model="detailInfo.code" class="input-style" placeholder="请输入应用访问地址"/> -->
                 </el-form-item>
                 <el-form-item label="绑定服务代号" prop="serviceCodes">
                   <el-select
                     v-model="detailInfo.serviceCodes"
-                    placeholder="请选择"
+                    placeholder="选择应用code后默认展示"
                     class="input-style"
                     multiple
+                    :disabled="!detailInfo.code"
                   >
                     <el-option
                       v-for="(key, value) in serviceCodeMap"
@@ -97,7 +97,6 @@
                       :value="value"
                     />
                   </el-select>
-                  <!-- <el-input v-model="detailInfo.serviceCodes" class="input-style" placeholder="请输入应用访问地址"/> -->
                 </el-form-item>
                 <el-form-item
                   label="代码包"
@@ -196,164 +195,200 @@
 </template>
 
 <script setup>
-import { ref, reactive, onMounted } from "vue";
+import { ref, reactive, onMounted } from 'vue'
 import $application, {
   codeMap,
   codeMapTrans,
   serviceCodeMap,
   serviceCodeMapTrans,
-} from "@/plugins/application";
-import Uploader from "@/components/common/Uploader.vue";
-import { Upload } from "@element-plus/icons-vue";
-import { $account } from "@yeying-community/yeying-wallet";
-import { useRoute, useRouter } from "vue-router";
-import BreadcrumbHeader from "@/views/components/BreadcrumbHeader.vue";
-import { ElMessageBox } from "element-plus";
-import { h } from "vue";
-import { SuccessFilled } from "@element-plus/icons-vue";
-import ResultChooseModal from "@/views/components/ResultChooseModal.vue";
-const route = useRoute();
-const router = useRouter();
+} from '@/plugins/application'
+import Uploader from '@/components/common/Uploader.vue'
+import { Upload } from '@element-plus/icons-vue'
+import { $account } from '@yeying-community/yeying-wallet'
+import { useRoute, useRouter } from 'vue-router'
+import BreadcrumbHeader from '@/views/components/BreadcrumbHeader.vue'
+import { ElMessageBox } from 'element-plus'
+import { h } from 'vue'
+import { SuccessFilled } from '@element-plus/icons-vue'
+import ResultChooseModal from '@/views/components/ResultChooseModal.vue'
+import { userInfo } from '@/plugins/account'
+
+console.log(userInfo, '--userInfo99999-')
+const route = useRoute()
+const router = useRouter()
 
 const goBack = () => {
-  router.back();
-};
+  router.back()
+}
 
 const cancelForm = () => {
-  ElMessageBox.confirm("", {
-    message: h("p", null, [
+  ElMessageBox.confirm('', {
+    message: h('p', null, [
       h(
-        "div",
-        { style: "font-size:18px;color:rgba(0,0,0,0.85)" },
-        "确定要取消创建应用吗？"
+        'div',
+        { style: 'font-size:18px;color:rgba(0,0,0,0.85)' },
+        '确定要取消创建应用吗？',
       ),
       h(
-        "div",
-        { style: "font-size:14px;font-weight:400;color:rgba(0,0,0,0.85)" },
-        "取消后当前应用信息将不会保存"
+        'div',
+        { style: 'font-size:14px;font-weight:400;color:rgba(0,0,0,0.85)' },
+        '取消后当前应用信息将不会保存',
       ),
     ]),
-    type: "warning",
-    confirmButtonText: "确定",
-    cancelButtonText: "取消",
+    type: 'warning',
+    confirmButtonText: '确定',
+    cancelButtonText: '取消',
     showClose: false,
-    customClass: "messageBox-wrap",
+    customClass: 'messageBox-wrap',
   })
     .then(() => {
-      goBack();
+      goBack()
     })
-    .catch(() => {});
-};
+    .catch(() => {})
+}
 
-const isEdit = ref(false);
-const containerRef = ref(null);
-const ruleFormRef = ref();
-const avatarChk = ref("2");
-const codeChk = ref("2");
-const avatarList = ref([]);
-const codeList = ref([]);
+const isEdit = ref(false)
+const containerRef = ref(null)
+const ruleFormRef = ref()
+const avatarChk = ref('2')
+const codeChk = ref('2')
+const avatarList = ref([])
+
+const codeList = ref([])
 const detailInfo = ref({
-  name: "",
-  description: "",
-  location: "",
-  hash: "",
-  code: "",
+  name: '',
+  description: '',
+  location: '',
+  hash: '',
+  code: '',
   serviceCodes: [],
-  avatar: "",
-  owner: "",
-});
+  avatar: '',
+  owner: '',
+})
 
-const innerVisible = ref(false);
-const userMeta = ref({});
+const innerVisible = ref(false)
+const userMeta = ref({})
 const handleClick = (e) => {
-  e.preventDefault();
-};
+  e.preventDefault()
+}
 const rules = reactive({
-  name: [{ required: true, message: "请输入", trigger: "blur" }],
-  location: [{ required: true, message: "请输入", trigger: "blur" }],
-  avatar: [{ required: true, message: "请选择", trigger: "blur" }],
-  code: [{ required: true, message: "请选择", trigger: "blur" }],
-  serviceCodes: [{ required: true, message: "请选择", trigger: "blur" }],
+  name: [{ required: true, message: '请输入', trigger: 'blur' }],
+  location: [{ required: true, message: '请输入', trigger: 'blur' }],
+  avatar: [{ required: true, message: '请选择', trigger: 'blur' }],
+  code: [{ required: true, message: '请选择', trigger: 'blur' }],
+  serviceCodes: [{ required: true, message: '请选择', trigger: 'blur' }],
   codePackagePath: [
-    { required: true, message: "请上传代码包", trigger: "blur" },
+    { required: true, message: '请上传代码包', trigger: 'blur' },
   ],
-});
+})
 const getDetailInfo = async () => {
-  const { did, version } = route.query;
+  const { did, version } = route.query
 
   if (did) {
-    isEdit.value = true;
-    const res = await $application.detail(did, version);
-    console.log(res, "-detailRes-");
+    isEdit.value = true
+
+    const res = await $application.myApplyDetail(did)
+    // const res = await $application.detail(did, version);
+    console.log(res, '-detailRes-')
     if (res) {
-      detailInfo.value = res.body.application;
-      detailInfo.value.code = String(res.body.application.code);
-      detailInfo.value.serviceCodes = res.body.application.serviceCodes.map(
-        (v) => String(v)
-      );
+      detailInfo.value = res
+      detailInfo.value.code = String(res.code)
+      detailInfo.value.serviceCodes = res.serviceCodes.map((v) => String(v))
+      avatarChk.value = res.avatar === '1' ? '1' : '2'
+      avatarList.value =
+        res.avatar !== '1'
+          ? [
+              {
+                name: res.avatarName,
+                url: res.avatar,
+              },
+            ]
+          : []
+      codeChk.value = res.codeType
+      codeList.value =
+        res.codeType === '2'
+          ? [
+              {
+                name: res.codePackageName,
+                url: res.codePackagePath,
+              },
+            ]
+          : []
     }
   } else {
-    await getUserInfo();
-    detailInfo.value.did = userMeta.value.did;
-    detailInfo.value.owner = userMeta.value.parent;
-    detailInfo.value.address = userMeta.value.address;
-    detailInfo.value.network = userMeta.value.network + "";
-    detailInfo.value.version = userMeta.value.version;
+    await getUserInfo()
+    detailInfo.value.did = userMeta.value.did
+    detailInfo.value.owner = userMeta.value.parent
+    detailInfo.value.address = userMeta.value.address
+    detailInfo.value.network = userMeta.value.network + ''
+    detailInfo.value.version = userMeta.value.version
   }
-};
+}
 
 const submitForm = async (formEl) => {
-  if (!formEl) return;
-  if (avatarChk.value == "1") {
-    detailInfo.value.avatar = "1";
+  if (!formEl) return
+  if (avatarChk.value == '1') {
+    detailInfo.value.avatar = '1'
   }
   await formEl.validate(async (valid, fields) => {
     if (valid) {
-      const params = JSON.parse(JSON.stringify(detailInfo.value));
-      delete params.$typeName;
-      params.code = codeMapTrans[params.code];
+      const { did, version } = route.query
+      const params = JSON.parse(JSON.stringify(detailInfo.value))
+      delete params.$typeName
+      params.code = codeMapTrans[params.code]
       params.serviceCodes = params.serviceCodes.map(
-        (item) => serviceCodeMapTrans[item]
-      );
-      const rst = await $application.create(params);
-      console.log("submit!", params, rst);
-      innerVisible.value = true;
-    } else {
-      console.log("error submit!", fields);
-    }
-  });
-};
+        (item) => serviceCodeMapTrans[item],
+      )
+      params.codeType = codeChk.value
 
-const toOnlineApply = () => {
-  innerVisible.value = false;
-};
+      console.log(params, '-ppp-')
+
+      if (did) {
+        const rst = await $application.update(params)
+        console.log('submit444!', params, rst)
+        // innerVisible.value = true
+      } else {
+        const rst = await $application.create(params)
+        console.log('submit!', params, rst)
+        innerVisible.value = true
+      }
+    } else {
+      console.log('error submit!', fields)
+    }
+  })
+}
+
+const toOnlineApply = async () => {
+  innerVisible.value = false
+  const rst = await $application.online(detailInfo.did, detailInfo.version)
+  console.log(rst, '--i=onlinerrr-')
+}
 const toList = () => {
   router.push({
-    path: "/market",
-  });
-};
+    path: '/market',
+  })
+}
 const submitFormAndOnline = (formEl) => {
-  submitForm(formEl);
-};
+  submitForm(formEl)
+}
 const changeFileAvatar = (uploadFile) => {
-  changeFile(1, uploadFile);
-};
+  console.log(uploadFile, '--uploader-666')
+  changeFile(1, uploadFile)
+}
 const changeFileCode = (uploadFile) => {
-  changeFile(2, uploadFile);
-};
-const handleAvatarUpdate = (newFiles) => {
-  avatarList.value = newFiles;
-};
+  changeFile(2, uploadFile)
+}
+
 const changeFile = async (fileType, uploadFile) => {
-  const namespaceId = await $application.getNameSpaceId();
+  const namespaceId = await $application.getNameSpaceId()
 
   // curImg.value.name = uploadFile.name;
   // curImg.value.size = (uploadFile.size / 1024).toFixed(1) + "M";
 
   if (namespaceId && uploadFile) {
-    console.log(uploadFile, "--uploader-");
+    console.log(uploadFile, '--uploader-')
     try {
-      const uploader = await $application.uploads(uploadFile.raw, namespaceId);
+      const uploader = await $application.uploads(uploadFile.raw, namespaceId)
 
       const params = {
         namespaceId,
@@ -361,29 +396,34 @@ const changeFile = async (fileType, uploadFile) => {
         type: 1,
         duration: 3600,
         name: uploader.name,
-      };
+      }
 
-      const linkInfo = await $application.createLink(params);
-      const url = linkInfo && linkInfo.url && linkInfo.url.url;
+      const linkInfo = await $application.createLink(params)
+      const url = linkInfo && linkInfo.url && linkInfo.url.url
       if (fileType == 1) {
-        detailInfo.value.avatar = url;
+        detailInfo.value.avatar = url
+        detailInfo.value.avatarName = uploadFile.name
       } else {
-        detailInfo.value.codePackagePath = url;
-        detailInfo.value.hash = uploader.hash;
+        detailInfo.value.codePackagePath = url
+        detailInfo.value.codePackageName = uploadFile.name
+        detailInfo.value.hash = uploader.hash
       }
     } catch (error) {
-      console.log(error);
+      console.log(error)
     }
   }
-};
-const getUserInfo = async () => {
-  const info = await $account.getActiveIdentity();
-  userMeta.value = info.metadata || {};
-};
+}
+const getUserInfo = async (params) => {
+  const info = await $application.createIdentity(template, 'Aa123456')
+
+  console.log(info, '-infoinfoinfo-')
+
+  userMeta.value = info.metadata || {}
+}
 onMounted(() => {
-  getDetailInfo();
+  getDetailInfo()
   // await getDetailInfo();
-});
+})
 </script>
 <style scoped lang="less">
 .edit {
