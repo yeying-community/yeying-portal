@@ -23,8 +23,8 @@
             <el-tag type="primary" size="small">官方</el-tag>
           </span>
           <span>
-            {{ pageFrom === 'myCreate' ? '创建于' : '上架于' }}
-            {{ dayjs(detail.createdAt).format('YYYY-MM-DD') }}</span
+            {{ pageFrom === "myCreate" ? "创建于" : "上架于" }}
+            {{ dayjs(detail.createdAt).format("YYYY-MM-DD") }}</span
           >
         </div>
         <div class="desc">
@@ -52,6 +52,21 @@
             <div>更多</div>
             <template #dropdown>
               <el-dropdown-menu>
+                <el-dropdown-item>
+                  <el-popconfirm
+                    confirm-button-text="确定"
+                    cancel-button-text="取消"
+                    :icon="WarningFilled"
+                    icon-color="#FB9A0E"
+                    title="您确定要删除该应用吗？"
+                    width="220px"
+                    @confirm="toDelete"
+                  >
+                    <template #reference> 删除 </template>
+                  </el-popconfirm>
+                </el-dropdown-item>
+
+                <el-dropdown-item @click="toEdit">编辑</el-dropdown-item>
                 <el-dropdown-item @click="exportIdentity"
                   >导出身份</el-dropdown-item
                 >
@@ -90,7 +105,7 @@
                     width="220px"
                     @confirm="toDelete"
                   >
-                    <template #reference> 删除 </template>
+                    <template #reference>删除</template>
                   </el-popconfirm>
                 </el-dropdown-item>
 
@@ -99,9 +114,7 @@
                   @click="toEdit"
                   >编辑</el-dropdown-item
                 >
-                <el-dropdown-item @click="exportIdentity"
-                  >导出身份</el-dropdown-item
-                >
+                <el-dropdown-item disabled>加入子网</el-dropdown-item>
               </el-dropdown-menu>
             </template>
           </el-dropdown>
@@ -183,11 +196,6 @@
                   @click="dialogVisible = true"
                   >重新申请</el-dropdown-item
                 >
-                <el-dropdown-item
-                  v-if="mockApplyStatus === 'success'"
-                  @click="toConfigService"
-                  >配置服务</el-dropdown-item
-                >
               </el-dropdown-menu>
             </template>
           </el-dropdown>
@@ -203,202 +211,155 @@
     :closeClick="afterSubmit"
   />
   <ConfigServiceModal :modalVisible="modalVisible" :cancelModal="cancelModal" />
-  <ResultChooseModal
-    v-model="innerVisible"
-    title="申请使用"
-    mainDesc="应用申请中"
-    subDesc="正在等待服务所有人审批，请耐心等待"
-    leftBtnText="查看详情"
-    rightBtnText="返回列表"
-    :leftBtnClick="toDetail"
-    :rightBtnClick="toList"
-    :closeClick="toList"
-  >
-    <template #icon>
-      <el-icon :size="70"><SuccessFilled color="#30A46C" /></el-icon>
-    </template>
-  </ResultChooseModal>
 </template>
 <script setup>
-import { ref } from 'vue'
-import { useRouter } from 'vue-router'
-import $application from '@/plugins/application'
-import { SuccessFilled } from '@element-plus/icons-vue'
-import dayjs from 'dayjs'
-import { userInfo } from '@/plugins/account'
-import { ElMessageBox } from 'element-plus'
-import { h } from 'vue'
-import Popover from '@/views/components/Popover.vue'
-import ApplyUseModal from './ApplyUseModal.vue'
-import ConfigServiceModal from './ConfigServiceModal.vue'
-import ResultChooseModal from './ResultChooseModal.vue'
+import { ref } from "vue";
+import { useRouter } from "vue-router";
+import $application from "@/plugins/application";
+
+import dayjs from "dayjs";
+
+import { ElMessageBox } from "element-plus";
+import { h } from "vue";
+import Popover from "@/views/components/Popover.vue";
+import ApplyUseModal from "./ApplyUseModal.vue";
+import ConfigServiceModal from "./ConfigServiceModal.vue";
+
+const confirmUnbind = async () => {
+  // 执行解绑逻辑
+};
 
 const StatusInfo = {
   online: {
-    type: 'success',
-    text: '已上架',
+    type: "success",
+    text: "已上架",
   },
   offline: {
-    type: 'info',
-    text: '未上架',
+    type: "info",
+    text: "未上架",
   },
   success: {
-    type: 'success',
-    text: '申请通过',
+    type: "success",
+    text: "申请通过",
   },
   applying: {
-    type: 'primary',
-    text: '申请中',
+    type: "primary",
+    text: "申请中",
   },
   reject: {
-    type: 'danger',
-    text: '申请驳回',
+    type: "danger",
+    text: "申请驳回",
   },
   cancel: {
-    type: 'info',
-    text: '已取消',
+    type: "info",
+    text: "已取消",
   },
-}
+};
 
-const router = useRouter()
+const dialogVisible = ref(false);
+const modalVisible = ref(false);
+
+import { userInfo } from "@/plugins/account";
+const router = useRouter();
 const props = defineProps({
   detail: Object,
   selectId: Number,
   refreshCardList: Function,
   pageFrom: String,
-})
+});
 
-const isOwner = userInfo?.metadata?.did === props.detail?.did
-const confirmUnbind = async () => {
-  // 执行解绑逻辑
-}
-const innerVisible = ref(false)
-const dialogVisible = ref(false)
-const modalVisible = ref(false)
+const isOwner = userInfo?.metadata?.did === props.detail?.did;
 
-const mockLineStatus = 'offline'
-const mockApplyStatus = 'success'
+const mockLineStatus = "offline";
+const mockApplyStatus = "success";
 
 // 取消申请
-const cancelApply = () => {}
+const cancelApply = () => {};
 
-const toDelete = async () => {
-  if (props.pageFrom === 'myCreate') {
-    await $application.myApplyDelete(props.detail.did)
-  } else {
-    await $application.delete(props.detail.did, props.detail.version)
-  }
-  props.refreshCardList()
-}
+const toDelete = () => {};
 const toEdit = () => {
   router.push({
-    path: '/market/apply-edit',
+    path: "/market/apply-edit",
     query: {
       did: props.detail.did,
       version: props.detail.version,
     },
-  })
-}
-const exportIdentity = () => {}
+  });
+};
+const exportIdentity = () => {};
 const toDetail = () => {
   router.push({
-    path: '/market/apply-detail',
+    path: "/market/apply-detail",
     query: {
       did: props.detail.did,
       version: props.detail.version,
-      pageFrom: props.pageFrom,
     },
-  })
-}
-const toList = () => {
-  innerVisible.value = false
-}
+  });
+};
 
 const toConfigService = () => {
-  modalVisible.value = true
-}
+  modalVisible.value = true;
+};
 
 const cancelModal = () => {
-  modalVisible.value = false
-}
+  modalVisible.value = false;
+};
 
 // 下架应用
 const handleOffline = async () => {
   const offlinelRst = await $application.offline(
     props.detail.did,
-    props.detail.version,
-  )
-  console.log(offlinelRst, '-offlinelRst')
-  const { status } = offlinelRst.body
+    props.detail.version
+  );
+  console.log(offlinelRst, "-offlinelRst");
+  const { status } = offlinelRst.body;
 
-  if (status?.message === 'success') {
+  if (status?.message === "success") {
     ElMessage({
-      message: '已下架',
-      type: 'success',
-    })
-    props.refreshCardList()
+      message: "已下架",
+      type: "success",
+    });
+    props.refreshCardList();
   }
-}
+};
 
 const handleOfflineConfirm = () => {
-  ElMessageBox.confirm('', {
-    message: h('p', null, [
+  ElMessageBox.confirm("", {
+    message: h("p", null, [
       h(
-        'div',
-        { style: 'font-size:18px;color:rgba(0,0,0,0.85)' },
-        '你确定要下架当前应用吗？',
+        "div",
+        { style: "font-size:18px;color:rgba(0,0,0,0.85)" },
+        "你确定要下架当前应用吗？"
       ),
       h(
-        'div',
-        { style: 'font-size:14px;font-weight:400;color:rgba(0,0,0,0.85)' },
-        '下架后当前应用将不在应用市场展示。',
+        "div",
+        { style: "font-size:14px;font-weight:400;color:rgba(0,0,0,0.85)" },
+        "下架后当前应用将不在应用市场展示。"
       ),
     ]),
-    type: 'warning',
-    confirmButtonText: '确定',
-    cancelButtonText: '取消',
+    type: "warning",
+    confirmButtonText: "确定",
+    cancelButtonText: "取消",
     showClose: false,
-    customClass: 'messageBox-wrap',
+    customClass: "messageBox-wrap",
   })
     .then(() => {
-      handleOffline()
+      handleOffline();
     })
-    .catch(() => {})
-}
+    .catch(() => {});
+};
 
 // 上架应用
-const handleOnline = () => {
-  ElMessageBox.confirm('', {
-    message: h('p', null, [
-      h(
-        'div',
-        { style: 'font-size:18px;color:rgba(0,0,0,0.85)' },
-        '你确定要上架当前应用吗？',
-      ),
-      h(
-        'div',
-        { style: 'font-size:14px;font-weight:400;color:rgba(0,0,0,0.85)' },
-        '上架后当前应用将不可再编辑修改。',
-      ),
-    ]),
-    type: 'warning',
-    confirmButtonText: '确定',
-    cancelButtonText: '取消',
-    showClose: false,
-    customClass: 'messageBox-wrap',
-  })
-    .then(() => {
-      innerVisible.value = true
-    })
-    .catch(() => {})
-}
+const handleOnline = () => {};
 const afterSubmit = () => {
-  dialogVisible.value = false
-}
+  dialogVisible.value = false;
+};
 
 // const emit = defineEmits(['change']);
 </script>
 <style scoped lang="less">
+/* 强制显示弹窗 */
+
 .tab {
   background-color: #fff;
   border-radius: 6px;
@@ -514,5 +475,9 @@ const afterSubmit = () => {
 
 .mt-1 {
   margin-top: 4px;
+}
+.high-z-index {
+  border: 1px solid red;
+  z-index: 3000 !important; /* 需大于 ElDropdown 的 z-index（通常是 2000+） */
 }
 </style>

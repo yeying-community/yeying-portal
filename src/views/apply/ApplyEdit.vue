@@ -1,22 +1,14 @@
 <template>
   <div class="edit">
-    <!-- <el-page-header>
-      <template #breadcrumb>
-        <el-breadcrumb separator="/">
-          <el-breadcrumb-item :to="{ path: '/market/' }">
-            应用中心
-          </el-breadcrumb-item>
-          <el-breadcrumb-item>创建应用身份</el-breadcrumb-item>
-        </el-breadcrumb>
-      </template>
-      <template #content>
-        <span class="text-large font-600 mr-3"> 创建应用身份 </span>
-      </template>
-    </el-page-header> -->
     <el-breadcrumb separator="/">
-      <el-breadcrumb-item :to="{ path: '/market/' }">应用中心</el-breadcrumb-item>
-      <el-breadcrumb-item>创建应用身份</el-breadcrumb-item>
+      <el-breadcrumb-item :to="{ path: '/market/' }"
+        >应用中心</el-breadcrumb-item
+      >
+      <el-breadcrumb-item
+        >{{ isEdit ? '编辑' : '创建' }}应用身份</el-breadcrumb-item
+      >
     </el-breadcrumb>
+    <BreadcrumbHeader :pageName="isEdit ? '编辑应用身份' : '创建应用身份'" />
     <el-form
       label-position="top"
       label-width="auto"
@@ -28,16 +20,21 @@
         <el-col :span="19" :xs="24">
           <div class="left" ref="containerRef">
             <div id="part1">
-              <div class="title">
-                应用身份信息
-              </div>
+              <div class="title">应用身份信息</div>
               <el-divider />
               <div class="form">
                 <el-form-item label="应用名称" prop="name">
-                  <el-input v-model="detailInfo.name" class="input-style" placeholder="请输入"/>
+                  <el-input
+                    v-model="detailInfo.name"
+                    class="input-style"
+                    placeholder="请输入"
+                  />
                 </el-form-item>
                 <el-form-item label="应用描述" prop="description">
-                  <el-input v-model="detailInfo.description" class="input-style" placeholder="请输入"
+                  <el-input
+                    v-model="detailInfo.description"
+                    class="input-style"
+                    placeholder="请输入"
                     type="textarea"
                   />
                 </el-form-item>
@@ -48,21 +45,27 @@
                   </el-radio-group>
                   <!-- <el-input v-model="detailInfo.name" class="input-style" placeholder="请输入"/> -->
                 </el-form-item>
-                <div v-if="avatarChk=='2'" class="wrap-cols">
-                  <Uploader @change="changeFileAvatar" v-model="avatarList" accept=".png,jpg">
+                <div v-if="avatarChk == '2'" class="wrap-cols">
+                  <Uploader
+                    @change="changeFileAvatar"
+                    v-model="avatarList"
+                    accept=".png,jpg"
+                  >
                     <el-button :icon="Upload">上传文件</el-button>
                   </Uploader>
                   <div class="upload-text">支持图片类型：png, jpg</div>
                 </div>
                 <div v-else>
-                  <img class="mr-1 w-7 h-7 rounded-full" src="../../assets/img/apply_default.png">
+                  <img
+                    class="mr-1 w-7 h-7"
+                    src="../../assets/img/apply_default.png"
+                    style="border-radius: 8px"
+                  />
                 </div>
               </div>
             </div>
             <div id="part2">
-              <div class="title">
-                应用信息
-              </div>
+              <div class="title">应用信息</div>
               <el-divider />
               <div class="form">
                 <el-form-item label="应用代号" prop="code">
@@ -72,56 +75,89 @@
                     class="input-style"
                   >
                     <el-option
-                      v-for="(key,value) in codeMap"
-                      :key="key+value"
+                      v-for="(key, value) in codeMap"
+                      :key="key + value"
                       :label="key"
                       :value="value"
                     />
                   </el-select>
-                  <!-- <el-input v-model="detailInfo.code" class="input-style" placeholder="请输入应用访问地址"/> -->
                 </el-form-item>
                 <el-form-item label="绑定服务代号" prop="serviceCodes">
                   <el-select
                     v-model="detailInfo.serviceCodes"
-                    placeholder="请选择"
+                    placeholder="选择应用code后默认展示"
                     class="input-style"
                     multiple
+                    :disabled="!detailInfo.code"
                   >
                     <el-option
-                      v-for="(key,value) in serviceCodeMap"
-                      :key="key+value"
+                      v-for="(key, value) in serviceCodeMap"
+                      :key="key + value"
                       :label="key"
                       :value="value"
                     />
                   </el-select>
-                  <!-- <el-input v-model="detailInfo.serviceCodes" class="input-style" placeholder="请输入应用访问地址"/> -->
                 </el-form-item>
-                <el-form-item label="代码包" prop="codePackagePath">
+                <el-form-item
+                  label="代码包"
+                  prop="codePackagePath"
+                  style="margin-bottom: 0"
+                >
                   <el-radio-group v-model="codeChk">
                     <el-radio value="1" size="large">下载链接</el-radio>
-                    <el-radio value="2" size="large">上传图标</el-radio>
+                    <el-radio value="2" size="large">上传文件</el-radio>
                   </el-radio-group>
                 </el-form-item>
-                <div v-if="codeChk=='2'" class="wrap-cols">
-                  <Uploader @change="changeFileCode" v-model="codeList" accept=".zip,.rar,.tar.gz">
+
+                <div v-if="codeChk == '2'" class="wrap-cols">
+                  <Uploader
+                    @change="changeFileCode"
+                    v-model="codeList"
+                    accept=".zip,.rar,.tar.gz"
+                  >
                     <el-button :icon="Upload">上传文件</el-button>
                   </Uploader>
-                  <div class="upload-text">支持文件类型：‌‌.zip ‌.rar  .tar.gz 限制文件数量：1</div>
+                  <div class="upload-text">
+                    支持文件类型：‌‌.zip ‌.rar .tar.gz 限制文件数量：1
+                  </div>
                 </div>
-                <div v-else class="wrap-cols" style="margin-bottom: 18px;">
-                  <el-input v-model="detailInfo.codePackagePath" class="input-style" placeholder="请输入下载链接"/>
+                <div v-else class="wrap-cols" style="margin-bottom: 18px">
+                  <el-input
+                    v-model="detailInfo.codePackagePath"
+                    class="input-style"
+                    placeholder="请输入下载链接"
+                  />
                 </div>
                 <el-form-item label="访问地址(URL)" prop="location">
-                  <el-input v-model="detailInfo.location" class="input-style" placeholder="请输入应用访问地址"/>
+                  <el-input
+                    v-model="detailInfo.location"
+                    class="input-style"
+                    placeholder="请输入应用访问地址"
+                  />
                 </el-form-item>
                 <el-form-item label="代码包Hash" prop="hash">
-                  <el-input v-model="detailInfo.hash" class="input-style" placeholder="系统默认计算"/>
+                  <el-input
+                    v-model="detailInfo.hash"
+                    class="input-style"
+                    placeholder="系统默认计算"
+                    disabled
+                  />
                 </el-form-item>
               </div>
             </div>
             <div class="footer">
-              <!-- <el-button @click="resetForm(ruleFormRef)"></el-button> -->
-              <el-button type="primary" @click="submitForm(ruleFormRef)">保存</el-button>
+              <el-button type="default" @click="cancelForm">取消</el-button>
+              <el-button
+                :type="isEdit ? 'default' : 'primary'"
+                @click="submitForm(ruleFormRef)"
+                >保存
+              </el-button>
+              <el-button
+                v-if="isEdit"
+                type="primary"
+                @click="submitFormAndOnline(ruleFormRef)"
+                >保存并上架
+              </el-button>
             </div>
           </div>
         </el-col>
@@ -140,22 +176,84 @@
       </el-row>
     </el-form>
   </div>
+
+  <ResultChooseModal
+    v-model="innerVisible"
+    title=""
+    :closeIconHidden="true"
+    mainDesc="应用创建成功"
+    subDesc="可返回列表或继续上架当前应用"
+    leftBtnText="上架应用"
+    rightBtnText="返回列表"
+    :leftBtnClick="toOnlineApply"
+    :rightBtnClick="toList"
+  >
+    <template #icon>
+      <el-icon :size="70"><SuccessFilled color="#30A46C" /></el-icon>
+    </template>
+  </ResultChooseModal>
 </template>
 
 <script setup>
 import { ref, reactive, onMounted } from 'vue'
-import $application,{codeMap,codeMapTrans,serviceCodeMap,serviceCodeMapTrans} from '@/plugins/application'
+import $application, {
+  codeMap,
+  codeMapTrans,
+  serviceCodeMap,
+  serviceCodeMapTrans,
+} from '@/plugins/application'
 import Uploader from '@/components/common/Uploader.vue'
 import { Upload } from '@element-plus/icons-vue'
-import {$account} from '@yeying-community/yeying-wallet';
-import { useRoute } from 'vue-router'
+import { $account } from '@yeying-community/yeying-wallet'
+import { useRoute, useRouter } from 'vue-router'
+import BreadcrumbHeader from '@/views/components/BreadcrumbHeader.vue'
+import { ElMessageBox } from 'element-plus'
+import { h } from 'vue'
+import { SuccessFilled } from '@element-plus/icons-vue'
+import ResultChooseModal from '@/views/components/ResultChooseModal.vue'
+import { userInfo } from '@/plugins/account'
 
+console.log(userInfo, '--userInfo99999-')
 const route = useRoute()
+const router = useRouter()
+
+const goBack = () => {
+  router.back()
+}
+
+const cancelForm = () => {
+  ElMessageBox.confirm('', {
+    message: h('p', null, [
+      h(
+        'div',
+        { style: 'font-size:18px;color:rgba(0,0,0,0.85)' },
+        '确定要取消创建应用吗？',
+      ),
+      h(
+        'div',
+        { style: 'font-size:14px;font-weight:400;color:rgba(0,0,0,0.85)' },
+        '取消后当前应用信息将不会保存',
+      ),
+    ]),
+    type: 'warning',
+    confirmButtonText: '确定',
+    cancelButtonText: '取消',
+    showClose: false,
+    customClass: 'messageBox-wrap',
+  })
+    .then(() => {
+      goBack()
+    })
+    .catch(() => {})
+}
+
+const isEdit = ref(false)
 const containerRef = ref(null)
 const ruleFormRef = ref()
 const avatarChk = ref('2')
 const codeChk = ref('2')
 const avatarList = ref([])
+
 const codeList = ref([])
 const detailInfo = ref({
   name: '',
@@ -165,102 +263,159 @@ const detailInfo = ref({
   code: '',
   serviceCodes: [],
   avatar: '',
-  codeaaa: '',
   owner: '',
 })
+
+const innerVisible = ref(false)
 const userMeta = ref({})
 const handleClick = (e) => {
   e.preventDefault()
 }
 const rules = reactive({
-  name: [
-    { required: true, message: '请输入', trigger: 'blur' },
-  ],
-  location: [
-    { required: true, message: '请输入', trigger: 'blur' },
-  ],
-  avatar: [
-    { required: true, message: '请选择', trigger: 'blur' },
-  ],
-  codeaaa: [
-    { required: true, message: '请选择', trigger: 'blur' },
-  ],
-  code: [
-    { required: true, message: '请选择', trigger: 'blur' },
-  ],
-  serviceCodes: [
-    { required: true, message: '请选择', trigger: 'blur' },
+  name: [{ required: true, message: '请输入', trigger: 'blur' }],
+  location: [{ required: true, message: '请输入', trigger: 'blur' }],
+  avatar: [{ required: true, message: '请选择', trigger: 'blur' }],
+  code: [{ required: true, message: '请选择', trigger: 'blur' }],
+  serviceCodes: [{ required: true, message: '请选择', trigger: 'blur' }],
+  codePackagePath: [
+    { required: true, message: '请上传代码包', trigger: 'blur' },
   ],
 })
 const getDetailInfo = async () => {
-  const {did,version} = route.query
-  if(did){
-    const res = await $application.detail(did,version);
-    if(res){
-      detailInfo.value = res.body.application;
+  const { did, version } = route.query
+
+  if (did) {
+    isEdit.value = true
+
+    const res = await $application.myApplyDetail(did)
+    // const res = await $application.detail(did, version);
+    console.log(res, '-detailRes-')
+    if (res) {
+      detailInfo.value = res
+      detailInfo.value.code = String(res.code)
+      detailInfo.value.serviceCodes = res.serviceCodes.map((v) => String(v))
+      avatarChk.value = res.avatar === '1' ? '1' : '2'
+      avatarList.value =
+        res.avatar !== '1'
+          ? [
+              {
+                name: res.avatarName,
+                url: res.avatar,
+              },
+            ]
+          : []
+      codeChk.value = res.codeType
+      codeList.value =
+        res.codeType === '2'
+          ? [
+              {
+                name: res.codePackageName,
+                url: res.codePackagePath,
+              },
+            ]
+          : []
     }
-  }else{
+  } else {
     await getUserInfo()
     detailInfo.value.did = userMeta.value.did
     detailInfo.value.owner = userMeta.value.parent
     detailInfo.value.address = userMeta.value.address
-    detailInfo.value.network = userMeta.value.network+""
+    detailInfo.value.network = userMeta.value.network + ''
     detailInfo.value.version = userMeta.value.version
   }
 }
+
 const submitForm = async (formEl) => {
   if (!formEl) return
-  if(avatarChk.value=='1'){
-    detailInfo.value.avatar = "1";
+  if (avatarChk.value == '1') {
+    detailInfo.value.avatar = '1'
   }
-  await formEl.validate(async(valid, fields) => {
+  await formEl.validate(async (valid, fields) => {
     if (valid) {
+      const { did, version } = route.query
       const params = JSON.parse(JSON.stringify(detailInfo.value))
-      delete params.codeaaa
+      delete params.$typeName
       params.code = codeMapTrans[params.code]
-      params.serviceCodes = params.serviceCodes.map(item=>serviceCodeMapTrans[item])
-      const rst = await $application.create(params)
-      console.log('submit!',params,rst)
+      params.serviceCodes = params.serviceCodes.map(
+        (item) => serviceCodeMapTrans[item],
+      )
+      params.codeType = codeChk.value
+
+      console.log(params, '-ppp-')
+
+      if (did) {
+        const rst = await $application.update(params)
+        console.log('submit444!', params, rst)
+        // innerVisible.value = true
+      } else {
+        const rst = await $application.create(params)
+        console.log('submit!', params, rst)
+        innerVisible.value = true
+      }
     } else {
       console.log('error submit!', fields)
     }
   })
 }
+
+const toOnlineApply = async () => {
+  innerVisible.value = false
+  const rst = await $application.online(detailInfo.did, detailInfo.version)
+  console.log(rst, '--i=onlinerrr-')
+}
+const toList = () => {
+  router.push({
+    path: '/market',
+  })
+}
+const submitFormAndOnline = (formEl) => {
+  submitForm(formEl)
+}
 const changeFileAvatar = (uploadFile) => {
-  changeFile(1,uploadFile)
+  console.log(uploadFile, '--uploader-666')
+  changeFile(1, uploadFile)
 }
 const changeFileCode = (uploadFile) => {
-  changeFile(2,uploadFile)
+  changeFile(2, uploadFile)
 }
-const handleAvatarUpdate = (newFiles) => {
-  avatarList.value = newFiles;
-};
-const changeFile = async (fileType,uploadFile) => {
-  const namespaceId = await $application.getNameSpaceId();
+
+const changeFile = async (fileType, uploadFile) => {
+  const namespaceId = await $application.getNameSpaceId()
+
+  // curImg.value.name = uploadFile.name;
+  // curImg.value.size = (uploadFile.size / 1024).toFixed(1) + "M";
+
   if (namespaceId && uploadFile) {
-    // curImg.value.name = uploadFile.name;
-    // curImg.value.size = (uploadFile.size / 1024).toFixed(1) + "M";
-    const uploader = await $application.uploads(namespaceId, uploadFile.raw);
-    const params = {
-      namespaceId,
-      hash: uploader.hash,
-      type: 1,
-      duration: 3600,
-      name: uploader.name,
-    };
-   
-    const linkInfo = await $application.createLink(params);
-    const url = linkInfo && linkInfo.url && linkInfo.url.url;
-    if(fileType==1){
-      detailInfo.value.avatar = url;
-    }else{
-      detailInfo.value.codePackagePath = url;
-      detailInfo.value.hash = uploader.hash;
+    console.log(uploadFile, '--uploader-')
+    try {
+      const uploader = await $application.uploads(uploadFile.raw, namespaceId)
+
+      const params = {
+        namespaceId,
+        hash: uploader.hash,
+        type: 1,
+        duration: 3600,
+        name: uploader.name,
+      }
+
+      const linkInfo = await $application.createLink(params)
+      const url = linkInfo && linkInfo.url && linkInfo.url.url
+      if (fileType == 1) {
+        detailInfo.value.avatar = url
+        detailInfo.value.avatarName = uploadFile.name
+      } else {
+        detailInfo.value.codePackagePath = url
+        detailInfo.value.codePackageName = uploadFile.name
+        detailInfo.value.hash = uploader.hash
+      }
+    } catch (error) {
+      console.log(error)
     }
   }
 }
 const getUserInfo = async () => {
   const info = await $account.getActiveIdentity()
+  console.log(info, '-infoinfoinfo-')
   userMeta.value = info.metadata || {}
 }
 onMounted(() => {
@@ -271,49 +426,78 @@ onMounted(() => {
 <style scoped lang="less">
 .edit {
   margin: 20px;
-  .content{
+  .el-divider--horizontal {
+    margin: 16px 0 24px !important;
+  }
+  .content {
     margin-top: 24px;
-    .left{
+    .left {
       height: 82vh;
       overflow-y: auto;
       padding-right: 20px;
-      .input-style{
+
+      .input-style {
         width: 473px;
       }
-      .upload-text{
+      .upload-text {
         font-size: 14px;
         color: rgba(0, 0, 0, 0.85);
         font-weight: 400;
       }
       @media (max-width: 768px) {
-        .input-style{
-          width:240px;
+        .input-style {
+          width: 240px;
         }
       }
-      .title{
+      .title {
         font-size: 16px;
         font-weight: 500;
         color: rgba(0, 0, 0, 0.85);
+        padding: 0 20px;
       }
-      #part1 {
-        background: #fff;
-        padding: 20px;
-      }
+      #part1,
       #part2 {
-        margin-top: 10px;
         background: #fff;
-        padding: 20px;
+        padding: 20px 0;
+        border-radius: 6px;
+        margin-bottom: 18px;
+        box-shadow: 0px 0px 1px 0px #00000014, 0px 1px 2px 0px #190f0f12,
+          0px 2px 4px 0px #0000000d;
+        .form {
+          padding: 0 20px;
+        }
       }
     }
-    .right{
+    .right {
       margin-left: 20px;
       font-size: 14px;
+
+      .el-anchor {
+        --el-anchor-bg-color: transparent !important;
+        .el-anchor__marker {
+          width: 2px !important;
+          height: 18px !important;
+        }
+      }
+
+      .el-anchor__link.is-active {
+        color: #1677ff !important;
+      }
     }
   }
-  .footer{
+  .footer {
     margin-top: 20px;
     text-align: right;
-    padding: 0 20px 20px 0;
+    padding: 0 0px 20px 0;
   }
+}
+.status-desc {
+  color: rgba(0, 0, 0, 0.45);
+  font-size: 14px;
+}
+.waring-text {
+  font-size: 18px;
+  font-weight: 500;
+  color: rgba(0, 0, 0, 0.85);
 }
 </style>

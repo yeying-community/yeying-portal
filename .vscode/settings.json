@@ -1,0 +1,18 @@
+{
+  // 启用 JavaScript/TypeScript 验证
+  "javascript.validate.enable": true,
+  "typescript.validate.enable": true,
+  
+  // 强制显示错误波浪线
+  "editor.errorSquiggles": "on",
+  
+  // 配置 TypeScript 服务器
+  "typescript.tsserver.log": "verbose", // 可选：用于调试
+  "typescript.tsserver.ignoreDefinitionFiles": false,
+  
+  // ESLint 配置（如果使用）
+  "eslint.validate": ["javascript", "typescript", "vue"],
+  "editor.codeActionsOnSave": {
+    "source.fixAll.eslint": true
+  }
+}
