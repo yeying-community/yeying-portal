@@ -3,13 +3,9 @@
 // import { ProviderCodeEnum } from '@yeying-community/yeying-client-ts';
 // import { ProviderCodeEnum } from '@yeying-community/yeying-web3'
 import {
-  applicationProvider,
-  uploader,
-  namespaceProvider,
-  linkProvider,
+ 
   serviceCenterProvider,
 } from "./account";
-import { setLocalStorage, getLocalStorage } from "@/utils/common";
 export const ApplyStatusMap = {
   1: "申请中",
   2: "已取消",

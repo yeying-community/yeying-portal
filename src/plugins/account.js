@@ -59,7 +59,6 @@ let applicationProvider = null
 let userInfo = null
 let auditProvider = null
 let serviceCenterProvider = null
-let applicationManager = null
 let indexedCache = null
 // async function open(){
 //   const table=[{
