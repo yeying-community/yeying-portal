@@ -16,7 +16,7 @@
                     scope.row.state
                 }}
                 <el-tooltip class="box-item" effect="dark" :content="scope.row.msg" placement="top-start">
-                    <el-icon v-if="pageTabFrom === 'finishApproval'"><QuestionFilled /></el-icon>
+                    <el-icon v-if="pageTabFrom === 'finishApproval'" style="margin-top: 15px"><Warning /></el-icon>
                 </el-tooltip>
             </template>
         </el-table-column>
@@ -48,7 +48,7 @@
 import { ref } from 'vue'
 import ApplRoveModal from './ApplRoveModal.vue'
 import dayjs from 'dayjs'
-import { QuestionFilled } from '@element-plus/icons-vue'
+import { Warning } from '@element-plus/icons-vue'
 const applroveShow = ref(false)
 const record = ref({
     did: ''
