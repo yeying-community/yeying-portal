@@ -175,9 +175,9 @@
     <ConfigServiceModal :modalVisible="modalVisible" :cancelModal="cancelModal" />
     <ResultChooseModal
         v-model="innerVisible"
-        title="申请使用"
-        mainDesc="应用申请中"
-        subDesc="正在等待服务所有人审批，请耐心等待"
+        title="应用上架成功"
+        mainDesc="应用上架成功"
+        subDesc="应用已成功上架至应用市场"
         leftBtnText="查看详情"
         rightBtnText="返回列表"
         :leftBtnClick="toDetail"
@@ -246,7 +246,13 @@ const innerVisible = ref(false)
 const dialogVisible = ref(false)
 const modalVisible = ref(false)
 
+/**
+ * 应用是否上架
+ */
 const mockLineStatus = 'offline'
+/**
+ * 申请应用的状态
+ */
 const mockApplyStatus = 'success'
 
 // 取消申请
