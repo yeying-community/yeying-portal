@@ -1,359 +1,318 @@
 <template>
-  <div class="tab">
-    <div class="top">
-      <div class="top-left">
-        <el-avatar shape="square" size="50" :src="detail.avatar" />
-      </div>
-      <div class="top-right">
-        <div class="name">{{ detail.name }}</div>
-        <div
-          v-if="
-            (pageFrom === 'myCreate' || pageFrom === 'myApply') && detail.status
-          "
-          class="badge-info"
-        >
-          <el-badge is-dot :type="StatusInfo[detail.status]?.type" />
-          <span class="badge-text">{{ StatusInfo[detail.status]?.text }}</span>
-        </div>
-        <div class="title">
-          <span v-if="detail.owner && pageFrom !== 'myCreate'">
-            所有者: {{ detail.owner }}
-          </span>
-          <span v-else>
-            <el-tag type="primary" size="small">官方</el-tag>
-          </span>
-          <span>
-            {{ pageFrom === "myCreate" ? "创建于" : "上架于" }}
-            {{ dayjs(detail.createdAt).format("YYYY-MM-DD") }}</span
-          >
-        </div>
-        <div class="desc">
-          {{ detail.description }}
-        </div>
-      </div>
-    </div>
-
-    <!-- 应用市场 -->
-    <div v-if="pageFrom === 'market'">
-      <div class="bottom owner" v-if="!isOwner">
-        <div @click="toDetail" class="cursor">详情</div>
-        <el-divider direction="vertical" />
-        <div v-if="!isOwner" @click="dialogVisible = true" class="cursor">
-          申请使用
-        </div>
-      </div>
-      <div class="bottom owner" v-else>
-        <div @click="toDetail" class="cursor">详情</div>
-        <el-divider direction="vertical" />
-        <div @click="handleOfflineConfirm" class="cursor">下架应用</div>
-        <el-divider direction="vertical" />
-        <div class="bottom-more">
-          <el-dropdown placement="top-start">
-            <div>更多</div>
-            <template #dropdown>
-              <el-dropdown-menu>
-                <el-dropdown-item>
-                  <el-popconfirm
-                    confirm-button-text="确定"
-                    cancel-button-text="取消"
-                    :icon="WarningFilled"
-                    icon-color="#FB9A0E"
-                    title="您确定要删除该应用吗？"
-                    width="220px"
-                    @confirm="toDelete"
-                  >
-                    <template #reference> 删除 </template>
-                  </el-popconfirm>
-                </el-dropdown-item>
-
-                <el-dropdown-item @click="toEdit">编辑</el-dropdown-item>
-                <el-dropdown-item @click="exportIdentity"
-                  >导出身份</el-dropdown-item
-                >
-              </el-dropdown-menu>
-            </template>
-          </el-dropdown>
-        </div>
-      </div>
-    </div>
-    <!-- 我的创建 -->
-    <div v-if="pageFrom === 'myCreate'">
-      <div class="bottom owner">
-        <div @click="toDetail" class="cursor">详情</div>
-        <el-divider direction="vertical" />
-        <div
-          v-if="mockLineStatus === 'online'"
-          @click="handleOfflineConfirm"
-          class="cursor"
-        >
-          下架应用
-        </div>
-        <div v-else @click="handleOnline" class="cursor">上架应用</div>
-        <el-divider direction="vertical" />
-        <div class="bottom-more">
-          <el-dropdown placement="top-start">
-            <div>更多</div>
-            <template #dropdown>
-              <el-dropdown-menu>
-                <el-dropdown-item v-if="mockLineStatus === 'offline'">
-                  <el-popconfirm
-                    confirm-button-text="确定"
-                    cancel-button-text="取消"
-                    :icon="WarningFilled"
-                    icon-color="#FB9A0E"
-                    title="您确定要删除该应用吗？"
-                    width="220px"
-                    @confirm="toDelete"
-                  >
-                    <template #reference>删除</template>
-                  </el-popconfirm>
-                </el-dropdown-item>
-
-                <el-dropdown-item
-                  v-if="mockLineStatus === 'offline'"
-                  @click="toEdit"
-                  >编辑</el-dropdown-item
-                >
-                <el-dropdown-item disabled>加入子网</el-dropdown-item>
-              </el-dropdown-menu>
-            </template>
-          </el-dropdown>
-        </div>
-      </div>
-    </div>
-
-    <!-- 我的申请 -->
-    <div v-if="pageFrom === 'myApply'">
-      <div class="bottom owner">
-        <div @click="toDetail" class="cursor">详情</div>
-        <el-divider direction="vertical" />
-
-        <el-popconfirm
-          confirm-button-text="确定"
-          cancel-button-text="取消"
-          :icon="WarningFilled"
-          icon-color="#FB9A0E"
-          title="您确定要取消当前应用的申请吗？"
-          width="220px"
-          @confirm="cancelApply"
-        >
-          <template #reference>
-            <div v-if="mockApplyStatus === 'applying'" class="cursor">
-              取消申请
+    <div class="tab">
+        <div class="top">
+            <div class="top-left">
+                <el-avatar shape="square" size="50" :src="detail.avatar" />
             </div>
-          </template>
-        </el-popconfirm>
-
-        <Popover
-          :show="mockApplyStatus === 'success'"
-          title="您确定要解绑当前服务吗？"
-          subTitle="解绑后，当前服务将从当前列表移除，如需使用需重新申请。"
-          :okClick="confirmUnbind"
-          referenceText="解绑应用"
-        />
-
-        <el-divider v-if="mockApplyStatus === 'success'" direction="vertical" />
-        <div v-if="mockApplyStatus !== 'applying'" class="bottom-more">
-          <el-dropdown placement="top-start">
-            <div>更多</div>
-            <template #dropdown>
-              <el-dropdown-menu>
-                <el-popconfirm
-                  confirm-button-text="确定"
-                  cancel-button-text="取消"
-                  :icon="WarningFilled"
-                  icon-color="#FB9A0E"
-                  title="您确定要取消当前应用的申请吗？"
-                  width="220px"
-                  @confirm="cancelApply"
-                >
-                  <template #reference>
-                    <el-dropdown-item
-                      v-if="
-                        mockApplyStatus === 'cancel' ||
-                        mockApplyStatus === 'reject'
-                      "
+            <div class="top-right">
+                <div class="name">{{ detail.name }}</div>
+                <div v-if="(pageFrom === 'myCreate' || pageFrom === 'myApply') && detail.status" class="badge-info">
+                    <el-badge is-dot :type="StatusInfo[detail.status]?.type" />
+                    <span class="badge-text">{{ StatusInfo[detail.status]?.text }}</span>
+                </div>
+                <div class="title">
+                    <span v-if="detail.owner && pageFrom !== 'myCreate'"> 所有者: {{ detail.owner }} </span>
+                    <span v-else>
+                        <el-tag type="primary" size="small">官方</el-tag>
+                    </span>
+                    <span>
+                        {{ pageFrom === 'myCreate' ? '创建于' : '上架于' }}
+                        {{ dayjs(detail.createdAt).format('YYYY-MM-DD') }}</span
                     >
-                      <el-popconfirm
-                        confirm-button-text="确定"
-                        cancel-button-text="取消"
-                        :icon="WarningFilled"
-                        icon-color="#FB9A0E"
-                        title="您确定要删除该应用吗？"
-                        width="220px"
-                        @confirm="toDelete"
-                      >
-                        <template #reference> 删除 </template>
-                      </el-popconfirm>
-                    </el-dropdown-item>
-                  </template>
+                </div>
+                <div class="desc">
+                    {{ detail.description }}
+                </div>
+            </div>
+        </div>
+
+        <!-- 应用市场 -->
+        <div v-if="pageFrom === 'market'">
+            <div class="bottom owner" v-if="!isOwner">
+                <div @click="toDetail" class="cursor">详情</div>
+                <el-divider direction="vertical" />
+                <div v-if="!isOwner" @click="dialogVisible = true" class="cursor">申请使用</div>
+            </div>
+            <div class="bottom owner" v-else>
+                <div @click="toDetail" class="cursor">详情</div>
+                <el-divider direction="vertical" />
+                <div @click="handleOfflineConfirm" class="cursor">下架应用</div>
+                <el-divider direction="vertical" />
+                <div class="bottom-more">
+                    <el-dropdown placement="top-start">
+                        <div>更多</div>
+                        <template #dropdown>
+                            <el-dropdown-menu>
+                                <el-dropdown-item>
+                                    <el-popconfirm
+                                        confirm-button-text="确定"
+                                        cancel-button-text="取消"
+                                        :icon="WarningFilled"
+                                        icon-color="#FB9A0E"
+                                        title="您确定要删除该应用吗？"
+                                        width="220px"
+                                        @confirm="toDelete"
+                                    >
+                                        <template #reference> 删除 </template>
+                                    </el-popconfirm>
+                                </el-dropdown-item>
+
+                                <el-dropdown-item @click="toEdit">编辑</el-dropdown-item>
+                                <el-dropdown-item @click="exportIdentity">导出身份</el-dropdown-item>
+                            </el-dropdown-menu>
+                        </template>
+                    </el-dropdown>
+                </div>
+            </div>
+        </div>
+        <!-- 我的创建 -->
+        <div v-if="pageFrom === 'myCreate'">
+            <div class="bottom owner">
+                <div @click="toDetail" class="cursor">详情</div>
+                <el-divider direction="vertical" />
+                <div v-if="mockLineStatus === 'online'" @click="handleOfflineConfirm" class="cursor">下架应用</div>
+                <div v-else @click="handleOnline" class="cursor">上架应用</div>
+                <el-divider direction="vertical" />
+                <div class="bottom-more">
+                    <el-dropdown placement="top-start">
+                        <div>更多</div>
+                        <template #dropdown>
+                            <el-dropdown-menu>
+                                <el-dropdown-item v-if="mockLineStatus === 'offline'">
+                                    <el-popconfirm
+                                        confirm-button-text="确定"
+                                        cancel-button-text="取消"
+                                        :icon="WarningFilled"
+                                        icon-color="#FB9A0E"
+                                        title="您确定要删除该应用吗？"
+                                        width="220px"
+                                        @confirm="toDelete"
+                                    >
+                                        <template #reference>删除</template>
+                                    </el-popconfirm>
+                                </el-dropdown-item>
+
+                                <el-dropdown-item v-if="mockLineStatus === 'offline'" @click="toEdit"
+                                    >编辑</el-dropdown-item
+                                >
+                                <el-dropdown-item disabled>加入子网</el-dropdown-item>
+                            </el-dropdown-menu>
+                        </template>
+                    </el-dropdown>
+                </div>
+            </div>
+        </div>
+
+        <!-- 我的申请 -->
+        <div v-if="pageFrom === 'myApply'">
+            <div class="bottom owner">
+                <div @click="toDetail" class="cursor">详情</div>
+                <el-divider direction="vertical" />
+
+                <el-popconfirm
+                    confirm-button-text="确定"
+                    cancel-button-text="取消"
+                    :icon="WarningFilled"
+                    icon-color="#FB9A0E"
+                    title="您确定要取消当前应用的申请吗？"
+                    width="220px"
+                    @confirm="cancelApply"
+                >
+                    <template #reference>
+                        <div v-if="mockApplyStatus === 'applying'" class="cursor">取消申请</div>
+                    </template>
                 </el-popconfirm>
 
-                <el-dropdown-item
-                  v-if="
-                    mockApplyStatus === 'cancel' || mockApplyStatus === 'reject'
-                  "
-                  @click="dialogVisible = true"
-                  >重新申请</el-dropdown-item
-                >
-              </el-dropdown-menu>
-            </template>
-          </el-dropdown>
+                <Popover
+                    :show="mockApplyStatus === 'success'"
+                    title="您确定要解绑当前服务吗？"
+                    subTitle="解绑后，当前服务将从当前列表移除，如需使用需重新申请。"
+                    :okClick="confirmUnbind"
+                    referenceText="解绑应用"
+                />
+
+                <el-divider v-if="mockApplyStatus === 'success'" direction="vertical" />
+                <div v-if="mockApplyStatus !== 'applying'" class="bottom-more">
+                    <el-dropdown placement="top-start">
+                        <div>更多</div>
+                        <template #dropdown>
+                            <el-dropdown-menu>
+                                <el-popconfirm
+                                    confirm-button-text="确定"
+                                    cancel-button-text="取消"
+                                    :icon="WarningFilled"
+                                    icon-color="#FB9A0E"
+                                    title="您确定要取消当前应用的申请吗？"
+                                    width="220px"
+                                    @confirm="cancelApply"
+                                >
+                                    <template #reference>
+                                        <el-dropdown-item
+                                            v-if="mockApplyStatus === 'cancel' || mockApplyStatus === 'reject'"
+                                        >
+                                            <el-popconfirm
+                                                confirm-button-text="确定"
+                                                cancel-button-text="取消"
+                                                :icon="WarningFilled"
+                                                icon-color="#FB9A0E"
+                                                title="您确定要删除该应用吗？"
+                                                width="220px"
+                                                @confirm="toDelete"
+                                            >
+                                                <template #reference> 删除 </template>
+                                            </el-popconfirm>
+                                        </el-dropdown-item>
+                                    </template>
+                                </el-popconfirm>
+
+                                <el-dropdown-item
+                                    v-if="mockApplyStatus === 'cancel' || mockApplyStatus === 'reject'"
+                                    @click="dialogVisible = true"
+                                    >重新申请</el-dropdown-item
+                                >
+                            </el-dropdown-menu>
+                        </template>
+                    </el-dropdown>
+                </div>
+            </div>
         </div>
-      </div>
     </div>
-  </div>
-  <ApplyUseModal
-    :title="pageFrom === 'market' ? '申请使用' : '重新申请'"
-    :dialogVisible="dialogVisible"
-    :detail="detail"
-    :afterSubmit="afterSubmit"
-    :closeClick="afterSubmit"
-  />
-  <ConfigServiceModal :modalVisible="modalVisible" :cancelModal="cancelModal" />
+    <ApplyUseModal
+        :title="pageFrom === 'market' ? '申请使用' : '重新申请'"
+        :dialogVisible="dialogVisible"
+        :detail="detail"
+        :afterSubmit="afterSubmit"
+        :closeClick="afterSubmit"
+    />
 </template>
 <script setup>
-import { ref } from "vue";
-import { useRouter } from "vue-router";
-import $application from "@/plugins/application";
+import { ref } from 'vue'
+import { useRouter } from 'vue-router'
+import $application from '@/plugins/application'
 
-import dayjs from "dayjs";
+import dayjs from 'dayjs'
 
-import { ElMessageBox } from "element-plus";
-import { h } from "vue";
-import Popover from "@/views/components/Popover.vue";
-import ApplyUseModal from "./ApplyUseModal.vue";
-import ConfigServiceModal from "./ConfigServiceModal.vue";
+import { ElMessageBox } from 'element-plus'
+import { h } from 'vue'
+import Popover from '@/views/components/Popover.vue'
+import ApplyUseModal from './ApplyUseModal.vue'
+import ConfigServiceModal from './ConfigServiceModal.vue'
 
 const confirmUnbind = async () => {
-  // 执行解绑逻辑
-};
+    // 执行解绑逻辑
+}
 
 const StatusInfo = {
-  online: {
-    type: "success",
-    text: "已上架",
-  },
-  offline: {
-    type: "info",
-    text: "未上架",
-  },
-  success: {
-    type: "success",
-    text: "申请通过",
-  },
-  applying: {
-    type: "primary",
-    text: "申请中",
-  },
-  reject: {
-    type: "danger",
-    text: "申请驳回",
-  },
-  cancel: {
-    type: "info",
-    text: "已取消",
-  },
-};
+    online: {
+        type: 'success',
+        text: '已上架'
+    },
+    offline: {
+        type: 'info',
+        text: '未上架'
+    },
+    success: {
+        type: 'success',
+        text: '申请通过'
+    },
+    applying: {
+        type: 'primary',
+        text: '申请中'
+    },
+    reject: {
+        type: 'danger',
+        text: '申请驳回'
+    },
+    cancel: {
+        type: 'info',
+        text: '已取消'
+    }
+}
 
-const dialogVisible = ref(false);
-const modalVisible = ref(false);
+const dialogVisible = ref(false)
+const modalVisible = ref(false)
 
-import { userInfo } from "@/plugins/account";
-const router = useRouter();
+import { userInfo } from '@/plugins/account'
+const router = useRouter()
 const props = defineProps({
-  detail: Object,
-  selectId: Number,
-  refreshCardList: Function,
-  pageFrom: String,
-});
+    detail: Object,
+    selectId: Number,
+    refreshCardList: Function,
+    pageFrom: String
+})
 
-const isOwner = userInfo?.metadata?.did === props.detail?.did;
+const isOwner = userInfo?.metadata?.did === props.detail?.did
 
-const mockLineStatus = "offline";
-const mockApplyStatus = "success";
+const mockLineStatus = 'offline'
+const mockApplyStatus = 'success'
 
 // 取消申请
-const cancelApply = () => {};
+const cancelApply = () => {}
 
-const toDelete = () => {};
+const toDelete = () => {}
 const toEdit = () => {
-  router.push({
-    path: "/market/apply-edit",
-    query: {
-      did: props.detail.did,
-      version: props.detail.version,
-    },
-  });
-};
-const exportIdentity = () => {};
+    router.push({
+        path: '/market/service-edit',
+        query: {
+            did: props.detail.did,
+            version: props.detail.version
+        }
+    })
+}
+const exportIdentity = () => {}
 const toDetail = () => {
-  router.push({
-    path: "/market/apply-detail",
-    query: {
-      did: props.detail.did,
-      version: props.detail.version,
-    },
-  });
-};
-
-const toConfigService = () => {
-  modalVisible.value = true;
-};
-
-const cancelModal = () => {
-  modalVisible.value = false;
-};
+    router.push({
+        path: '/market/service-detail',
+        query: {
+            did: props.detail.did,
+            version: props.detail.version,
+            pageFrom: props.pageFrom
+        }
+    })
+}
 
 // 下架应用
 const handleOffline = async () => {
-  const offlinelRst = await $application.offline(
-    props.detail.did,
-    props.detail.version
-  );
-  console.log(offlinelRst, "-offlinelRst");
-  const { status } = offlinelRst.body;
+    const offlinelRst = await $application.offline(props.detail.did, props.detail.version)
+    console.log(offlinelRst, '-offlinelRst')
+    const { status } = offlinelRst.body
 
-  if (status?.message === "success") {
-    ElMessage({
-      message: "已下架",
-      type: "success",
-    });
-    props.refreshCardList();
-  }
-};
+    if (status?.message === 'success') {
+        ElMessage({
+            message: '已下架',
+            type: 'success'
+        })
+        props.refreshCardList()
+    }
+}
 
 const handleOfflineConfirm = () => {
-  ElMessageBox.confirm("", {
-    message: h("p", null, [
-      h(
-        "div",
-        { style: "font-size:18px;color:rgba(0,0,0,0.85)" },
-        "你确定要下架当前应用吗？"
-      ),
-      h(
-        "div",
-        { style: "font-size:14px;font-weight:400;color:rgba(0,0,0,0.85)" },
-        "下架后当前应用将不在应用市场展示。"
-      ),
-    ]),
-    type: "warning",
-    confirmButtonText: "确定",
-    cancelButtonText: "取消",
-    showClose: false,
-    customClass: "messageBox-wrap",
-  })
-    .then(() => {
-      handleOffline();
+    ElMessageBox.confirm('', {
+        message: h('p', null, [
+            h('div', { style: 'font-size:18px;color:rgba(0,0,0,0.85)' }, '你确定要下架当前应用吗？'),
+            h(
+                'div',
+                { style: 'font-size:14px;font-weight:400;color:rgba(0,0,0,0.85)' },
+                '下架后当前应用将不在应用市场展示。'
+            )
+        ]),
+        type: 'warning',
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        showClose: false,
+        customClass: 'messageBox-wrap'
     })
-    .catch(() => {});
-};
+        .then(() => {
+            handleOffline()
+        })
+        .catch(() => {})
+}
 
 // 上架应用
-const handleOnline = () => {};
+const handleOnline = () => {}
 const afterSubmit = () => {
-  dialogVisible.value = false;
-};
+    dialogVisible.value = false
+}
 
 // const emit = defineEmits(['change']);
 </script>
@@ -361,123 +320,122 @@ const afterSubmit = () => {
 /* 强制显示弹窗 */
 
 .tab {
-  background-color: #fff;
-  border-radius: 6px;
-  padding: 24px;
-  .cursor {
-    cursor: pointer;
-  }
-  .top {
-    display: flex;
-    gap: 16px;
-    .top-left {
+    background-color: #fff;
+    border-radius: 6px;
+    padding: 24px;
+    .cursor {
+        cursor: pointer;
     }
-    .top-right {
-      position: relative;
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-      .name {
-        font-size: 20px;
-        font-weight: 500;
-        color: rgba(0, 0, 0, 0.85);
-      }
-      .title {
+    .top {
         display: flex;
-        color: rgba(0, 0, 0, 0.45);
-        font-size: 14px;
-        font-weight: 400;
-        gap: 4px;
-        .el-tag {
-          margin-top: -4px;
+        gap: 16px;
+        .top-left {
         }
-      }
-      .desc {
-        color: rgba(0, 0, 0, 0.45);
-        font-size: 16px;
-        font-weight: 400;
-        height: 44px;
-        display: -webkit-box;
-        -webkit-box-orient: vertical;
-        -webkit-line-clamp: 2; /* 限制显示的行数 */
-        overflow: hidden;
-        text-overflow: ellipsis; /* 文本溢出时显示省略号 */
-      }
+        .top-right {
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            .name {
+                font-size: 20px;
+                font-weight: 500;
+                color: rgba(0, 0, 0, 0.85);
+            }
+            .title {
+                display: flex;
+                color: rgba(0, 0, 0, 0.45);
+                font-size: 14px;
+                font-weight: 400;
+                gap: 4px;
+                .el-tag {
+                    margin-top: -4px;
+                }
+            }
+            .desc {
+                color: rgba(0, 0, 0, 0.45);
+                font-size: 16px;
+                font-weight: 400;
+                height: 44px;
+                display: -webkit-box;
+                -webkit-box-orient: vertical;
+                -webkit-line-clamp: 2; /* 限制显示的行数 */
+                overflow: hidden;
+                text-overflow: ellipsis; /* 文本溢出时显示省略号 */
+            }
 
-      .badge-info {
-        position: absolute;
-        right: 0px;
-        top: 0px;
-        .el-badge {
-          margin-top: 5px;
+            .badge-info {
+                position: absolute;
+                right: 0px;
+                top: 0px;
+                .el-badge {
+                    margin-top: 5px;
+                }
+            }
+
+            .badge-text {
+                font-size: 14px;
+                margin: -15px 0 0 8px;
+            }
         }
-      }
-
-      .badge-text {
+    }
+    .bottom {
+        padding-top: 10px;
+        border-top: 1px solid rgba(0, 0, 0, 0.06);
+        margin-top: 12px;
+        display: flex;
         font-size: 14px;
-        margin: -15px 0 0 8px;
-      }
+        color: rgba(22, 119, 255, 1);
+        .bottom-left {
+            width: 50%;
+            text-align: center;
+            border-right: 1px solid rgba(0, 0, 0, 0.06);
+            cursor: pointer;
+        }
+        .bottom-right {
+            width: 50%;
+            text-align: center;
+            cursor: pointer;
+        }
+        .bottom-more {
+            display: flex;
+            align-items: center;
+        }
     }
-  }
-  .bottom {
-    padding-top: 10px;
-    border-top: 1px solid rgba(0, 0, 0, 0.06);
-    margin-top: 12px;
-    display: flex;
-    font-size: 14px;
-    color: rgba(22, 119, 255, 1);
-    .bottom-left {
-      width: 50%;
-      text-align: center;
-      border-right: 1px solid rgba(0, 0, 0, 0.06);
-      cursor: pointer;
+    .owner {
+        justify-content: space-around;
     }
-    .bottom-right {
-      width: 50%;
-      text-align: center;
-      cursor: pointer;
+    .el-dropdown {
+        font-size: 14px;
+        color: rgba(22, 119, 255, 1);
     }
-    .bottom-more {
-      display: flex;
-      align-items: center;
-    }
-  }
-  .owner {
-    justify-content: space-around;
-  }
-  .el-dropdown {
-    font-size: 14px;
-    color: rgba(22, 119, 255, 1);
-  }
 }
 
 .status-desc {
-  color: rgba(0, 0, 0, 0.45);
-  font-size: 14px;
+    color: rgba(0, 0, 0, 0.45);
+    font-size: 14px;
 }
 .waring-text {
-  font-size: 18px;
-  font-weight: 500;
-  color: rgba(0, 0, 0, 0.85);
+    font-size: 18px;
+    font-weight: 500;
+    color: rgba(0, 0, 0, 0.85);
 }
 
 .font-medium {
-  font-weight: 500;
+    font-weight: 500;
 }
 
 .text-sm {
-  font-size: 12px;
+    font-size: 12px;
 }
 
 .ml-3 {
-  margin-left: 12px;
+    margin-left: 12px;
 }
 
 .mt-1 {
-  margin-top: 4px;
+    margin-top: 4px;
 }
 .high-z-index {
-  border: 1px solid red;
-  z-index: 3000 !important; /* 需大于 ElDropdown 的 z-index（通常是 2000+） */
+    z-index: 3000 !important; /* 需大于 ElDropdown 的 z-index（通常是 2000+） */
 }
 </style>
