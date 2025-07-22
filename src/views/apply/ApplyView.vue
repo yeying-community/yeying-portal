@@ -51,7 +51,7 @@ import { onMounted, ref, watch } from 'vue'
 import { Search } from '@element-plus/icons-vue'
 import $application from '@/plugins/application'
 import MarketBlock from '@/views/components/MarketBlock.vue'
-import { useRouter } from 'vue-router'
+import { useRouter, useRoute } from 'vue-router'
 import { userInfo } from '@/plugins/account'
 
 // const userDid = userInfo?.metadata?.did;
@@ -60,6 +60,7 @@ const searchVal = ref('')
 const activeService = ref('market')
 const applicationList = ref([])
 const router = useRouter()
+const route = useRoute()
 const tabs = [
     {
         name: 'market',
@@ -93,11 +94,37 @@ const search = async () => {
         // 根据当前激活的标签页传递不同的查询参数
         let condition = { keyword: searchVal.value }
 
-        // if (activeService.value === "myCreate") {
-        //   condition = { ...condition, owner: userDid }; // 假设当前用户ID可以获取
-        // } else if (activeService.value === "myApply") {
-        //   condition = { ...condition, applicant: "当前用户ID" }; // 假设当前用户ID可以获取
-        // }
+        if (activeService.value === 'myCreate') {
+            /**
+             * todo 学虎 调用我的创建列表也接口
+             * 调用完接口以后，下面的注释也可以放开。
+             */
+            //  const rst  = await 我的创建列表接口
+            /**
+             * applicationList 数据源，从rst中获取的
+             */
+            //  applicationList.value = applications || []
+            /**
+             * 总条数，分页器需要用到
+             */
+            //  pagination.value.total = page.total || 0
+            //return;
+        } else if (activeService.value === 'myApply') {
+            /**
+             * todo 学虎 调用我的申请列表也接口
+             * 调用完接口以后，下面的注释也可以放开。
+             */
+            //  const rst  = await 我的申请列表接口
+            /**
+             * applicationList 数据源，从rst中获取的
+             */
+            //  applicationList.value = applications || []
+            /**
+             * 总条数，分页器需要用到
+             */
+            //  pagination.value.total = page.total || 0
+            //return;
+        }
 
         const rst = await $application.search(pagination.value.page, pagination.value.pageSize, condition)
 

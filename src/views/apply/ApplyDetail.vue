@@ -14,7 +14,7 @@
             <!-- 应用中心-我的创建的详情 -->
             <div v-if="pageFrom === 'myCreate'">
                 <div v-if="isOnline">
-                    <el-button plain>导出身份</el-button>
+                    <el-button plain @click="exportIdentity">导出身份</el-button>
                     <el-button type="danger" plain @click="handleOfflineConfirm">下架应用</el-button>
                 </div>
                 <div v-else>
@@ -32,7 +32,7 @@
                         </template>
                     </el-popconfirm>
                     <el-button plain @click="toEdit">编辑</el-button>
-                    <el-button plain>导出身份</el-button>
+                    <el-button plain @click="exportIdentity">导出身份</el-button>
                     <el-button type="danger" plain. @click="handleOnline">上架应用</el-button>
                 </div>
             </div>
@@ -148,31 +148,60 @@ const modalVisible = ref(false)
 
 /**
  * 应用是否上架
+ * 我创建的-详情页需要展示这个字段，且右上角按钮也会跟着这个状态联动
+ * todo 学虎，需要调用接口查询下应用的上架下架状态
  */
 const isOnline = ref(true) // 是否已经上架
 
 /**
  * 申请应用的状态
+ * 我申请的-详情页需要展示这个字段，且右上角按钮也会跟着这个状态联动
+ * todo 学虎，需要调用接口查询下应用的申请状态
  */
-const mockApplyStatus = 'success'
+const mockApplyStatus = ref('success')
 
+/**
+ * todo 学虎 查询详情接口
+ * 进入详情页的时候，需要查询详情接口
+ */
 const detail = async () => {
     if (pageFrom !== 'myCreate') {
+        /**
+         * 我创建的-详情接口
+         */
         const detailRst = await $application.detail(did, version)
         const { application } = detailRst.body || {}
         console.log(application, '-detailRst--')
         detailInfo.value = application || {}
     } else {
+        /**
+         * 我申请的详情接口
+         * 应用市场详情接口
+         */
         const detailRst = await $application.myApplyDetail(did, version)
     }
 }
 
 /**
+ *todo 学虎
+  我创建的tab-详情页-导出身份
+ */
+const exportIdentity = () => {}
+
+/**
  * 删除接口
  */
 const toDelete = () => {
-    // todo调用删除接口
+    /**
+     *  todo学虎 调用删除接口
+     */
+    if (pageFrom === 'myApply') {
+        // 这里调用我申请的-详情页删除接口
+    } else {
+        // 这里调用我创建的-详情页删除接口
+    }
 
+    // 删除成功后跳转到列表页
     toList()
 }
 
@@ -230,7 +259,9 @@ const handleOnline = () => {
         customClass: 'messageBox-wrap'
     })
         .then(() => {
-            // todo 上架应用的接口
+            /**
+             * todo 学虎 我创建的-详情页-右上角-上架按钮调用接口
+             */
             innerVisible.value = true
         })
         .catch(() => {})
@@ -256,7 +287,9 @@ const handleOfflineConfirm = () => {
         customClass: 'messageBox-wrap'
     })
         .then(() => {
-            // 下架应用接口
+            /**
+             * todo 学虎 我创建的-详情页-右上角-下架按钮调用接口
+             */
         })
         .catch(() => {})
 }

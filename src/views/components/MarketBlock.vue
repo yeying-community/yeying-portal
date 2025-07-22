@@ -51,6 +51,7 @@
             </div>
         </div>
         <!-- 我的创建 -->
+        <!-- todo 学虎，这个div包裹着的就是我创建的列表页上卡片中的按钮，需要接入接口 -->
         <div v-if="pageFrom === 'myCreate'">
             <div class="bottom owner">
                 <div @click="toDetail" class="cursor">详情</div>
@@ -89,6 +90,7 @@
         </div>
 
         <!-- 我的申请 -->
+        <!-- todo 学虎，这个div包裹着的就是我的申请列表页上卡片中的按钮，需要接入接口 -->
         <div v-if="pageFrom === 'myApply'">
             <div class="bottom owner">
                 <div @click="toDetail" class="cursor">详情</div>
@@ -190,7 +192,7 @@
     </ResultChooseModal>
 </template>
 <script setup>
-import { ref } from 'vue'
+import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import $application from '@/plugins/application'
 import { SuccessFilled } from '@element-plus/icons-vue'
@@ -248,20 +250,56 @@ const modalVisible = ref(false)
 
 /**
  * 应用是否上架
+ * todo 学虎 这里我给了mockLineStatus一个初始值表示了上架状态，但实际上需要调用接口获取到应用真正的上架状态
+ * 在我创建的-每个应用卡片的右上角需要展示出来上架状态
+ * 每个卡片的按钮的展示与隐藏也依赖这个状态
  */
-const mockLineStatus = 'offline'
+const mockLineStatus = ref('offline')
+const getLineStatus = async () => {
+    // const res = await applyLineStatus()
+    // if (res.status) {
+    //     mockLineStatus.value = 'online'
+    // } else {
+    //     mockLineStatus.value = 'offline'
+    // }
+}
+
 /**
  * 申请应用的状态
+ * todo 学虎 这里我mock了应用申请状态，但实际上需要调用接口
+ * 在我申请的-每个应用卡片的右上角需要展示出来申请状态
+ * 每个卡片的按钮的展示与隐藏也依赖这个状态
  */
-const mockApplyStatus = 'success'
+const mockApplyStatus = ref('success')
 
-// 取消申请
+const getApplyStatus = async () => {
+    // const res = await applyStatus()
+    // if (res.status) {
+    //     mockApplyStatus.value = 'online'
+    // } else {
+    //     mockApplyStatus.value = 'offline'
+    // }
+}
+
+/**
+ * 取消申请
+ *
+ */
 const cancelApply = () => {}
 
+/**
+ * 删除
+ */
 const toDelete = async () => {
     if (props.pageFrom === 'myCreate') {
+        /**
+         * todo 学虎 我创建的-删除
+         */
         await $application.myApplyDelete(props.detail.did)
     } else {
+        /**
+         * todo 学虎 我申请的-删除
+         */
         await $application.delete(props.detail.did, props.detail.version)
     }
     props.refreshCardList()
@@ -275,6 +313,10 @@ const toEdit = () => {
         }
     })
 }
+/**
+ * 我创建的-导出身份
+ * todo 学虎
+ */
 const exportIdentity = () => {}
 const toDetail = () => {
     router.push({
@@ -300,6 +342,9 @@ const cancelModal = () => {
 
 // 下架应用
 const handleOffline = async () => {
+    /**
+     * todo 学虎 这块调用下架应用接口
+     */
     const offlinelRst = await $application.offline(props.detail.did, props.detail.version)
     console.log(offlinelRst, '-offlinelRst')
     const { status } = offlinelRst.body
@@ -352,7 +397,15 @@ const handleOnline = () => {
         showClose: false,
         customClass: 'messageBox-wrap'
     })
-        .then(() => {
+        .then(async () => {
+            /**
+             * todo学虎 这块调用上架应用接口
+             * innerVisible.value = true 是上架成功后，打开一个弹窗提示用户上架成功了
+             */
+            // const offlinelRst = await $application.online(props.detail.did, props.detail.version)
+            // if (offlinelRst.success) {
+            //innerVisible.value = true
+            // }
             innerVisible.value = true
         })
         .catch(() => {})
@@ -360,7 +413,14 @@ const handleOnline = () => {
 const afterSubmit = () => {
     dialogVisible.value = false
 }
-
+onMounted(() => {
+    if (props.pageFrom === 'myCreate') {
+        getLineStatus()
+    }
+    if (props.pageFrom === 'myApply') {
+        getApplyStatus()
+    }
+})
 // const emit = defineEmits(['change']);
 </script>
 <style scoped lang="less">
