@@ -14,4 +14,4 @@ dist
 .idea
 stats.html
 build.log
-
+components.d.ts

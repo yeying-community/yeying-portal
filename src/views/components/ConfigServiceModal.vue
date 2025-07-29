@@ -140,11 +140,11 @@ const resetForm = (formEl: FormInstance | undefined) => {
     }
 }
 .demo-dynamic {
-    ::v-deep .el-form-item__label {
+    :deep(.el-form-item__label) {
         border: 1px solid blue;
         display: none;
     }
-    ::v-deep .el-form-item__content {
+    :deep(.el-form-item__content) {
         margin-left: 0px !important;
     }
 }

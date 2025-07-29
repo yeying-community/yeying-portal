@@ -115,7 +115,7 @@ const tableData = [
 </script>
 
 <style scoped lang="less">
-::v-deep .el-table__header th {
+:deep(.el-table__header th) {
     background-color: #fafafa !important;
     color: rgba(0, 0, 0, 0.88) !important;
 }
@@ -123,7 +123,7 @@ const tableData = [
     color: rgba(22, 119, 255, 1);
 }
 
-::v-deep .el-badge__content.is-dot {
+:deep(.el-badge__content.is-dot) {
     height: 10px;
     width: 10px;
 }
