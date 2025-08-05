@@ -11,7 +11,7 @@ export const ApplyStatusMap = {
 }
 class $service {
     async search(page, pageSize, condition) {
-        let params = {}
+        let params: { page?: number; pageSize?: number; condition?: Record<string, any> } = {}
         params.page = page || 1
         params.pageSize = pageSize || 10
         params.condition = condition || {}

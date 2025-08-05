@@ -142,8 +142,23 @@ const onReset = (formEl) => {
     formEl.resetFields()
     pagination.value.page = 1
 }
+
+/**
+ * 我的审批页面，
+ *
+ */
 const onSubmit = () => {
-    pagination.value.page = 1
+    if (pagination.value.page === 1) {
+        /**
+         * todo 学虎
+         * 待我审批，查询接口
+         * */
+    } else {
+        /**
+         * todo 学虎
+         * 审批完成 查询接口
+         */
+    }
 }
 </script>
 <style scoped lang="less">

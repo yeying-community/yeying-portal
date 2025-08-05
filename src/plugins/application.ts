@@ -44,15 +44,15 @@ export const serviceCodeMap = {
 }
 class $application {
     async search(page, pageSize, condition) {
-        let params = {}
+        let params: { page?: number; pageSize?: number; condition?: Record<string, any> } = {}
         params.page = page || 1
         params.pageSize = pageSize || 10
         params.condition = condition || {}
         return await applicationProvider.search(params.page, params.pageSize, params.condition)
     }
 
-    async myApplySearch() {
-        let params = {}
+    async myApplySearch(page, pageSize, condition) {
+        let params: { page?: number; pageSize?: number; condition?: Record<string, any> } = {}
         params.page = page || 1
         params.pageSize = pageSize || 10
         params.condition = condition || {}
