@@ -1,8 +1,9 @@
+<!-- todo 学虎 页面上的字段需要回填一下，很多字段现在都是mock的 -->
 <template>
     <div class="detail">
         <el-breadcrumb separator="/">
-            <el-breadcrumb-item :to="{ path: '/market/' }">应用中心</el-breadcrumb-item>
-            <el-breadcrumb-item>应用详情</el-breadcrumb-item>
+            <el-breadcrumb-item :to="{ path: '/market/service' }">服务中心</el-breadcrumb-item>
+            <el-breadcrumb-item>服务详情</el-breadcrumb-item>
         </el-breadcrumb>
 
         <div class="header">
@@ -11,7 +12,7 @@
                 <ApplyStatus status="applying" v-if="urlQuery.pageFrom === 'myApply'" />
             </div>
 
-            <!-- 应用中心-我的创建的详情 -->
+            <!-- 服务中心-我的创建的详情 -->
             <div v-if="urlQuery.pageFrom === 'myCreate'">
                 <div v-if="isOnline">
                     <el-button plain>导出身份</el-button>
@@ -35,7 +36,7 @@
                     <el-button type="danger" plain>上架应用</el-button>
                 </div>
             </div>
-            <!-- 应用中心-我的申请的详情 -->
+            <!-- 服务中心-我的申请的详情 -->
             <div v-if="urlQuery.pageFrom === 'myApply'">
                 <div>
                     <el-button type="danger">解绑应用</el-button>
@@ -43,6 +44,21 @@
                 </div>
             </div>
         </div>
+
+        <div class="part">
+            <el-row class="count-row">
+                <el-col :span="4" :xs="24"
+                    >绑定应用数:
+                    <div style="font-weight: 500; font-size: 30px">{{ detailInfo.bindApplyCount || '-' }}</div></el-col
+                >
+                <el-col :span="1" :xs="24"> <el-divider direction="vertical" /></el-col>
+                <el-col :span="4" :xs="24"
+                    >用户使用数:
+                    <div style="font-weight: 500; font-size: 30px">{{ detailInfo.userCount || '-' }}</div></el-col
+                >
+            </el-row>
+        </div>
+
         <div class="part">
             <div class="title">基本信息</div>
             <el-row class="part-row">
@@ -71,6 +87,20 @@
                 <el-col :span="8" :xs="24">服务地址:{{ detail.serviceIP }} </el-col>
             </el-row>
         </div>
+        <div class="part">
+            <el-row class="part-row">
+                <el-col :span="24" :xs="24" style="font-size: 26px; font-weight: 500">【功能介绍】</el-col>
+                <el-col :span="24" :xs="24">
+                    <el-input v-model="textarea" :rows="2" type="textarea" placeholder="请输入功能介绍" />
+                </el-col>
+            </el-row>
+            <el-row class="part-row">
+                <el-col :span="24" :xs="24" style="font-size: 26px; font-weight: 500">【使用方法】</el-col>
+                <el-col :span="24" :xs="24">
+                    <el-input v-model="textarea" :rows="2" type="textarea" placeholder="请输入使用方法" />
+                </el-col>
+            </el-row>
+        </div>
     </div>
 </template>
 
@@ -88,14 +118,20 @@ const urlQuery = ref({})
 const detailInfo = ref({})
 const { did = '', version = '', pageFrom = '' } = route.query || {}
 /**
- * 应用是否上架
+ * todo 学虎，
+ * 应用是否上架，这里需要调用接口查询应用的上架状态
  */
 const isOnline = ref(false) // 是否已经上架
 
 /**
- * 申请应用的状态
+ * todo 学虎，
+ * 申请应用的状态，这里需要调用接口查询应用的申请状态
  */
 const mockApplyStatus = 'success'
+
+/**
+ * todo 学虎，服务详情接口
+ */
 
 const detail = async () => {
     if (pageFrom !== 'myCreate') {
@@ -107,6 +143,11 @@ const detail = async () => {
         const detailRst = await $application.myApplyDetail(did, version)
     }
 }
+/**
+ * todo 学虎，删除应用接口
+ */
+
+const toDelete = () => {}
 
 onMounted(() => {
     urlQuery.value = route.query
@@ -150,6 +191,11 @@ onMounted(() => {
             font-weight: 400;
             color: rgba(0, 0, 0, 0.85);
             margin-top: 16px;
+        }
+        .count-row {
+            font-size: 14px;
+            font-weight: 400;
+            color: rgba(0, 0, 0, 0.85);
         }
     }
     .link-url {

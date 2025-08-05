@@ -1,3 +1,5 @@
+<!-- todo 学虎，这个是服务编辑页面，里面的接口应该跟应用类似 -->
+
 <template>
     <div class="edit">
         <el-breadcrumb separator="/">
@@ -174,7 +176,10 @@ const toOnlineApply = () => {
         customClass: 'messageBox-wrap'
     })
         .then(() => {
-            // 上架接口
+            /**
+             * todo 学虎 上架服务接口
+             *
+             */
         })
         .catch(() => {})
 }
@@ -233,6 +238,9 @@ const getDetailInfo = async () => {
 
     if (did) {
         isEdit.value = true
+        /**
+         *todo 学虎 服务详情接口，编辑页面进来的时候需要回填
+         */
         const res = await $application.detail(did, version)
         console.log(res, '-detailRes-')
         if (res) {
@@ -241,6 +249,9 @@ const getDetailInfo = async () => {
             detailInfo.value.serviceCodes = res.body.application.serviceCodes.map((v) => String(v))
         }
     } else {
+        /**
+         * 新建页面的时候需要拿到did，下面这个接口是不对的，需要改成创建did的接口
+         */
         await getUserInfo()
         detailInfo.value.did = userMeta.value.did
         detailInfo.value.owner = userMeta.value.parent
@@ -261,6 +272,11 @@ const submitForm = async (formEl) => {
             delete params.$typeName
             params.code = codeMapTrans[params.code]
             params.serviceCodes = params.serviceCodes.map((item) => serviceCodeMapTrans[item])
+
+            /**
+             * todo 学虎 服务新建接口
+             * 这里需要加判断，是新建还是编辑，需要在参数上区分
+             */
             const rst = await $application.create(params)
             console.log('submit!', params, rst)
             innerVisible.value = true
@@ -269,6 +285,12 @@ const submitForm = async (formEl) => {
         }
     })
 }
+/**
+ * todo 学虎，保存并上架服务
+ * 保存接口调用submitForm可以实现
+ * 上架接口需要补充在这里
+ *
+ */
 const submitFormAndOnline = (formEl) => {
     submitForm(formEl)
 }
@@ -313,6 +335,7 @@ const changeFile = async (fileType, uploadFile) => {
         }
     }
 }
+
 const getUserInfo = async () => {
     const info = await $account.getActiveIdentity()
     userMeta.value = info.metadata || {}
