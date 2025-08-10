@@ -79,9 +79,6 @@
                 <el-col :span="8" :xs="24">应用状态:{{ '-' }}</el-col>
             </el-row>
             <el-row class="part-row">
-                <el-col :span="24">应用名称: {{ detailInfo.createdAt }}</el-col>
-            </el-row>
-            <el-row class="part-row">
                 <el-col :span="24">应用描述: {{ detailInfo.description }}</el-col>
             </el-row>
         </div>
@@ -124,7 +121,7 @@
     <ConfigServiceModal :modalVisible="modalVisible" :cancelModal="cancelModal" />
 </template>
 
-<script setup>
+<script lang="ts" setup>
 import { onMounted, ref } from 'vue'
 import BreadcrumbHeader from '@/views/components/BreadcrumbHeader.vue'
 import ApplyStatus from '@/views/components/ApplyStatus.vue'
@@ -133,7 +130,7 @@ import ResultChooseModal from '@/views/components/ResultChooseModal.vue'
 import { ElMessageBox } from 'element-plus'
 import { h } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
-import $application from '@/plugins/application'
+import $application, { ApplicationDetail } from '@/plugins/application'
 import { Link } from '@element-plus/icons-vue'
 import Popover from '@/views/components/Popover.vue'
 import ConfigServiceModal from '@/views/components/ConfigServiceModal.vue'
@@ -141,8 +138,17 @@ import ConfigServiceModal from '@/views/components/ConfigServiceModal.vue'
 const route = useRoute()
 const router = useRouter()
 const urlQuery = ref({})
-const detailInfo = ref({})
-const { did = '', version = '', pageFrom = '' } = route.query || {}
+const detailInfo = ref<ApplicationDetail>({
+    name: '',
+    description: '',
+    location: '',
+    hash: '',
+    code: '',
+    serviceCodes: [],
+    avatar: '',
+    owner: ''
+})
+const { uid = '', pageFrom = '' } = route.query || {}
 const innerVisible = ref(false)
 const modalVisible = ref(false)
 
@@ -165,20 +171,21 @@ const mockApplyStatus = ref('success')
  * 进入详情页的时候，需要查询详情接口
  */
 const detail = async () => {
-    if (pageFrom !== 'myCreate') {
+    if (pageFrom === 'myCreate') {
         /**
-         * 我创建的-详情接口
+         * 应用中心：我创建的-详情接口
          */
-        const detailRst = await $application.detail(did, version)
-        const { application } = detailRst.body || {}
-        console.log(application, '-detailRst--')
-        detailInfo.value = application || {}
+        console.log("进入我创建的-详情接口")
+        const detailRst = await $application.myCreateDetailByUid(uid)
+        console.log(`detailRst=${JSON.stringify(detailRst)}`)
+        // const detailRst = await $application.detail(did, version)
+        detailInfo.value = detailRst || {}
     } else {
         /**
          * 我申请的详情接口
          * 应用市场详情接口
          */
-        const detailRst = await $application.myApplyDetail(did, version)
+        //const detailRst = await $application.myApplyDetail(did, version)
     }
 }
 
@@ -217,14 +224,14 @@ const closeInnerModal = () => {
  * 编辑
  */
 const toEdit = () => {
-    console.log(urlQuery.value.did, '-urlQuery-')
-    router.push({
-        path: '/market/apply-edit',
-        query: {
-            did: did,
-            version: version
-        }
-    })
+    // console.log(urlQuery.value.did, '-urlQuery-')
+    // router.push({
+    //     path: '/market/apply-edit',
+    //     query: {
+    //         did: did,
+    //         version: version
+    //     }
+    // })
 }
 
 const toConfigService = () => {
@@ -295,6 +302,7 @@ const handleOfflineConfirm = () => {
 }
 
 onMounted(() => {
+    console.log(`route.query=${JSON.stringify(route.query)}`)
     urlQuery.value = route.query
     detail()
 })

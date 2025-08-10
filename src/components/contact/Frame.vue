@@ -7,7 +7,7 @@
   </div>
 </template>
 
-<script setup>
+<script lang="ts" setup>
 import {ref,getCurrentInstance} from 'vue'
 import Contact from '@/components/contact/Modal.vue'
 import {$account} from '@yeying-community/yeying-wallet';

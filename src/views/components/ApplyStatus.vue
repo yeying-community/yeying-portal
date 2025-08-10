@@ -3,7 +3,7 @@
     statusInfo[props.status]?.text
   }}</el-tag>
 </template>
-<script setup>
+<script lang="ts" setup>
 const statusInfo = {
   success: {
     type: "success",

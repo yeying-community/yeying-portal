@@ -104,7 +104,7 @@
     </div>
 </template>
 
-<script setup>
+<script lang="ts" setup>
 import { ref, reactive } from 'vue'
 import $service, { ApplyStatusMap } from '@/plugins/service'
 import ApprovalTable from '@/views/components/ApprovalTable.vue'

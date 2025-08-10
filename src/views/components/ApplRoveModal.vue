@@ -32,7 +32,7 @@
     </el-dialog>
 </template>
 
-<script setup>
+<script lang="ts" setup>
 import { userInfo } from '@/plugins/account'
 import $auditProvider from '@/plugins/auditProvider'
 import { ref, reactive } from 'vue'

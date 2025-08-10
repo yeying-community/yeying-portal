@@ -5,7 +5,7 @@
     </h1>
   </div>
 </template>
-<script setup>
+<script lang="ts" setup>
 import {getCurrentInstance} from 'vue'
 
 const {proxy} = getCurrentInstance()

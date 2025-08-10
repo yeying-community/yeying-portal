@@ -1,4 +1,4 @@
-<script setup>
+<script lang="ts" setup>
 import SolutionSearch from '@/views/solution/SolutionSearch.vue'
 import SolutionItem from '@/views/solution/SolutionItem.vue'
 import Footer from '@/components/layout/Footer.vue'

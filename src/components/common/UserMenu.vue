@@ -45,7 +45,7 @@
     </Menu>
   </template>
   
-<script setup>
+<script lang="ts" setup>
   import { ref } from "vue";
   import { Menu, MenuButton, MenuItem, MenuItems } from "@headlessui/vue";
   import { setLanguage } from "@yeying-community/yeying-i18n";

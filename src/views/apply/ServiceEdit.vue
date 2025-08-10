@@ -139,7 +139,7 @@
     </ResultChooseModal>
 </template>
 
-<script setup>
+<script lang="ts" setup>
 import { ref, reactive, onMounted } from 'vue'
 import $application, { codeMap, codeMapTrans, serviceCodeMap, serviceCodeMapTrans } from '@/plugins/application'
 import Uploader from '@/components/common/Uploader.vue'

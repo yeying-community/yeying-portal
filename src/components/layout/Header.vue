@@ -86,7 +86,7 @@
     <!-- <auto-login ref="RefLogin"/> -->
   </header>
 </template>
-<script setup>
+<script lang="ts" setup>
 import { ref, watch, getCurrentInstance } from "vue";
 // import { Bars3Icon, XMarkIcon } from '@heroicons/vue/24/outline'
 // import { Dialog, DialogPanel } from '@headlessui/vue'

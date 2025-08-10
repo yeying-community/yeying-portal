@@ -6,7 +6,7 @@
   </div>
 </template>
 
-<script setup>
+<script lang="ts" setup>
 import {ref} from 'vue'
 import { RouterLink, RouterView } from 'vue-router'
 import Header from '@/components/layout/Header.vue'

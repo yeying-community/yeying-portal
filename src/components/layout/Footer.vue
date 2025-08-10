@@ -48,7 +48,7 @@
   </div>
 </template>
 
-<script setup></script>
+<script lang="ts" setup></script>
 <style scoped>
 .self-icon {
   font-size: 1.875rem;

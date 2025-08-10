@@ -1,4 +1,4 @@
-<script setup>
+<script lang="ts" setup>
 import Contact from '@/components/contact/Modal.vue'
 import {getCurrentInstance, ref} from 'vue'
 // import $account from '@/plugins/account.js'

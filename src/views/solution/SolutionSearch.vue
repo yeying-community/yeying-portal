@@ -1,4 +1,4 @@
-<script setup>
+<script lang="ts" setup>
 import {getCurrentInstance, ref} from 'vue'
 import {useSolutionStore} from '@/stores/index'
 // import {InputSearch} from 'ant-design-vue'

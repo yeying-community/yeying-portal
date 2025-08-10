@@ -65,7 +65,7 @@
   </div>
 </template>
 
-<script setup>
+<script lang="ts" setup>
 import { ref,watch,toRefs } from 'vue'
 import { RouterView,useRouter,useRoute } from 'vue-router'
 import {

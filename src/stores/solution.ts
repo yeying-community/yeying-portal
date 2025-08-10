@@ -2,10 +2,10 @@ import { ref } from 'vue'
 import { defineStore } from 'pinia'
 
 export const useSolutionStore = defineStore('solution', () => {
-    const solutionList = ref([])
+    const solutionList = ref<any>([])
     const test = ref(1)
 
-    function getSolutionList(keyWord) {
+    function getSolutionList(keyWord: any) {
         const list = [
             {
                 code: '1',

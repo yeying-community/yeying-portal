@@ -2,9 +2,20 @@
 
 // import { ProviderCodeEnum } from '@yeying-community/yeying-client-ts';
 // import { ProviderCodeEnum } from '@yeying-community/yeying-web3'
-import { applicationProvider, uploader, namespaceProvider, linkProvider, TEST_TABLES, indexedCache } from './account'
+import { applicationProvider, uploader, namespaceProvider, linkProvider, indexedCache } from './account'
 import { setLocalStorage, getLocalStorage } from '@/utils/common'
 import { createIdentity } from '@yeying-community/yeying-web3'
+
+export interface ApplicationDetail {
+    name: string
+    description: string
+    location: string
+    hash: string
+    code: string
+    serviceCodes: string[]
+    avatar: string
+    owner: string
+}
 
 // 应用编码
 export const codeMapTrans = {
@@ -43,6 +54,45 @@ export const serviceCodeMap = {
     SERVICE_CODE_MCP: '模型上下文供应商'
 }
 class $application {
+
+    /**
+     * 应用中心 -> 创建应用
+     * @param {*} params 
+     */
+    async create(params) {
+        await indexedCache.insert('applications', params)
+    }
+    /**
+     * 应用中心 -> 我创建的列表展示接口
+     * @param {*} did 
+     * @returns 
+     */
+    async myCreateList(did) {
+        console.log(`request did=${JSON.stringify(did)}`)
+        const res = await indexedCache.indexAll('applications', 'did', did)
+        console.log(`response=${JSON.stringify(res)}`)
+        return res
+    }
+    /**
+     * 应用中心 -> 我创建的应用详情接口
+     * @param {*} uid 
+     * @returns 
+     */
+    async myCreateDetailByUid(uid) {
+        console.log(`uid=${uid}`)
+        const res = await indexedCache.getByKey('applications', uid)
+        console.log(`res=${JSON.stringify(res)}`)
+        return res
+    }
+
+    async myCreateDetailByDidAndVersion(did, version) {
+        console.log(`did=${did}`)
+        console.log(`version=${version}`)
+        const res = await indexedCache.cursorIndex('applications', )
+        console.log(`res=${JSON.stringify(res)}`)
+        return res
+    }
+
     async search(page, pageSize, condition) {
         let params: { page?: number; pageSize?: number; condition?: Record<string, any> } = {}
         params.page = page || 1
@@ -64,19 +114,8 @@ class $application {
     }
 
     async myApplyDelete(did) {
-        return await indexedCache.deleteByKey(TEST_TABLES[1].name, did, (r) => {
+        return await indexedCache.deleteByKey("applications", did, (r) => {
             console.log(`total record=${JSON.stringify(r)}`)
-        })
-    }
-
-    async create(params) {
-        // return await applicationProvider.create(params);
-        // return new Promise((resolve, reject) => {
-        //   resolve(params)
-        // })
-        return await indexedCache.insert(TEST_TABLES[1].name, {
-            id: params.did,
-            ...params
         })
     }
 
@@ -85,14 +124,14 @@ class $application {
         // return new Promise((resolve, reject) => {
         //   resolve(params)
         // })
-        return await indexedCache.updateByKey(TEST_TABLES[1].name, {
+        return await indexedCache.updateByKey("applications", {
             id: params.did,
             ...params
         })
     }
 
     async myApplyDetail(did, version) {
-        return await indexedCache.getByKey(TEST_TABLES[1].name, did)
+        return await indexedCache.getByKey("applications", did)
     }
 
     async createIdentity(template, password) {
@@ -160,4 +199,5 @@ class $application {
         return info
     }
 }
+
 export default new $application()

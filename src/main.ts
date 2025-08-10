@@ -5,7 +5,7 @@ import { createApp } from 'vue'
 import { createPinia } from 'pinia'
 import App from '@/App.vue'
 import { routes } from '@/router'
-import { createRouter, createWebHistory } from 'vue-router'
+import { createRouter, createWebHistory, Router } from 'vue-router'
 import { createWallet, sdkRoutes } from '@yeying-community/yeying-wallet'
 import { initializeProviders } from '@/plugins/account'
 import ElementPlus from 'element-plus'
@@ -21,7 +21,7 @@ app.use(ElementPlus, {
 app.config.globalProperties.$t = t
 
 // 合并路由
-const router = createRouter({
+const router: Router = createRouter({
     history: createWebHistory(import.meta.env.BASE_URL),
     routes: [...routes, ...sdkRoutes]
 })
@@ -32,12 +32,12 @@ app.use(router)
 // sdk初始化调用
 createWallet(router, initializeProviders, {
     // 登录成功回调
-    onLoginSuccess: (account) => {
+    onLoginSuccess: (account: any) => {
         console.log('登录成功', account)
     },
     // 创建身份成功回调
-    onCreateSuccess: () => {
-        console.log('注册成功')
+    onCreateSuccess: (account: any) => {
+        console.log('注册成功', account)
     }
 })
 app.mount('#app')

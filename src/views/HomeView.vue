@@ -1,4 +1,4 @@
-<script setup>
+<script lang="ts" setup>
 import HomeDesc from '@/views/home/HomeDesc.vue'
 import HomeItem from '@/views/home/HomeItem.vue'
 import Footer from '@/components/layout/Footer.vue'

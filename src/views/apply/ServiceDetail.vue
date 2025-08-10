@@ -104,7 +104,7 @@
     </div>
 </template>
 
-<script setup>
+<script lang="ts" setup>
 import { onMounted, ref } from 'vue'
 import BreadcrumbHeader from '@/views/components/BreadcrumbHeader.vue'
 import ApplyStatus from '@/views/components/ApplyStatus.vue'
