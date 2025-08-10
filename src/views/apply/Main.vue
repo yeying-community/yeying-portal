@@ -25,7 +25,7 @@
   </div>
 </template>
 
-<script setup>
+<script lang="ts" setup>
 import { ref, watch } from "vue";
 import { RouterView, useRouter, useRoute } from "vue-router";
 import { Menu, Operation, Document } from "@element-plus/icons-vue";

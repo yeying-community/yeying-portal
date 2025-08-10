@@ -20,33 +20,6 @@ import {
 // import type {CacheTable} from './types'
 import { $account } from '@yeying-community/yeying-wallet'
 
-export const TEST_TABLES = [
-    {
-        name: 'table1',
-        key: 'id',
-        autoIncrement: false,
-        indexes: [
-            {
-                keyPath: 'name',
-                name: 'name',
-                unique: false
-            }
-        ]
-    },
-    {
-        name: 'addTable',
-        key: 'id',
-        autoIncrement: false,
-        indexes: [
-            {
-                keyPath: 'name',
-                name: 'name',
-                unique: false
-            }
-        ]
-    }
-]
-
 let namespaceProvider = null
 // let llmManager = null;
 // let sessionManager = null;
@@ -59,25 +32,15 @@ let applicationProvider = null
 let userInfo = null
 let auditProvider = null
 let serviceCenterProvider = null
-let indexedCache = null
-// async function open(){
-//   const table=[{
-//     name: 'messageTB',
-//     key: "id",
-//     autoIncrement: false,
-//     indexes: [
-//       {keyPath: "sessionId", name: "sessionId", unique: false},
-//       {keyPath: "isStar", name: "isStar", unique: false},
-//     ]
-//   }]
-//   return await indexedCache.open(table)
-// }
+let indexedCache: IndexedCache = null
+
 // 初始化提供者
 async function initializeProviders() {
     // if(sessionManager||llmManager)return
     userInfo = await $account.getActiveIdentity()
     console.log('userinfo--->22', userInfo)
     const did = userInfo?.metadata?.did
+    console.log('did--->22', did)
     let blockAddress = null
     if (did) {
         blockAddress = await $account.getBlockAddress(did)
@@ -115,17 +78,25 @@ async function initializeProviders() {
     // userProvider = new UserProvider(agentProviderOption)
     linkProvider = new LinkProvider(warehouseProviderOption)
     applicationProvider = new ApplicationProvider(serviceProviderOption)
-    indexedCache = new IndexedCache('sessionDB', 2)
-    await indexedCache.open(TEST_TABLES)
-    // 验证表是否存在
-    // const res = await indexedCache.insert(TEST_TABLES[0].name, {
-    //   id: "12333455",
-    //   description: "test",
-    //   name: `alice`,
-    // });
-    // await indexedCache.cursor(TEST_TABLES[0].name, (r) => {
-    //   console.log(`total record=${JSON.stringify(r)}`);
-    // });
+    indexedCache = new IndexedCache('yeying-protal', 1)
+    await indexedCache.open([
+        {
+            // 表名
+            name: 'applications', 
+            // 主键字段
+            key: 'uid', 
+            // 主键是否自增，走采用 uuid 作为主键
+            autoIncrement: false, 
+            // 索引：keyPath 表示列名； name 表示索引名； unique 表示字段值是否唯一
+            indexes: [{ keyPath: 'did', name: 'did', unique: false }]
+        },
+        {
+            name: 'services',
+            key: 'uid',
+            autoIncrement: false,
+            indexes: [{ keyPath: 'did', name: 'did', unique: false }]
+        }
+    ])
 
     auditProvider = new AuditProvider(serviceProviderOption)
     serviceCenterProvider = new ServiceProvider(serviceProviderOption)

@@ -14,7 +14,7 @@
   </div>
 </template>
 
-<script setup>
+<script lang="ts" setup>
 import { reactive, ref, toRefs } from "vue";
 import SlideSplit from "./SliderCaptcha.vue";
 import { bgBase64,blockBase64 } from './test';

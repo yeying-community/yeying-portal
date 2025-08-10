@@ -157,9 +157,9 @@
     </ResultChooseModal>
 </template>
 
-<script setup>
+<script lang="ts" setup>
 import { ref, reactive, onMounted } from 'vue'
-import $application, { codeMap, codeMapTrans, serviceCodeMap, serviceCodeMapTrans } from '@/plugins/application'
+import $application, { ApplicationDetail, codeMap, codeMapTrans, serviceCodeMap, serviceCodeMapTrans } from '@/plugins/application'
 import Uploader from '@/components/common/Uploader.vue'
 import { Upload } from '@element-plus/icons-vue'
 import { $account } from '@yeying-community/yeying-wallet'
@@ -170,11 +170,16 @@ import { h } from 'vue'
 import { SuccessFilled } from '@element-plus/icons-vue'
 import ResultChooseModal from '@/views/components/ResultChooseModal.vue'
 import { userInfo } from '@/plugins/account'
+import { v4 as uuidv4 } from 'uuid';
 
-console.log(userInfo, '--userInfo99999-')
+console.log(`apply edit userInfo=${JSON.stringify(userInfo)}`)
+
+const did: string = userInfo.metadata.did
+const version: string = userInfo.metadata.version
+console.log(`apply edit userInfo.did=${did}`)
+console.log(`apply edit userInfo.did=${version}`)
 const route = useRoute()
 const router = useRouter()
-const { did, version } = route.query
 
 const goBack = () => {
     router.back()
@@ -206,7 +211,7 @@ const codeChk = ref('2')
 const avatarList = ref([])
 
 const codeList = ref([])
-const detailInfo = ref({
+const detailInfo = ref<ApplicationDetail>({
     name: '',
     description: '',
     location: '',
@@ -216,6 +221,7 @@ const detailInfo = ref({
     avatar: '',
     owner: ''
 })
+
 
 const innerVisible = ref(false)
 const userMeta = ref({})
@@ -239,7 +245,7 @@ const getDetailInfo = async () => {
          * 进入编辑页面首先要查一下详情，回显数据
          * 下面的myApplyDetail也是我自己写的，你可以改成你写的
          */
-        const res = await $application.myApplyDetail(did)
+        const res = await $application.myApplyDetail(did, version)
         // const res = await $application.detail(did, version);
         console.log(res, '-detailRes-')
         if (res) {
@@ -286,20 +292,20 @@ const submitForm = async (formEl, andOnline) => {
     }
     await formEl.validate(async (valid, fields) => {
         if (valid) {
-            const { did, version } = route.query
             const params = JSON.parse(JSON.stringify(detailInfo.value))
-            delete params.$typeName
-            params.code = codeMapTrans[params.code]
-            params.serviceCodes = params.serviceCodes.map((item) => serviceCodeMapTrans[item])
+            console.log(`创建应用表单参数=${JSON.stringify(params)}`)
             params.codeType = codeChk.value
-
-            console.log(params, '-ppp-')
-
             if (did) {
+                console.log("!!!!!!!!!!!")
                 /**
                  * todo 学虎 编辑页面-点击保存按钮调用的接口
                  * update是我自己写的接口，你可以换一下
                  */
+                $application.myCreateDetailByUid
+                params.uid = uuidv4()
+                params.did = did
+                params.version = version
+                params.owner = did
                 const rst = await $application.update(params)
                 console.log('submit444!', params, rst)
                 if (!andOnline) {
@@ -316,8 +322,11 @@ const submitForm = async (formEl, andOnline) => {
                  * 首先得先调用一个接口生成一个新的did，这个生成did的接口我没做
                  * create是我自己写的接口，你可以自己换一下
                  */
-                const rst = await $application.create(params)
-                console.log('submit!', params, rst)
+                params.uid = uuidv4()
+                params.did = did
+                params.version = version
+                const result = await $application.create(params)
+                console.log(`result=${JSON.stringify(result)}`)
                 innerVisible.value = true
             }
         } else {
@@ -333,7 +342,7 @@ const toOnlineApply = async () => {
      * 点击保存按钮会弹出一个弹窗，左边按钮叫做上架应用
      * 目前调不通
      */
-    const rst = await $application.online(detailInfo.did, detailInfo.version)
+    const rst = await $application.online(did, version)
     console.log(rst, '--i=onlinerrr-')
 }
 const toList = () => {

@@ -5,7 +5,7 @@
   </div>
 </template>
 
-<script setup>
+<script lang="ts" setup>
 import { useRouter } from "vue-router";
 import { Back } from "@element-plus/icons-vue";
 const router = useRouter();

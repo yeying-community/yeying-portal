@@ -62,7 +62,7 @@
   </div>
 </template>
 
-<script setup>
+<script lang="ts" setup>
 import { onMounted, ref, watch } from "vue";
 import { Search } from "@element-plus/icons-vue";
 import $service from "@/plugins/service";

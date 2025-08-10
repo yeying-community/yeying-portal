@@ -16,7 +16,7 @@
           </div> -->
     </div>
 </template>
-<script setup>
+<script lang="ts" setup>
 // import Language from '@/components/common/Language.vue'
 // import UserMenu from '@/components/common/UserMenu.vue'
 // import {useProfileStore} from '@/stores/index'

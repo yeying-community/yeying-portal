@@ -36,7 +36,7 @@
   </div>
 </template>
 
-<script setup>
+<script lang="ts" setup>
 import {onMounted, ref, toRefs} from 'vue'
 // import { storeToRefs } from 'pinia'
 import {useSolutionStore} from '@/stores/index'

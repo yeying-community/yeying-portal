@@ -29,7 +29,7 @@
     </el-dialog>
 </template>
 
-<script setup>
+<script lang="ts" setup>
 const props = defineProps({
     modelValue: {
         type: Boolean,

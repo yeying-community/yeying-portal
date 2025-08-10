@@ -83,7 +83,7 @@
   </TransitionRoot>
 </template>
 
-<script setup>
+<script lang="ts" setup>
 import { ref,reactive, onMounted,getCurrentInstance } from 'vue'
 import { Dialog, DialogPanel, DialogTitle, TransitionChild, TransitionRoot } from '@headlessui/vue'
 import SelectMenu from '@/components/common/SelectMenu.vue'

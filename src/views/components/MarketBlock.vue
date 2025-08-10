@@ -191,7 +191,7 @@
         </template>
     </ResultChooseModal>
 </template>
-<script setup>
+<script lang="ts" setup>
 import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import $application from '@/plugins/application'
@@ -322,8 +322,7 @@ const toDetail = () => {
     router.push({
         path: '/market/apply-detail',
         query: {
-            did: props.detail.did,
-            version: props.detail.version,
+            uid: props.detail.uid,
             pageFrom: props.pageFrom
         }
     })

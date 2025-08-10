@@ -15,7 +15,7 @@
       </template>
     </el-upload>
   </template>
-  <script setup>
+<script lang="ts" setup>
   import { ref,watch } from 'vue'
   
   const emit = defineEmits(['change','removeAllFile','update:modelValue']);

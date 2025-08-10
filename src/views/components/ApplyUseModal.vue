@@ -52,7 +52,7 @@
   </ResultChooseModal>
 </template>
 
-<script setup>
+<script lang="ts" setup>
 import { userInfo } from '@/plugins/account'
 import $auditProvider from '@/plugins/auditProvider'
 import ResultChooseModal from './ResultChooseModal.vue'

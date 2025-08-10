@@ -17,7 +17,7 @@
     </dl>
   </div>
 </template>
-<script setup>
+<script lang="ts" setup>
 const itemList = [
   {
     title: 'Self-Controllable',

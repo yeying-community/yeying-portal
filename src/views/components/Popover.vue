@@ -31,7 +31,7 @@
   </el-popover>
 </template>
 
-<script setup>
+<script lang="ts" setup>
 import { ref } from "vue";
 import { WarningFilled } from "@element-plus/icons-vue";
 const props = defineProps({

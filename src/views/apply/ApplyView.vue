@@ -46,14 +46,15 @@
     </div>
 </template>
 
-<script setup>
+<script lang="ts" setup>
 import { onMounted, ref, watch } from 'vue'
 import { Search } from '@element-plus/icons-vue'
 import $application from '@/plugins/application'
 import MarketBlock from '@/views/components/MarketBlock.vue'
 import { useRouter, useRoute } from 'vue-router'
 import { userInfo } from '@/plugins/account'
-
+const did = userInfo?.metadata?.did;
+console.log(`did=${did}`)
 // const userDid = userInfo?.metadata?.did;
 
 const searchVal = ref('')
@@ -94,45 +95,37 @@ const search = async () => {
         // 根据当前激活的标签页传递不同的查询参数
         let condition = { keyword: searchVal.value }
 
+        // 应用中心：我创建的列表展示
         if (activeService.value === 'myCreate') {
-            /**
-             * todo 学虎 调用我的创建列表也接口
-             * 调用完接口以后，下面的注释也可以放开。
-             */
-            //  const rst  = await 我的创建列表接口
-            /**
-             * applicationList 数据源，从rst中获取的
-             */
-            //  applicationList.value = applications || []
+            const res = await $application.myCreateList(did || "did:ethr:0x07e4:0x02cc933db9ba636a9441c2cce025681a1f1443b5770307e13983cd76d49896c4b1")
+            console.log(`res list=${res}`)
+            applicationList.value = res || []
             /**
              * 总条数，分页器需要用到
              */
-            //  pagination.value.total = page.total || 0
-            //return;
+            pagination.value.total = 0
+            return;
         } else if (activeService.value === 'myApply') {
             /**
              * todo 学虎 调用我的申请列表也接口
              * 调用完接口以后，下面的注释也可以放开。
              */
-            //  const rst  = await 我的申请列表接口
-            /**
-             * applicationList 数据源，从rst中获取的
-             */
-            //  applicationList.value = applications || []
+            applications = []
+            applicationList.value = applications || []
             /**
              * 总条数，分页器需要用到
              */
-            //  pagination.value.total = page.total || 0
-            //return;
+            pagination.value.total = 0
+            return;
         }
 
         const rst = await $application.search(pagination.value.page, pagination.value.pageSize, condition)
 
         console.log(rst, '-rst-')
-
-        const { applications, page } = rst.body || {}
-        applicationList.value = applications || []
-        pagination.value.total = page.total || 0
+        // const { applications, page } = rst.body || {}
+        // applicationList.value = applications || []
+        //pagination.value.total = page.total || 0
+        pagination.value.total = 0
     } catch (error) {
         console.error('获取应用列表失败', error)
         // 处理错误，如显示提示信息
