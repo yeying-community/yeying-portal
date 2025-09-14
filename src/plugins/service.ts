@@ -11,11 +11,41 @@ export const ApplyStatusMap = {
 }
 class $service {
     async search(page, pageSize, condition) {
-        let params: { page?: number; pageSize?: number; condition?: Record<string, any> } = {}
-        params.page = page || 1
-        params.pageSize = pageSize || 10
-        params.condition = condition || {}
-        return await serviceCenterProvider.search(params.page, params.pageSize, params.condition)
+        const header = {
+            "did": "xxxx"
+        }
+        const body = {
+            "header": header,
+            "body": {
+                "condition": {
+                    "code": condition.code || "SERVICE_CODE_NODE"
+                },
+                "page": {
+                    "page": page || 1,
+                    "pageSize": pageSize || 10
+                }
+            }
+        }
+        console.log(`body=${JSON.stringify(body)}`)
+        const endpoint = import.meta.env.VITE_API_ENDPOINT
+        console.log(`endpoint=${endpoint}`)
+        const response = await fetch(endpoint + '/api/v1/service/search', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'accept': 'application/json'
+            },
+            body: JSON.stringify(body),
+        });
+        
+        if (!response.ok) {
+            throw new Error(`Failed to create post: ${response.status}`);
+        }
+
+        const r =  await response.json();
+        console.log(`r=${JSON.stringify(r)}`)
+        return r.body.services
+        //return await serviceCenterProvider.search(params.page, params.pageSize, params.condition)
         // return new Promise((resolve, reject) => {
         //   const rst = [
         //     {

@@ -19,15 +19,11 @@ import {
 // import {getLocalStorage} from '@/utils/common'
 // import type {CacheTable} from './types'
 import { $account } from '@yeying-community/yeying-wallet'
+import $service from "@/plugins/service";
 
 let namespaceProvider = null
-// let llmManager = null;
-// let sessionManager = null;
 let uploader = null
-// let providerProvider = null;
-// let userProvider = null;
 let linkProvider = null
-// let indexedCache = null;
 let applicationProvider = null
 let userInfo = null
 let auditProvider = null
@@ -38,13 +34,10 @@ let indexedCache: IndexedCache = null
 async function initializeProviders() {
     // if(sessionManager||llmManager)return
     userInfo = await $account.getActiveIdentity()
-    console.log('userinfo--->22', userInfo)
     const did = userInfo?.metadata?.did
-    console.log('did--->22', did)
     let blockAddress = null
     if (did) {
         blockAddress = await $account.getBlockAddress(did)
-        console.log('blockAddress--->22', blockAddress)
     }
     // const blockAddress = getLocalStorage('blockAddress')
     if (!blockAddress) return
@@ -53,10 +46,8 @@ async function initializeProviders() {
     let warehouse = null
     let serviceProvider = null
     if (blockAddress) {
-        serviceProvider = await $account.getServicesByCode(ServiceCodeEnum.SERVICE_CODE_NODE)
-
-        // agent = await $account.getServicesByCode(ServiceCodeEnum.SERVICE_CODE_AGENT)
-        warehouse = await $account.getServicesByCode(ServiceCodeEnum.SERVICE_CODE_WAREHOUSE)
+        serviceProvider = await $service.search(1, 10, {"code": "SERVICE_CODE_NODE"})
+        warehouse = await $service.search(1, 10, {"code": "SERVICE_CODE_WAREHOUSE"})
     }
     const securityAlgorithm = userInfo?.securityConfig?.algorithm
     const serviceProviderOption = {
@@ -100,6 +91,7 @@ async function initializeProviders() {
 
     auditProvider = new AuditProvider(serviceProviderOption)
     serviceCenterProvider = new ServiceProvider(serviceProviderOption)
+    console.log("初始化结束")
 }
 // 页面加载时初始化提供者
 // if (typeof window !== 'undefined') {
