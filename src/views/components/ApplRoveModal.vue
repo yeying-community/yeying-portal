@@ -34,7 +34,7 @@
 
 <script lang="ts" setup>
 import { userInfo } from '@/plugins/account'
-import $auditProvider from '@/plugins/auditProvider'
+import $auditProvider from '@/plugins/audit'
 import { ref, reactive } from 'vue'
 import { useRouter } from 'vue-router'
 

@@ -194,7 +194,7 @@
 <script lang="ts" setup>
 import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
-import $application from '@/plugins/application'
+import $audit, { AuditAuditMetadata } from '@/plugins/audit'
 import { SuccessFilled } from '@element-plus/icons-vue'
 import dayjs from 'dayjs'
 import { userInfo } from '@/plugins/account'
@@ -204,6 +204,8 @@ import Popover from '@/views/components/Popover.vue'
 import ApplyUseModal from './ApplyUseModal.vue'
 import ConfigServiceModal from './ConfigServiceModal.vue'
 import ResultChooseModal from './ResultChooseModal.vue'
+import { generateUuid, getCurrentUtcString } from '@/utils/common'
+import $application, { ApplicationMetadata } from '@/plugins/application'
 
 const StatusInfo = {
     online: {
@@ -295,7 +297,7 @@ const toDelete = async () => {
         /**
          * todo 学虎 我创建的-删除
          */
-        await $application.myApplyDelete(props.detail.did)
+        await $application.myCreateDeleteByUid(props.detail.did)
     } else {
         /**
          * todo 学虎 我申请的-删除
@@ -398,20 +400,33 @@ const handleOnline = () => {
     })
         .then(async () => {
             /**
-             * todo学虎 这块调用上架应用接口
+             * 创建上架申请
              * innerVisible.value = true 是上架成功后，打开一个弹窗提示用户上架成功了
              */
-            // const offlinelRst = await $application.online(props.detail.did, props.detail.version)
-            // if (offlinelRst.success) {
-            //innerVisible.value = true
-            // }
-            innerVisible.value = true
+            const detailRst = await $application.myCreateDetailByUid(props.detail.uid)
+            console.log(`detailRst=${JSON.stringify(detailRst)}`)
+            const meta: AuditAuditMetadata = {
+                uid: generateUuid(),
+                appOrServiceMetadata: JSON.stringify(detailRst),
+                applicant: `${userInfo?.metadata?.did}::${userInfo?.metadata?.did}`, // 申请人身份，did::name
+                approver: 'did:ethr:0x07e4:0x036bc5c8f6807d1c550b383b7c20038b1fee4e0e2e5e9bbf53db1961ad9189246e::did:ethr:0x07e4:0x036bc5c8f6807d1c550b383b7c20038b1fee4e0e2e5e9bbf53db1961ad9189246e', // 审批人身份，list[did::name]，先写死，固定的审批人，后续改成从 kv 配置表里获取
+                reason: '上架申请',
+                createdAt: getCurrentUtcString(),
+                updatedAt: getCurrentUtcString(),
+                signature: 'xxx'
+            }
+            const status = await $audit.create(meta)
+            if (status.code === "OK") {
+                innerVisible.value = true
+            }
         })
         .catch(() => {})
 }
+
 const afterSubmit = () => {
     dialogVisible.value = false
 }
+
 onMounted(() => {
     if (props.pageFrom === 'myCreate') {
         getLineStatus()
@@ -420,6 +435,7 @@ onMounted(() => {
         getApplyStatus()
     }
 })
+
 // const emit = defineEmits(['change']);
 </script>
 <style scoped lang="less">

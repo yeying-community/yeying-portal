@@ -53,13 +53,41 @@ export const serviceCodeMap = {
     SERVICE_CODE_AGENT: '智能体供应商',
     SERVICE_CODE_MCP: '模型上下文供应商'
 }
+export interface ApplicationMetadata {
+    owner?: string;
+    network?: string;
+    address?: string;
+    did?: string;
+    version?: number;
+    hash?: string;
+    name?: string;
+    code?: string;
+    description?: string;
+    location?: string;
+    serviceCodes?: string[];
+    avatar?: string;
+    createdAt?: string;
+    updatedAt?: string;
+    signature?: string;
+    codePackagePath?: string;
+}
+export interface ApplicationSearchCondition {
+    code?: string;
+    status?: string;
+    owner?: string;
+    name?: string;
+    keyword?: string;
+}
+
+const endpoint = import.meta.env.VITE_API_ENDPOINT
+
 class $application {
 
     /**
      * 应用中心 -> 创建应用
      * @param {*} params 
      */
-    async create(params) {
+    async create(params: ApplicationMetadata) {
         await indexedCache.insert('applications', params)
     }
     /**
@@ -67,7 +95,7 @@ class $application {
      * @param {*} did 
      * @returns 
      */
-    async myCreateList(did) {
+    async myCreateList(did: string) {
         console.log(`request did=${JSON.stringify(did)}`)
         const res = await indexedCache.indexAll('applications', 'did', did)
         console.log(`response=${JSON.stringify(res)}`)
@@ -78,30 +106,70 @@ class $application {
      * @param {*} uid 
      * @returns 
      */
-    async myCreateDetailByUid(uid) {
+    async myCreateDetailByUid(uid: string) {
         console.log(`uid=${uid}`)
         const res = await indexedCache.getByKey('applications', uid)
         console.log(`res=${JSON.stringify(res)}`)
         return res
     }
 
-    async myCreateDetailByDidAndVersion(did, version) {
-        console.log(`did=${did}`)
-        console.log(`version=${version}`)
-        const res = await indexedCache.cursorIndex('applications', )
+    /**
+     * 应用中心 -> 我创建的应用详情接口
+     * @param {*} uid 
+     * @returns 
+     */
+    async myCreateDeleteByUid(uid: string) {
+        console.log(`uid=${uid}`)
+        const res = await indexedCache.deleteByKey('applications', uid)
         console.log(`res=${JSON.stringify(res)}`)
         return res
     }
 
-    async search(page, pageSize, condition) {
+    async search(page: number, pageSize: number, condition: ApplicationSearchCondition) {
         let params: { page?: number; pageSize?: number; condition?: Record<string, any> } = {}
         params.page = page || 1
         params.pageSize = pageSize || 10
         params.condition = condition || {}
-        return await applicationProvider.search(params.page, params.pageSize, params.condition)
+        const header = {
+            "did": "xxxx"
+        }
+        const body = {
+            "header": header,
+            "body": {
+                "condition": {
+                    "code": condition.code,
+                    "owner": condition.owner,
+                    "name": condition.name,
+                    "keyword": condition.keyword,
+                    "status": condition.status
+                },
+                "page": {
+                    "page": page || 1,
+                    "pageSize": pageSize || 10
+                }
+            }
+        }
+        console.log(`body=${JSON.stringify(body)}`)
+        console.log(`endpoint=${endpoint}`)
+        const response = await fetch(endpoint + '/api/v1/application/search', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'accept': 'application/json'
+            },
+            body: JSON.stringify(body),
+        });
+        
+        if (!response.ok) {
+            throw new Error(`Failed to create post: ${response.status}`);
+        }
+
+        const r =  await response.json();
+        console.log(`r=${JSON.stringify(r)}`)
+        return r.body.applications
     }
 
-    async myApplySearch(page, pageSize, condition) {
+    async myApplySearch(page: number, pageSize: number, condition) {
         let params: { page?: number; pageSize?: number; condition?: Record<string, any> } = {}
         params.page = page || 1
         params.pageSize = pageSize || 10
@@ -113,10 +181,8 @@ class $application {
         // });
     }
 
-    async myApplyDelete(did) {
-        return await indexedCache.deleteByKey("applications", did, (r) => {
-            console.log(`total record=${JSON.stringify(r)}`)
-        })
+    async myApplyDelete(did: string) {
+        return await indexedCache.deleteByKey("applications", did)
     }
 
     async update(params) {

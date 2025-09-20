@@ -49,17 +49,17 @@
 <script lang="ts" setup>
 import { onMounted, ref, watch } from 'vue'
 import { Search } from '@element-plus/icons-vue'
-import $application from '@/plugins/application'
+import $application, { ApplicationMetadata } from '@/plugins/application'
 import MarketBlock from '@/views/components/MarketBlock.vue'
-import { useRouter, useRoute } from 'vue-router'
+import { useRouter, useRoute, RouteLocationAsPathGeneric, RouteLocationAsRelativeGeneric } from 'vue-router'
 import { userInfo } from '@/plugins/account'
 const did = userInfo?.metadata?.did;
 console.log(`did=${did}`)
 // const userDid = userInfo?.metadata?.did;
 
-const searchVal = ref('')
-const activeService = ref('market')
-const applicationList = ref([])
+const searchVal = ref<string>('')
+const activeService = ref<string>('market')
+const applicationList = ref<ApplicationMetadata[]>([])
 const router = useRouter()
 const route = useRoute()
 const tabs = [
@@ -83,8 +83,7 @@ const pagination = ref({
     total: 0
 })
 
-const handleTabClick = (tab) => {
-    console.log(tab, '---acccc--')
+const handleTabClick = (tab: any) => {
     activeService.value = tab.name
 
     pagination.value.page = 1 // 切换标签时重置页码
@@ -93,13 +92,19 @@ const handleTabClick = (tab) => {
 const search = async () => {
     try {
         // 根据当前激活的标签页传递不同的查询参数
-        let condition = { keyword: searchVal.value }
+        let condition = { keyword: searchVal.value, status: "APPLICATION_STATUS_ONLINE" }
 
         // 应用中心：我创建的列表展示
         if (activeService.value === 'myCreate') {
             const res = await $application.myCreateList(did || "did:ethr:0x07e4:0x02cc933db9ba636a9441c2cce025681a1f1443b5770307e13983cd76d49896c4b1")
             console.log(`res list=${res}`)
-            applicationList.value = res || []
+            // 4. 确保 res 是数组再赋值
+            if (Array.isArray(res)) {
+                applicationList.value = res
+            } else {
+                console.warn('Expected array, but got:', res)
+                applicationList.value = []
+            }
             /**
              * 总条数，分页器需要用到
              */
@@ -110,8 +115,14 @@ const search = async () => {
              * todo 学虎 调用我的申请列表也接口
              * 调用完接口以后，下面的注释也可以放开。
              */
-            applications = []
-            applicationList.value = applications || []
+            const res: ApplicationMetadata[] = []
+            // 4. 确保 res 是数组再赋值
+            if (Array.isArray(res)) {
+                applicationList.value = res
+            } else {
+                console.warn('Expected array, but got:', res)
+                applicationList.value = []
+            }
             /**
              * 总条数，分页器需要用到
              */
@@ -119,24 +130,25 @@ const search = async () => {
             return;
         }
 
-        const rst = await $application.search(pagination.value.page, pagination.value.pageSize, condition)
-
-        console.log(rst, '-rst-')
-        // const { applications, page } = rst.body || {}
-        // applicationList.value = applications || []
-        //pagination.value.total = page.total || 0
+        const res = await $application.search(pagination.value.page, pagination.value.pageSize, condition)
+        // 4. 确保 res 是数组再赋值
+        if (Array.isArray(res)) {
+            applicationList.value = res
+        } else {
+            console.warn('Expected array, but got:', res)
+            applicationList.value = []
+        }
         pagination.value.total = 0
     } catch (error) {
         console.error('获取应用列表失败', error)
-        // 处理错误，如显示提示信息
     }
 }
 
-const handleCurrentChange = (currentPage) => {
+const handleCurrentChange = (currentPage: number) => {
     pagination.value.page = currentPage
 }
 
-const handleSizeChange = (pageSize) => {
+const handleSizeChange = (pageSize: number) => {
     pagination.value = {
         ...pagination.value,
         pageSize,
@@ -144,7 +156,7 @@ const handleSizeChange = (pageSize) => {
     }
 }
 
-const changeRouter = (url) => {
+const changeRouter = (url: string|RouteLocationAsRelativeGeneric|RouteLocationAsPathGeneric) => {
     router.push(url)
 }
 
