@@ -38,6 +38,15 @@ export interface AuditAuditDetail {
     commentMeta?: AuditCommentMetadata[];
 }
 
+export interface AuditCommentMetadata {
+    uid?: string;
+    auditId?: string;
+    text?: string;
+    status?: AuditCommentStatusEnum;
+    createdAt?: string;
+    updatedAt?: string;
+    signature?: string;
+}
 
 const endpoint = import.meta.env.VITE_API_ENDPOINT
 
@@ -102,6 +111,67 @@ class $audit {
         console.log(`r=${JSON.stringify(r)}`)
         return r.body.detail
     }
+
+    async passed(metadata: AuditCommentMetadata) {
+        const header = {
+            "did": "xxxx"
+        }
+        const body = {
+            "header": header,
+            "body": {
+                "metadata": metadata
+            }
+        }
+        console.log(`body=${JSON.stringify(body)}`)
+        console.log(`endpoint=${endpoint}`)
+        const response = await fetch(endpoint + '/api/v1/audit/approve', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'accept': 'application/json'
+            },
+            body: JSON.stringify(body),
+        });
+        
+        if (!response.ok) {
+            throw new Error(`Failed to create post: ${response.status}`);
+        }
+
+        const r =  await response.json();
+        console.log(`r=${JSON.stringify(r)}`)
+        return r.body.metadata
+    }
+
+    async reject(metadata: AuditCommentMetadata) {
+        const header = {
+            "did": "xxxx"
+        }
+        const body = {
+            "header": header,
+            "body": {
+                "metadata": metadata
+            }
+        }
+        console.log(`body=${JSON.stringify(body)}`)
+        console.log(`endpoint=${endpoint}`)
+        const response = await fetch(endpoint + '/api/v1/audit/reject', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'accept': 'application/json'
+            },
+            body: JSON.stringify(body),
+        });
+        
+        if (!response.ok) {
+            throw new Error(`Failed to create post: ${response.status}`);
+        }
+
+        const r =  await response.json();
+        console.log(`r=${JSON.stringify(r)}`)
+        return r.body.metadata
+    }
+
 }
 
 export default new $audit()

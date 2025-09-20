@@ -105,9 +105,11 @@
 </template>
 
 <script lang="ts" setup>
-import { ref, reactive } from 'vue'
-import $service, { ApplyStatusMap } from '@/plugins/service'
+import { ref, reactive, onMounted, watch } from 'vue'
 import ApprovalTable from '@/views/components/ApprovalTable.vue'
+import { userInfo } from '@/plugins/account'
+import $audit, { AuditAuditDetail } from '@/plugins/audit'
+import { ApplicationMetadata } from '@/plugins/application'
 
 const formRef = ref(null)
 const tabIndex = ref(0)
@@ -123,22 +125,22 @@ const pagination = ref({
     total: 30
 })
 
-const handleCurrentChange = (currentPage) => {
+const handleCurrentChange = (currentPage: number) => {
     pagination.value.page = currentPage
 }
 
-const handleSizeChange = (pageSize) => {
+const handleSizeChange = (pageSize: number) => {
     pagination.value = {
         ...pagination.value,
         pageSize,
         page: 1 // 切换每页数量时重置页码
     }
 }
-const changeTab = (index) => {
+const changeTab = (index: number) => {
     tabIndex.value = index
     pagination.value.page = 1
 }
-const onReset = (formEl) => {
+const onReset = (formEl: any) => {
     formEl.resetFields()
     pagination.value.page = 1
 }

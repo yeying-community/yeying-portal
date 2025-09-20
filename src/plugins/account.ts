@@ -11,12 +11,13 @@ import {
 
 import { $account } from '@yeying-community/yeying-wallet'
 import $service from "@/plugins/service";
+import { Identity, SecurityAlgorithm } from '@yeying-community/yeying-web3';
 
 let namespaceProvider = null
 let uploader = null
 let linkProvider = null
 let applicationProvider = null
-let userInfo = null
+let userInfo: Identity | null | undefined = null
 let auditProvider = null
 let serviceCenterProvider = null
 let indexedCache: IndexedCache = new IndexedCache('yeying-protal', 1)
@@ -36,7 +37,7 @@ async function initializeProviders() {
         serviceProvider = await $service.search(1, 10, {"code": "SERVICE_CODE_NODE"})
         warehouse = await $service.search(1, 10, {"code": "SERVICE_CODE_WAREHOUSE"})
     }
-    const securityAlgorithm = userInfo?.securityConfig?.algorithm
+    const securityAlgorithm = userInfo?.securityConfig?.algorithm as SecurityAlgorithm
     const serviceProviderOption = {
         proxy: serviceProvider && serviceProvider[1] && serviceProvider[1].proxy,
         blockAddress
@@ -71,7 +72,6 @@ async function initializeProviders() {
 
     auditProvider = new AuditProvider(serviceProviderOption)
     serviceCenterProvider = new ServiceProvider(serviceProviderOption)
-    console.log("初始化结束")
 }
 
 export {

@@ -41,17 +41,28 @@
         </el-table-column>
     </el-table>
 
-    <ApplRoveModal :applroveShow="applroveShow" :did="record.did" :closeClick="closeClick" />
+    <ApplRoveModal :applroveShow="applroveShow" :uid="record.uid" :closeClick="closeClick" />
 </template>
 
 <script lang="ts" setup>
-import { ref } from 'vue'
 import ApplRoveModal from './ApplRoveModal.vue'
 import dayjs from 'dayjs'
 import { Warning } from '@element-plus/icons-vue'
+import { ref, reactive, onMounted, watch } from 'vue'
+import { userInfo } from '@/plugins/account'
+import $audit, { AuditAuditDetail, AuditCommentMetadata, AuditCommentStatusEnum } from '@/plugins/audit'
+
+
 const applroveShow = ref(false)
-const record = ref({
-    did: ''
+const tableData = ref<AuditDetailBox[]>([])
+const record = ref<AuditDetailBox>({
+    uid: '',
+    name : '',
+    desc : '',
+    applicantor: '',
+    state: '',
+    date: '',
+    serviceType: '',
 })
 
 const statusInfo = {
@@ -74,46 +85,89 @@ const props = defineProps({
     pageTabFrom: String // finishApproval审批完成 / waitApproval待我审批
 })
 
-const tableData = [
-    {
-        date: '2016-05-03',
-        name: '这里是服务名称',
-        desc: '这里是一段申请理由这里是一段申请理由这里是一段申请理由这里是一段',
-        serviceType: '服务',
-        state: '待审批',
-        applicantor: 'Los Angeles',
-        msg: ''
-    },
-    {
-        date: '2016-05-02',
-        name: '这里是服务名称',
-        desc: '这里是一段申请理由这里是一段申请理由这里是一段申请理由这里是一段',
-        serviceType: '应用',
-        state: '审批通过',
-        applicantor: 'Los Angeles',
-        msg: '我是审批通过的理由'
-    },
-    {
-        date: '2016-05-04',
-        name: '这里是服务名称',
-        desc: '这里是一段申请理由这里是一段申请理由这里是一段申请理由这里是一段',
-        serviceType: '应用',
-        state: '审批驳回',
-        applicantor: 'Los Angeles',
-        msg: '我是审批驳回的理由'
-    },
-    {
-        date: '2016-05-01',
-        name: '这里是服务名称',
-        desc: '这里是一段申请理由这里是一段申请理由这里是一段申请理由这里是一段',
-        serviceType: '应用',
-        state: '待审批',
-        applicantor: 'Los Angeles',
-        msg: ''
-    }
-]
-</script>
+export interface AuditDetailBox {
+    uid?: string,
+    name? : string,
+    desc? : string,
+    applicantor?: string,
+    state?: string,
+    date?: string,
+    serviceType?: string
+}
 
+function allEqualTo<T>(arr: T[], value: T): boolean {
+  return arr.every(item => item === value);
+}
+
+function getState(metas?: AuditCommentMetadata[]) {
+  let status: string = "待审批";
+  if (metas === undefined || metas.length === 0) {
+    return status;
+  }
+
+  // 过滤掉 status 为 undefined 的项
+  const statusList: AuditCommentStatusEnum[] = metas
+    .map(item => item.status)
+    .filter((status): status is AuditCommentStatusEnum => status !== undefined);
+
+  if (statusList.length === 0) {
+    return status; // 如果没有有效状态，仍为“待审批”
+  }
+
+  if (statusList.includes(AuditCommentStatusEnum.COMMENTSTATUSREJECT)) {
+    status = '审批驳回';
+  } else if (allEqualTo(statusList, AuditCommentStatusEnum.COMMENTSTATUSAGREE)) {
+    status = '审批通过';
+  }
+
+  return status;
+}
+
+function cvData(auditMyApply: AuditAuditDetail) {
+    if (auditMyApply === undefined || auditMyApply.meta === undefined || auditMyApply.meta.appOrServiceMetadata === undefined || auditMyApply.meta.applicant === undefined) {
+        return null
+    }
+    
+    const rawData = JSON.parse(auditMyApply.meta.appOrServiceMetadata);
+    const did = auditMyApply.meta.applicant.split('::')[0]
+
+    const metadata: AuditDetailBox = {
+        uid: auditMyApply.meta.uid,
+        name: rawData.name,
+        desc: rawData.description,
+        serviceType: rawData.code,
+        applicantor: did,
+        state: getState(auditMyApply.commentMeta),
+        date: auditMyApply.meta.createdAt
+    };
+    return metadata
+ 
+}
+
+function convertApplicationMetadata(auditMyApply: AuditAuditDetail[]) {
+  return auditMyApply
+    .map(cvData)
+    .filter((item): item is AuditDetailBox => item !== null) // ✅ 过滤 null 并类型收窄
+}
+
+const search = async () => {
+    const approver = `${userInfo?.metadata?.did}::${userInfo?.metadata?.did}`
+    const auditMyApply: AuditAuditDetail[] = await $audit.search({approver: approver})
+    console.log(`auditMyApply=${JSON.stringify(auditMyApply)}`)
+    const res: AuditDetailBox[] = convertApplicationMetadata(auditMyApply)
+    if (Array.isArray(res)) {
+        tableData.value = res
+    } else {
+        console.warn('Expected array, but got:', res)
+        tableData.value = []
+    }
+}
+
+onMounted(() => {
+    search()
+})
+
+</script>
 <style scoped lang="less">
 :deep(.el-table__header th) {
     background-color: #fafafa !important;

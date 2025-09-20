@@ -34,11 +34,14 @@
 
 <script lang="ts" setup>
 import { userInfo } from '@/plugins/account'
-import $auditProvider from '@/plugins/audit'
+import $audit, { AuditCommentMetadata, AuditCommentStatusEnum } from '@/plugins/audit'
+import { generateUuid, getCurrentUtcString } from '@/utils/common';
+import { ElForm } from 'element-plus';
+import { ElMessage } from 'element-plus';
 import { ref, reactive } from 'vue'
 import { useRouter } from 'vue-router'
 
-const formRef = ref(null)
+const formRef = ref<InstanceType<typeof ElForm> | null>(null);
 const form = reactive({
     result: 'passed',
     opinion: ''
@@ -53,7 +56,7 @@ const rules = reactive({
 const props = defineProps({
     applroveShow: Boolean,
     afterSubmit: Function,
-    did: String,
+    uid: String,
     closeClick: Function
 })
 
@@ -61,33 +64,55 @@ const props = defineProps({
  * 表单提交
  */
 const submitForm = () => {
-    formRef.value.validate(async (valid) => {
+    if (formRef.value === undefined || formRef.value === null) {
+        ElMessage.error('请先选择审批结果')
+        return false
+    }
+    formRef.value.validate(async (valid: boolean) => {
         if (valid) {
             const applyResult = form.result
-            const applyOpinion = form.applyOpinion
-
-            const params = {
-                uid: userInfo?.metadata?.did,
-                status: applyResult,
-                applyOpinion: applyOpinion
+            const applyOpinion = form.opinion
+            console.log(`applyResult=${applyResult}`)
+            console.log(`applyOpinion=${applyOpinion}`)
+ 
+            if (applyResult === 'passed') {
+                try {
+                    const param = {
+                        uid: generateUuid(),
+                        auditId: props.uid,
+                        text: applyOpinion,
+                        status: AuditCommentStatusEnum.COMMENTSTATUSAGREE,
+                        createdAt: getCurrentUtcString(),
+                        updatedAt: getCurrentUtcString(),
+                        signature: ''
+                    }
+                    console.log(`param=${JSON.stringify(param)}`)
+                    const r: AuditCommentMetadata = await $audit.passed(param)
+                    console.log(`r=${JSON.stringify(r)}`)
+                } catch (e) {
+                    console.log(e)
+                }
+            } else if (applyResult === 'reject') {
+                try {
+                    const param = {
+                        uid: generateUuid(),
+                        auditId: props.uid,
+                        text: applyOpinion,
+                        status: AuditCommentStatusEnum.COMMENTSTATUSREJECT,
+                        createdAt: getCurrentUtcString(),
+                        updatedAt: getCurrentUtcString(),
+                        signature: ''
+                    }
+                    console.log(`param=${JSON.stringify(param)}`)
+                    const r: AuditCommentMetadata = await $audit.reject(param)
+                    console.log(`r=${JSON.stringify(r)}`)
+                } catch (e) {
+                    console.log(e)
+                }
             }
-            // todo 调用接口成功后的操作
-
-            // props.afterSubmit();
-            try {
-                /**
-                 *
-                 * todo 学虎
-                 * 审批确认弹窗调用的接口
-                 */
-                const auditCreate = await $auditProvider.audit(params)
-                console.log(auditCreate, '--audit-')
-            } catch (e) {
-                console.log(e, '-eee-')
-            }
+            props.closeClick()
         } else {
             ElMessage.error('请先选择审批结果')
-            return false
         }
     })
 }
