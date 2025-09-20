@@ -297,7 +297,7 @@ const toDelete = async () => {
         /**
          * todo 学虎 我创建的-删除
          */
-        await $application.myCreateDeleteByUid(props.detail.did)
+        await $application.myCreateDelete(props.detail.uid)
     } else {
         /**
          * todo 学虎 我申请的-删除
@@ -408,7 +408,7 @@ const handleOnline = () => {
             // 重复申请检查
             const applicant = `${userInfo?.metadata?.did}::${userInfo?.metadata?.did}`
             const approver = 'did:ethr:0x07e4:0x036bc5c8f6807d1c550b383b7c20038b1fee4e0e2e5e9bbf53db1961ad9189246e::did:ethr:0x07e4:0x036bc5c8f6807d1c550b383b7c20038b1fee4e0e2e5e9bbf53db1961ad9189246e'// 审批人身份，list[did::name]，先写死，固定的审批人，后续改成从 kv 配置表里获取
-            const searchList = await $audit.search({applicant: applicant, name: detailRst.name})
+            const searchList = await $audit.search({name: detailRst.name})
             if (searchList.length > 0) {
                 ElMessageBox.alert('您已申请，无需重复申请', '提示')
                 .then(() => {

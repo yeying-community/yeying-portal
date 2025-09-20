@@ -101,6 +101,13 @@ class $application {
         console.log(`response=${JSON.stringify(res)}`)
         return res
     }
+
+    async myCreateDelete(uid: string) {
+        console.log(`request did=${JSON.stringify(uid)}`)
+        const res = await indexedCache.deleteByKey('applications', uid)
+        console.log(`response=${JSON.stringify(res)}`)
+        return res
+    }
     /**
      * 应用中心 -> 我创建的应用详情接口
      * @param {*} uid 
@@ -219,14 +226,39 @@ class $application {
         //     code: "3",})
         // })
     }
+
     async offline(did, version) {
         return await applicationProvider.offline(did, version)
     }
-    async online(did, version) {
-        return await applicationProvider.online(did, version)
-        // return new Promise((resolve, reject) => {
-        //   resolve('success')
-        // })
+
+    async online(application: ApplicationMetadata) {
+        const header = {
+            "did": "xxxx"
+        }
+        const body = {
+            "header": header,
+            "body": {
+                "application": application
+            }
+        }
+        console.log(`body=${JSON.stringify(body)}`)
+        console.log(`endpoint=${endpoint}`)
+        const response = await fetch(endpoint + '/api/v1/application/create', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'accept': 'application/json'
+            },
+            body: JSON.stringify(body),
+        });
+        
+        if (!response.ok) {
+            throw new Error(`Failed to create post: ${response.status}`);
+        }
+
+        const r =  await response.json();
+        console.log(`r=${JSON.stringify(r)}`)
+        return r.body.application
     }
     async audit(did, version, passed, signature, auditor, comment) {
         return await applicationProvider.audit(did, version, passed, signature, auditor, comment)

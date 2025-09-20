@@ -1,5 +1,5 @@
 <template>
-    <el-table :data="tableData" style="width: 100%; display: flex">
+    <el-table :data="store.items" style="width: 100%; display: flex">
         <el-table-column prop="name" label="应用/服务名称" width="400">
             <template #default="scope">
                 <div class="name">{{ scope.row.name }}</div>
@@ -51,10 +51,12 @@ import { Warning } from '@element-plus/icons-vue'
 import { ref, reactive, onMounted, watch } from 'vue'
 import { userInfo } from '@/plugins/account'
 import $audit, { AuditAuditDetail, AuditCommentMetadata, AuditCommentStatusEnum } from '@/plugins/audit'
+import { AuditDetailBox, useDataStore } from '@/stores/audit'
 
+const store = useDataStore()
 
 const applroveShow = ref(false)
-const tableData = ref<AuditDetailBox[]>([])
+const tableData = ref<AuditDetailBox[]>(store.items)
 const record = ref<AuditDetailBox>({
     uid: '',
     name : '',
@@ -72,8 +74,7 @@ const statusInfo = {
 }
 
 const handleClick = (row: any) => {
-    console.log(row, '-当前行数据-')
-    record.value = row // 存储当前行数据
+    record.value = row 
     applroveShow.value = true
 }
 
@@ -82,18 +83,11 @@ const closeClick = () => {
 }
 
 const props = defineProps({
-    pageTabFrom: String // finishApproval审批完成 / waitApproval待我审批
+    pageTabFrom: String, // finishApproval审批完成 / waitApproval待我审批
+    tableData: String
 })
 
-export interface AuditDetailBox {
-    uid?: string,
-    name? : string,
-    desc? : string,
-    applicantor?: string,
-    state?: string,
-    date?: string,
-    serviceType?: string
-}
+
 
 function allEqualTo<T>(arr: T[], value: T): boolean {
   return arr.every(item => item === value);
@@ -153,8 +147,16 @@ function convertApplicationMetadata(auditMyApply: AuditAuditDetail[]) {
 const search = async () => {
     const approver = `${userInfo?.metadata?.did}::${userInfo?.metadata?.did}`
     const auditMyApply: AuditAuditDetail[] = await $audit.search({approver: approver})
-    console.log(`auditMyApply=${JSON.stringify(auditMyApply)}`)
-    const res: AuditDetailBox[] = convertApplicationMetadata(auditMyApply)
+
+    console.log(`pageTabFrom=${props.pageTabFrom}`)
+    let res: AuditDetailBox[] = convertApplicationMetadata(auditMyApply)
+    console.log(`res=${JSON.stringify(res)}`)
+    if (props.pageTabFrom === 'finishApproval') {
+        res = res.filter((s) => s.state === '审批通过' || s.state === '审批驳回')
+    }
+    if (props.pageTabFrom === 'waitApproval') {
+        res = res.filter((s) => s.state === '待审批')
+    }
     if (Array.isArray(res)) {
         tableData.value = res
     } else {

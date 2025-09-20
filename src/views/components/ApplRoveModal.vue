@@ -40,6 +40,7 @@ import { ElForm } from 'element-plus';
 import { ElMessage } from 'element-plus';
 import { ref, reactive } from 'vue'
 import { useRouter } from 'vue-router'
+import $application, { ApplicationMetadata } from '@/plugins/application'
 
 const formRef = ref<InstanceType<typeof ElForm> | null>(null);
 const form = reactive({
@@ -89,6 +90,10 @@ const submitForm = () => {
                     console.log(`param=${JSON.stringify(param)}`)
                     const r: AuditCommentMetadata = await $audit.passed(param)
                     console.log(`r=${JSON.stringify(r)}`)
+                    // 创建上线记录
+                    const rs = await $audit.detail(props.uid as string)
+                    const app = await $application.online(JSON.parse(rs.meta.appOrServiceMetadata))
+                    console.log(`app=${app}`)
                 } catch (e) {
                     console.log(e)
                 }
