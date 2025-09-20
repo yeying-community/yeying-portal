@@ -53,29 +53,34 @@ import $application, { ApplicationMetadata } from '@/plugins/application'
 import MarketBlock from '@/views/components/MarketBlock.vue'
 import { useRouter, useRoute, RouteLocationAsPathGeneric, RouteLocationAsRelativeGeneric } from 'vue-router'
 import { userInfo } from '@/plugins/account'
+import $audit, { AuditAuditDetail, AuditAuditMetadata } from '@/plugins/audit'
 const did = userInfo?.metadata?.did;
 console.log(`did=${did}`)
-// const userDid = userInfo?.metadata?.did;
 
 const searchVal = ref<string>('')
 const activeService = ref<string>('market')
 const applicationList = ref<ApplicationMetadata[]>([])
 const router = useRouter()
-const route = useRoute()
-const tabs = [
-    {
-        name: 'market',
-        title: '应用市场'
-    },
-    {
-        name: 'myCreate',
-        title: '我创建的'
-    },
-    {
-        name: 'myApply',
-        title: '我申请的'
-    }
-]
+
+interface Tab {
+  name: string;
+  title: string;
+}
+
+const tabs: Tab[] = [
+  {
+    name: 'market',
+    title: '应用市场',
+  },
+  {
+    name: 'myCreate',
+    title: '我创建的',
+  },
+  {
+    name: 'myApply',
+    title: '我申请的',
+  },
+];
 
 const pagination = ref({
     pageSize: 10,
@@ -83,18 +88,47 @@ const pagination = ref({
     total: 0
 })
 
-const handleTabClick = (tab: any) => {
-    activeService.value = tab.name
+const handleTabClick = (tab: Tab) => {
+    activeService.value = tab.props.name
+    pagination.value.page = 1
+}
 
-    pagination.value.page = 1 // 切换标签时重置页码
+function cvData(auditMyApply: AuditAuditDetail) {
+    if (auditMyApply === undefined || auditMyApply.meta === undefined || auditMyApply.meta.appOrServiceMetadata === undefined) {
+        return null
+    }
+    
+    const rawData = JSON.parse(auditMyApply.meta.appOrServiceMetadata);
+    const metadata: ApplicationMetadata = {
+        owner: rawData.owner,
+        did: rawData.did,
+        version: rawData.version,
+        hash: rawData.hash,
+        name: rawData.name,
+        code: rawData.code,
+        description: rawData.description,
+        location: rawData.location,
+        serviceCodes: rawData.serviceCodes,
+        avatar: rawData.avatar,
+        codePackagePath: rawData.codePackagePath,
+        network: rawData.network || '',
+        address: rawData.address || '',
+        createdAt: rawData.createdAt || '',
+        updatedAt: rawData.updatedAt || '',
+        signature: rawData.signature || '',
+    };
+    return metadata
+ 
+}
+
+function convertApplicationMetadata(auditMyApply: AuditAuditDetail[]) {
+    return auditMyApply.map((data) => cvData(data))
 }
 
 const search = async () => {
     try {
-        // 根据当前激活的标签页传递不同的查询参数
         let condition = { keyword: searchVal.value, status: "APPLICATION_STATUS_ONLINE" }
 
-        // 应用中心：我创建的列表展示
         if (activeService.value === 'myCreate') {
             const res = await $application.myCreateList(did || "did:ethr:0x07e4:0x02cc933db9ba636a9441c2cce025681a1f1443b5770307e13983cd76d49896c4b1")
             console.log(`res list=${res}`)
@@ -105,33 +139,24 @@ const search = async () => {
                 console.warn('Expected array, but got:', res)
                 applicationList.value = []
             }
-            /**
-             * 总条数，分页器需要用到
-             */
             pagination.value.total = 0
             return;
         } else if (activeService.value === 'myApply') {
-            /**
-             * todo 学虎 调用我的申请列表也接口
-             * 调用完接口以后，下面的注释也可以放开。
-             */
-            const res: ApplicationMetadata[] = []
-            // 4. 确保 res 是数组再赋值
+            const applicant = `${userInfo?.metadata?.did}::${userInfo?.metadata?.did}`
+            const auditMyApply: AuditAuditDetail[] = await $audit.search({applicant: applicant})
+            console.log(`auditMyApply=${JSON.stringify(auditMyApply)}`)
+
+            const res: ApplicationMetadata[] = convertApplicationMetadata(auditMyApply)
             if (Array.isArray(res)) {
                 applicationList.value = res
             } else {
                 console.warn('Expected array, but got:', res)
                 applicationList.value = []
             }
-            /**
-             * 总条数，分页器需要用到
-             */
             pagination.value.total = 0
             return;
         }
-
         const res = await $application.search(pagination.value.page, pagination.value.pageSize, condition)
-        // 4. 确保 res 是数组再赋值
         if (Array.isArray(res)) {
             applicationList.value = res
         } else {

@@ -405,11 +405,23 @@ const handleOnline = () => {
              */
             const detailRst = await $application.myCreateDetailByUid(props.detail.uid)
             console.log(`detailRst=${JSON.stringify(detailRst)}`)
+            // 重复申请检查
+            const applicant = `${userInfo?.metadata?.did}::${userInfo?.metadata?.did}`
+            const approver = 'did:ethr:0x07e4:0x036bc5c8f6807d1c550b383b7c20038b1fee4e0e2e5e9bbf53db1961ad9189246e::did:ethr:0x07e4:0x036bc5c8f6807d1c550b383b7c20038b1fee4e0e2e5e9bbf53db1961ad9189246e'// 审批人身份，list[did::name]，先写死，固定的审批人，后续改成从 kv 配置表里获取
+            const searchList = await $audit.search({applicant: applicant, name: detailRst.name})
+            if (searchList.length > 0) {
+                ElMessageBox.alert('您已申请，无需重复申请', '提示')
+                .then(() => {
+                })
+                .catch(() => {
+                });
+                return
+            }
             const meta: AuditAuditMetadata = {
                 uid: generateUuid(),
                 appOrServiceMetadata: JSON.stringify(detailRst),
-                applicant: `${userInfo?.metadata?.did}::${userInfo?.metadata?.did}`, // 申请人身份，did::name
-                approver: 'did:ethr:0x07e4:0x036bc5c8f6807d1c550b383b7c20038b1fee4e0e2e5e9bbf53db1961ad9189246e::did:ethr:0x07e4:0x036bc5c8f6807d1c550b383b7c20038b1fee4e0e2e5e9bbf53db1961ad9189246e', // 审批人身份，list[did::name]，先写死，固定的审批人，后续改成从 kv 配置表里获取
+                applicant: applicant, // 申请人身份，did::name
+                approver: approver,
                 reason: '上架申请',
                 createdAt: getCurrentUtcString(),
                 updatedAt: getCurrentUtcString(),
