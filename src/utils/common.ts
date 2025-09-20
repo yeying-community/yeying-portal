@@ -1,7 +1,9 @@
-export const setLocalStorage = (key, value) => {
+import { DateTime } from 'luxon'
+
+export const setLocalStorage = (key: string, value: any) => {
     localStorage.setItem(key, (value && JSON.stringify(value)) || '')
 }
-export const getLocalStorage = (key) => {
+export const getLocalStorage = (key: string) => {
     const str = localStorage.getItem(key)
     if (str) {
         return JSON.parse(str)
@@ -24,3 +26,17 @@ export const generateUuid = () => {
         .join('')
     return `${hex.slice(0, 8)}-${hex.slice(8, 12)}-${hex.slice(12, 16)}-${hex.slice(16, 20)}-${hex.slice(20)}`
 }
+
+export function getCurrentUtcString(): string {
+    const current = formatDateTime(getCurrentUtcDateTime())
+    return current === null ? '' : current
+}
+
+export function formatDateTime(datetime: DateTime) {
+    return datetime.toISO()
+}
+
+export function getCurrentUtcDateTime() {
+    return DateTime.utc()
+}
+
