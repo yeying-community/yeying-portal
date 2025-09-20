@@ -148,7 +148,7 @@ const detailInfo = ref<ApplicationDetail>({
     avatar: '',
     owner: ''
 })
-const { uid = '', pageFrom = '' } = route.query || {}
+const { uid: string = '', pageFrom = '' } = route.query || {}
 const innerVisible = ref(false)
 const modalVisible = ref(false)
 
@@ -176,7 +176,7 @@ const detail = async () => {
          * 应用中心：我创建的-详情接口
          */
         console.log("进入我创建的-详情接口")
-        const detailRst = await $application.myCreateDetailByUid(uid)
+        const detailRst = await $application.myCreateDetailByUid(route.query.uid)
         console.log(`detailRst=${JSON.stringify(detailRst)}`)
         // const detailRst = await $application.detail(did, version)
         detailInfo.value = detailRst || {}

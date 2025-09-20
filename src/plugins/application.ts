@@ -108,6 +108,13 @@ class $application {
         console.log(`response=${JSON.stringify(res)}`)
         return res
     }
+
+    async myCreateUpdate(params) {
+        return await indexedCache.updateByKey("applications", {
+            uid: params.uid,
+            ...params
+        })
+    }
     /**
      * 应用中心 -> 我创建的应用详情接口
      * @param {*} uid 

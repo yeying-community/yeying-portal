@@ -310,8 +310,7 @@ const toEdit = () => {
     router.push({
         path: '/market/apply-edit',
         query: {
-            did: props.detail.did,
-            version: props.detail.version
+            uid: props.detail.uid
         }
     })
 }
