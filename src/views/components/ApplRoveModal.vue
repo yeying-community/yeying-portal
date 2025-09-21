@@ -34,7 +34,7 @@
 
 <script lang="ts" setup>
 import { userInfo } from '@/plugins/account'
-import $audit, { AuditCommentMetadata, AuditCommentStatusEnum } from '@/plugins/audit'
+import $audit, { AuditAuditDetail, AuditCommentMetadata, AuditCommentStatusEnum } from '@/plugins/audit'
 import { generateUuid, getCurrentUtcString } from '@/utils/common';
 import { ElForm } from 'element-plus';
 import { ElMessage } from 'element-plus';
@@ -43,7 +43,9 @@ import { useRouter } from 'vue-router'
 import $application, { ApplicationMetadata } from '@/plugins/application'
 import { notifyError } from '@/utils/message';
 import { v4 as uuidv4 } from 'uuid';
+import { AuditDetailBox, useDataStore } from '@/stores/audit'
 
+const store = useDataStore()
 const formRef = ref<InstanceType<typeof ElForm> | null>(null);
 const form = reactive({
     result: 'passed',
@@ -62,6 +64,80 @@ const props = defineProps({
     uid: String,
     closeClick: Function
 })
+
+
+function allEqualTo<T>(arr: T[], value: T): boolean {
+  return arr.every(item => item === value);
+}
+
+function getState(metas?: AuditCommentMetadata[]) {
+  let status: string = "待审批";
+  if (metas === undefined || metas.length === 0) {
+    return status;
+  }
+
+  // 过滤掉 status 为 undefined 的项
+  const statusList: AuditCommentStatusEnum[] = metas
+    .map(item => item.status)
+    .filter((status): status is AuditCommentStatusEnum => status !== undefined);
+
+  if (statusList.length === 0) {
+    return status; // 如果没有有效状态，仍为“待审批”
+  }
+
+  if (statusList.includes(AuditCommentStatusEnum.COMMENTSTATUSREJECT)) {
+    status = '审批驳回';
+  } else if (allEqualTo(statusList, AuditCommentStatusEnum.COMMENTSTATUSAGREE)) {
+    status = '审批通过';
+  }
+
+  return status;
+}
+
+function cvData(auditMyApply: AuditAuditDetail) {
+    if (auditMyApply === undefined || auditMyApply.meta === undefined || auditMyApply.meta.appOrServiceMetadata === undefined || auditMyApply.meta.applicant === undefined) {
+        return null
+    }
+    const rawData = JSON.parse(auditMyApply.meta.appOrServiceMetadata);
+    const did = auditMyApply.meta.applicant.split('::')[0]
+
+    const metadata: AuditDetailBox = {
+        uid: auditMyApply.meta.uid,
+        name: rawData.name,
+        desc: rawData.description,
+        serviceType: rawData.code,
+        applicantor: did,
+        state: getState(auditMyApply.commentMeta),
+        date: auditMyApply.meta.createdAt
+    };
+    return metadata
+ 
+}
+
+function convertApplicationMetadata(auditMyApply: AuditAuditDetail[]) {
+  return auditMyApply
+    .map(cvData)
+    .filter((item): item is AuditDetailBox => item !== null) // ✅ 过滤 null 并类型收窄
+}
+
+const tableData = ref<AuditDetailBox[]>([])
+
+const searchWaitApply = async () => {
+    const approver = `${userInfo?.metadata?.did}::${userInfo?.metadata?.did}`
+    const auditMyApply: AuditAuditDetail[] = await $audit.search({approver: approver})
+
+    let res: AuditDetailBox[] = convertApplicationMetadata(auditMyApply)
+    console.log(`res=${JSON.stringify(res)}`)
+    res = res.filter((s) => s.state === '待审批')
+    if (Array.isArray(res)) {
+        tableData.value = res
+        store.setItems(tableData.value)
+    } else {
+        console.warn('Expected array, but got:', res)
+        tableData.value = []
+        store.setItems(tableData.value)
+    }
+}
 
 /**
  * 表单提交
@@ -119,7 +195,7 @@ const submitForm = () => {
                             notifyError(`❌创建申请的应用/服务异常，error=${e}`)
                         }
                     }
-   
+                    
                 } catch (e) {
                     console.log(e)
                 }
@@ -141,6 +217,7 @@ const submitForm = () => {
                     console.log(e)
                 }
             }
+            searchWaitApply()
             props.closeClick()
         } else {
             notifyError('请先选择审批结果')
