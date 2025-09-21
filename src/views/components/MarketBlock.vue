@@ -173,6 +173,7 @@
         :detail="detail"
         :afterSubmit="afterSubmit"
         :closeClick="afterSubmit"
+        :operateType="operateType"
     />
     <ConfigServiceModal :modalVisible="modalVisible" :cancelModal="cancelModal" />
     <ResultChooseModal
@@ -251,6 +252,7 @@ const confirmUnbind = async () => {
 const innerVisible = ref(false)
 const dialogVisible = ref(false)
 const modalVisible = ref(false)
+const operateType = ref('application')
 
 /**
  * 应用是否上架
@@ -427,6 +429,7 @@ const handleOnline = () => {
                 });
                 return
             }
+            detailRst.operateType = 'application'
             const meta: AuditAuditMetadata = {
                 uid: generateUuid(),
                 appOrServiceMetadata: JSON.stringify(detailRst),

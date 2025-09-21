@@ -183,6 +183,7 @@
         :detail="detail"
         :afterSubmit="afterSubmit"
         :closeClick="afterSubmit"
+        :operateType="operateType"
     />
     <ConfigServiceModal :modalVisible="modalVisible" :cancelModal="cancelModal" />
     <ResultChooseModal
@@ -248,6 +249,7 @@ const StatusInfo = {
 const innerVisible = ref(false)
 const dialogVisible = ref(false)
 const modalVisible = ref(false)
+const operateType = ref('service')
 
 import { userInfo } from '@/plugins/account'
 import $audit, { AuditAuditMetadata } from '@/plugins/audit'
@@ -387,6 +389,7 @@ const handleOnline = () => {
                 });
                 return
             }
+            detailRst.operateType = 'service'
             const meta: AuditAuditMetadata = {
                 uid: generateUuid(),
                 appOrServiceMetadata: JSON.stringify(detailRst),

@@ -41,6 +41,7 @@ import { ElMessage } from 'element-plus';
 import { ref, reactive } from 'vue'
 import { useRouter } from 'vue-router'
 import $application, { ApplicationMetadata } from '@/plugins/application'
+import $service from '@/plugins/service'
 import { notifyError } from '@/utils/message';
 import { v4 as uuidv4 } from 'uuid';
 import { AuditDetailBox, useDataStore } from '@/stores/audit'
@@ -176,9 +177,16 @@ const submitForm = () => {
                     const appOrService = JSON.parse(rs.meta.appOrServiceMetadata)
                     console.log(`appOrService=${JSON.stringify(appOrService)}`)
                     if (reasonRes.meta.reason === '上架申请') {
-                        // 创建上线记录
-                        const app = await $application.online(appOrService)
-                        console.log(`app=${app}`)
+                        if (appOrService.operateType === 'application') {
+                            // 创建应用上线记录
+                            const app = await $application.online(appOrService)
+                            console.log(`app=${app}`)
+                        } else if (appOrService.operateType === 'service') {
+                            // 创建服务上线记录
+                            const service = await $service.online(appOrService)
+                            console.log(`service=${service}`)
+                        }
+        
                     } else if (reasonRes.meta.reason === '申请使用') {
                         try {
                             const detailRst = await $application.detail(appOrService.did, appOrService.version)

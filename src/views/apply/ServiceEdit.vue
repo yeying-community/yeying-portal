@@ -64,7 +64,7 @@
                                 </el-form-item>
                                 <el-form-item label="接口代码" prop="serviceCodes">
                                     <el-select
-                                        v-model="detailInfo.serviceCodes"
+                                        v-model="detailInfo.apiCodes"
                                         placeholder="请选择"
                                         class="input-style"
                                         multiple
@@ -81,16 +81,24 @@
 
                                 <el-form-item label="代理地址" prop="location">
                                     <el-input
-                                        v-model="detailInfo.location"
+                                        v-model="detailInfo.proxy"
                                         class="input-style"
                                         placeholder="请输入服务代理地址"
                                     />
                                 </el-form-item>
                                 <el-form-item label="服务地址" prop="hash">
                                     <el-input
-                                        v-model="detailInfo.hash"
+                                        v-model="detailInfo.codePackagePath"
                                         class="input-style"
                                         placeholder="请输入输入服务IP：端口（如：192.168.1.1:8080）"
+                                    />
+                                </el-form-item>
+                                <el-form-item label="代码包Hash" prop="hash">
+                                    <el-input
+                                        v-model="detailInfo.hash"
+                                        class="input-style"
+                                        placeholder="系统默认计算"
+                                        disabled
                                     />
                                 </el-form-item>
                             </div>
@@ -141,7 +149,6 @@
 
 <script lang="ts" setup>
 import { ref, reactive, onMounted } from 'vue'
-import $service from '@/plugins/service'
 import Uploader from '@/components/common/Uploader.vue'
 import { Upload } from '@element-plus/icons-vue'
 import { $account } from '@yeying-community/yeying-wallet'
@@ -154,7 +161,7 @@ import ResultChooseModal from '@/views/components/ResultChooseModal.vue'
 import { userInfo } from '@/plugins/account'
 import { v4 as uuidv4 } from 'uuid';
 import { notifyError } from '@/utils/message'
-import $application, { ApplicationDetail, codeMap, codeMapTrans, serviceCodeMap, serviceCodeMapTrans } from '@/plugins/application'
+import $service, {codeMap, serviceCodeMap } from '@/plugins/service'
 
 const route = useRoute()
 const router = useRouter()
@@ -217,10 +224,10 @@ const codeList = ref([])
 const detailInfo = ref({
     name: '',
     description: '',
-    location: '',
+    proxy: '',
     hash: '',
     code: '',
-    serviceCodes: [],
+    apiCodes: [],
     avatar: '',
     owner: '',
     codePackagePath: ''

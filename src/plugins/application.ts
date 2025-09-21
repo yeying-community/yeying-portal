@@ -313,6 +313,7 @@ class $application {
         console.log(`r=${JSON.stringify(r)}`)
         return r.body.application
     }
+    
     async audit(did, version, passed, signature, auditor, comment) {
         return await applicationProvider.audit(did, version, passed, signature, auditor, comment)
         // return new Promise((resolve, reject) => {

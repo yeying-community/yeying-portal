@@ -83,6 +83,7 @@ const props = defineProps({
   detail: Object,
   title: String,
   closeClick: Function,
+  operateType: String
 })
 
 /**
@@ -119,6 +120,7 @@ const submitForm = () => {
         const applicant = `${userInfo?.metadata?.did}::${userInfo?.metadata?.did}`
         const approver = `${props.detail?.owner}::${props.detail?.owner}`
         const auditUid = generateUuid()
+        detailRst.operateType = props.operateType
         const meta: AuditAuditMetadata = {
             uid: auditUid,
             appOrServiceMetadata: JSON.stringify(detailRst),

@@ -7,6 +7,37 @@ export const ApplyStatusMap = {
     4: '申请驳回'
 }
 
+// // 应用编码
+export const codeMap = {
+    SERVICE_CODE_UNKNOWN: '未知',
+    SERVICE_CODE_NODE: '节点服务',
+    SERVICE_CODE_WAREHOUSE: '资产服务',
+    SERVICE_CODE_AGENT: '代理服务',
+    SERVICE_CODE_MCP: 'MCP服务',
+    SERVICE_CODE_RAG: '检索服务',
+    SERVICE_CODE_CORRECTION: '修正服务'
+}
+// 应用依赖的服务编码
+export const serviceCodeMap = {
+    API_CODE_UNKNOWN: '未知编码',
+    API_CODE_USER: '用户编码',
+    API_CODE_IDENTITY: '身份编码',
+    API_CODE_LLM_SERVICE: '大模型服务编码',
+    API_CODE_LLM_PROVIDER: '供应商服务编码',
+    API_CODE_ASSET_SERVICE: '资产服务编码',
+    API_CODE_ASSET_BLOCK: '资产块编码',
+    API_CODE_ASSET_LINK: '资产链接编码',
+    API_CODE_ASSET_NAMESPACE: '资产工作空间编码',
+    API_CODE_ASSET_RECYCLE: '资产回收站编码',
+    API_CODE_CERTIFICATE: '认证编码',
+    API_CODE_STORAGE: '存储编码',
+    API_CODE_APPLICATION: '应用编码',
+    API_CODE_EVENT: '事件编码',
+    API_CODE_INVITATION: '邀请编码',
+    API_CODE_SERVICE: '服务编码',
+    API_CODE_RAG: '检索编码',
+}
+
 export interface ServiceSearchCondition {
     code?: string;
     owner?: string;
@@ -52,8 +83,8 @@ export interface ServiceMetadata {
     version?: number;
     name?: string;
     description?: string;
-    code?: CommonServiceCodeEnum;
-    apiCodes?: CommonApiCodeEnum[];
+    code?: string;
+    apiCodes?: string[];
     proxy?: string;
     grpc?: string;
     avatar?: string;
@@ -146,6 +177,36 @@ class $service {
 
     async myApplyDelete(uid: string) {
         return await indexedCache.deleteByKey("services_apply", uid)
+    }
+
+    async online(service: ServiceMetadata) {
+        const header = {
+            "did": "xxxx"
+        }
+        const body = {
+            "header": header,
+            "body": {
+                "service": service
+            }
+        }
+        console.log(`body=${JSON.stringify(body)}`)
+        console.log(`endpoint=${endpoint}`)
+        const response = await fetch(endpoint + '/api/v1/service/create', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'accept': 'application/json'
+            },
+            body: JSON.stringify(body),
+        });
+        
+        if (!response.ok) {
+            throw new Error(`Failed to create post: ${response.status}`);
+        }
+
+        const r =  await response.json();
+        console.log(`r=${JSON.stringify(r)}`)
+        return r.body.service
     }
 }
 export default new $service()
