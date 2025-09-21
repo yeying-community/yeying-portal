@@ -60,13 +60,13 @@ async function initializeProviders() {
             // 主键是否自增，走采用 uuid 作为主键
             autoIncrement: false, 
             // 索引：keyPath 表示列名； name 表示索引名； unique 表示字段值是否唯一
-            indexes: [{ keyPath: 'did', name: 'did', unique: false }]
+            indexes: [{ keyPath: 'owner', name: 'owner', unique: false }]
         },
         {
             name: 'services',
             key: 'uid',
             autoIncrement: false,
-            indexes: [{ keyPath: 'did', name: 'did', unique: false }]
+            indexes: [{ keyPath: 'owner', name: 'owner', unique: false }]
         },
         {
             // 表名

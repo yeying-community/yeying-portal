@@ -172,16 +172,8 @@ import ResultChooseModal from '@/views/components/ResultChooseModal.vue'
 import { userInfo } from '@/plugins/account'
 import { v4 as uuidv4 } from 'uuid';
 
-console.log(`apply edit userInfo=${JSON.stringify(userInfo)}`)
-
 const route = useRoute()
 const router = useRouter()
-
-const did: string = userInfo.metadata.did
-const version: number = userInfo.metadata.version
-console.log(`apply edit userInfo.did=${did}`)
-console.log(`apply edit userInfo.did=${version}`)
-
 
 const goBack = () => {
     router.back()
@@ -242,7 +234,7 @@ const rules = reactive({
 const getDetailInfo = async () => {
     if (route.query.uid) {
         isEdit.value = true
-        const res = await $application.myCreateDetailByUid(route.query.uid)
+        const res = await $application.myCreateDetailByUid(route.query.uid as string)
         if (res) {
             detailInfo.value = res
             detailInfo.value.code = String(res.code)
@@ -285,13 +277,13 @@ const submitForm = async (formEl, andOnline) => {
     if (avatarChk.value == '1') {
         detailInfo.value.avatar = '1'
     }
-    await formEl.validate(async (valid, fields) => {
+    await formEl.validate(async (valid: boolean, fields) => {
         if (valid) {
             const params = JSON.parse(JSON.stringify(detailInfo.value))
             console.log(`创建应用表单参数=${JSON.stringify(params)}`)
             params.codeType = codeChk.value
             if (route.query.uid) {
-                const rr = await $application.myCreateDetailByUid(route.query.uid)
+                const rr = await $application.myCreateDetailByUid(route.query.uid as string)
                 rr.code = params.code
                 rr.codePackagePath = params.codePackagePath
                 rr.codeType = params.codeType
@@ -311,8 +303,9 @@ const submitForm = async (formEl, andOnline) => {
                 }
             } else {
                 params.uid = uuidv4()
-                params.did = did
-                params.version = version
+                params.did = uuidv4() // 暂时先mock
+                params.version = userInfo?.metadata?.version
+                params.owner = userInfo?.metadata?.did
                 const result = await $application.create(params)
                 console.log(`result=${JSON.stringify(result)}`)
                 innerVisible.value = true

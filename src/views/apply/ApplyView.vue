@@ -55,8 +55,6 @@ import { useRouter, useRoute, RouteLocationAsPathGeneric, RouteLocationAsRelativ
 import { userInfo } from '@/plugins/account'
 import $audit, { AuditAuditDetail, AuditAuditMetadata } from '@/plugins/audit'
 import { notifyError } from '@/utils/message'
-const did = userInfo?.metadata?.did;
-console.log(`did=${did}`)
 
 const searchVal = ref<string>('')
 const activeService = ref<string>('market')
@@ -133,11 +131,11 @@ const search = async () => {
         let condition = { keyword: searchVal.value, status: "APPLICATION_STATUS_ONLINE" }
 
         if (activeService.value === 'myCreate') {
-            if (did === undefined) {
+            if (userInfo?.metadata?.did === undefined) {
                 notifyError('❌登录失败，did is undefined')
                 return
             }
-            const res = await $application.myCreateList(did)
+            const res = await $application.myCreateList(userInfo?.metadata?.did)
             console.log(`myCreateList=${JSON.stringify(res)}`)
             if (Array.isArray(res)) {
                 applicationList.value = res
@@ -148,11 +146,11 @@ const search = async () => {
             pagination.value.total = 0
             return;
         } else if (activeService.value === 'myApply') {
-            if (did === undefined) {
+            if (userInfo?.metadata?.did === undefined) {
                 notifyError('❌登录失败，did is undefined')
                 return
             }
-            const res = await $application.myApplyList(did)
+            const res = await $application.myApplyList(userInfo?.metadata?.did)
             console.log(`auditMyApply=${JSON.stringify(res)}`)
 
             if (Array.isArray(res)) {

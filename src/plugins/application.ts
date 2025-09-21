@@ -97,7 +97,7 @@ class $application {
      */
     async myCreateList(did: string) {
         console.log(`request did=${JSON.stringify(did)}`)
-        const res = await indexedCache.indexAll('applications', 'did', did)
+        const res = await indexedCache.indexAll('applications', 'owner', did)
         console.log(`response=${JSON.stringify(res)}`)
         return res
     }
@@ -209,10 +209,6 @@ class $application {
         })
     }
 
-    async myApplyDetail(did, version) {
-        return await indexedCache.getByKey("applications", did)
-    }
-
     async createIdentity(template, password) {
         return await createIdentity(template, password)
     }
@@ -260,8 +256,35 @@ class $application {
         return r.body.application
     }
 
-    async offline(did, version) {
-        return await applicationProvider.offline(did, version)
+    async offline(did: string, version: number) {
+        const header = {
+            "did": "xxxx"
+        }
+        const body = {
+            "header": header,
+            "body": {
+                "did": did,
+                "version": version
+            }
+        }
+        console.log(`body=${JSON.stringify(body)}`)
+        console.log(`endpoint=${endpoint}`)
+        const response = await fetch(endpoint + '/api/v1/application/delete', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'accept': 'application/json'
+            },
+            body: JSON.stringify(body),
+        });
+        
+        if (!response.ok) {
+            throw new Error(`Failed to create post: ${response.status}`);
+        }
+
+        const r =  await response.json();
+        console.log(`r=${JSON.stringify(r)}`)
+        return r.body.status
     }
 
     async online(application: ApplicationMetadata) {

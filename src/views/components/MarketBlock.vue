@@ -198,7 +198,7 @@ import $audit, { AuditAuditMetadata } from '@/plugins/audit'
 import { SuccessFilled } from '@element-plus/icons-vue'
 import dayjs from 'dayjs'
 import { userInfo } from '@/plugins/account'
-import { ElMessageBox } from 'element-plus'
+import { ElMessage, ElMessageBox } from 'element-plus'
 import { h } from 'vue'
 import Popover from '@/views/components/Popover.vue'
 import ApplyUseModal from './ApplyUseModal.vue'
@@ -244,7 +244,7 @@ const props = defineProps({
     pageFrom: String
 })
 
-const isOwner = userInfo?.metadata?.did === props.detail?.did
+const isOwner = userInfo?.metadata?.did === props.detail?.owner
 const confirmUnbind = async () => {
     // 执行解绑逻辑
 }
@@ -299,12 +299,12 @@ const toDelete = async () => {
         /**
          * todo 学虎 我创建的-删除
          */
-        await $application.myCreateDelete(props.detail.uid)
+        await $application.myCreateDelete(props.detail?.uid)
     } else {
         /**
          * todo 学虎 我申请的-删除
          */
-        await $application.delete(props.detail.did, props.detail.version)
+        await $application.delete(props.detail?.did, props.detail?.version)
     }
     props.refreshCardList()
 }
@@ -312,7 +312,7 @@ const toEdit = () => {
     router.push({
         path: '/market/apply-edit',
         query: {
-            uid: props.detail.uid
+            uid: props.detail?.uid
         }
     })
 }
@@ -325,7 +325,7 @@ const toDetail = () => {
     router.push({
         path: '/market/apply-detail',
         query: {
-            uid: props.detail.uid,
+            uid: props.detail?.uid,
             pageFrom: props.pageFrom
         }
     })
@@ -347,17 +347,23 @@ const handleOffline = async () => {
     /**
      * todo 学虎 这块调用下架应用接口
      */
-    const offlinelRst = await $application.offline(props.detail.did, props.detail.version)
-    console.log(offlinelRst, '-offlinelRst')
-    const { status } = offlinelRst.body
+    const offlinelRst = await $application.offline(props.detail?.did, props.detail?.version)
 
-    if (status?.message === 'success') {
+    if (offlinelRst.code === 'OK') {
         ElMessage({
             message: '已下架',
             type: 'success'
         })
         props.refreshCardList()
     }
+    const applicant = `${userInfo?.metadata?.did}::${userInfo?.metadata?.did}`
+    const detail = await $audit.search({applicant: applicant})
+    const uids = detail.filter((d) => d.meta.reason === `上架申请` && d.meta.appOrServiceMetadata.includes(`"name":"${props.detail?.name}""`)).map((s) => s.meta.uid)
+    // 删除申请
+    for (const item of uids) {
+        await $audit.cancel(item)
+    }
+    
 }
 
 const handleOfflineConfirm = () => {
@@ -379,7 +385,9 @@ const handleOfflineConfirm = () => {
         .then(() => {
             handleOffline()
         })
-        .catch(() => {})
+        .catch(() => {
+            console.log(`下架异常`)
+        })
 }
 
 /**

@@ -15,7 +15,7 @@
     >
       <el-space direction="vertical" alignment="flex-start">
         <div>申请应用：{{ detail?.name }}</div>
-        <div>应用创建人：{{ detail?.did }}</div>
+        <div>应用创建人：{{ detail?.owner }}</div>
         <el-form-item label="申请原因" prop="reason">
           <el-input
             type="textarea"
@@ -89,6 +89,9 @@ const props = defineProps({
  * 表单提交
  */
 const submitForm = () => {
+  if (formRef.value === undefined || formRef.value === null) {
+    return
+  }
   formRef.value.validate(async (valid: boolean) => {
     if (valid) {
       const applyReason = form.reason
@@ -99,33 +102,25 @@ const submitForm = () => {
       // todo 调用接口成功后的操作
       innerVisible.value = true
       // props.afterSubmit();
-      // try {
-      //   const detailRst = await $application.detail(props.detail.did, props.detail.version)
-      //   if (detailRst === undefined || detailRst === null) {
-      //       notifyError("❌应用不存在")
-      //       return
-      //   }
-      //   detailRst.applyOwner = userInfo?.metadata?.did
-      //   detailRst.uid = uuidv4()
-
-      //   const r = await $application.myApplyCreate(detailRst)
-      //   console.log(`r=${JSON.stringify(r)}`)
-      // } catch (e) {
-      //   notifyError(`❌审批异常，error=${e}`)
-      // }
-
-
         console.log(`申请使用 detail = ${JSON.stringify(props.detail)}`)
-        const detailRst = await $application.detail(props.detail.did, props.detail.version)
+        const detailRst = await $application.detail(props.detail?.did, props.detail?.version)
         if (detailRst === undefined || detailRst === null) {
             notifyError("应用不存在")
             return
         }
 
+        const r = await $application.myApplyList(userInfo?.metadata?.did)
+        const names: string[] = r.map((d) => d.name)
+        if (names.includes(detailRst.name)) {
+          notifyError("申请使用已经提交，请勿重复操作")
+          return
+        }
+
         const applicant = `${userInfo?.metadata?.did}::${userInfo?.metadata?.did}`
-        const approver = `${props.detail.did}::${props.detail.did}`
+        const approver = `${props.detail?.owner}::${props.detail?.owner}`
+        const auditUid = generateUuid()
         const meta: AuditAuditMetadata = {
-            uid: generateUuid(),
+            uid: auditUid,
             appOrServiceMetadata: JSON.stringify(detailRst),
             applicant: applicant, // 申请人身份，did::name
             approver: approver,
@@ -139,7 +134,7 @@ const submitForm = () => {
         props.closeClick()
 
         try {
-          const rs = await $audit.detail(props.uid as string)
+          const rs = await $audit.detail(auditUid)
           const appOrService = JSON.parse(rs.meta.appOrServiceMetadata)
           console.log(`appOrService=${JSON.stringify(appOrService)}`)
           const detailRst = await $application.detail(appOrService.did, appOrService.version)
@@ -152,12 +147,10 @@ const submitForm = () => {
 
           const r = await $application.myApplyCreate(detailRst)
           console.log(`r=${JSON.stringify(r)}`)
-      } catch (e) {
-          notifyError(`❌创建申请的应用/服务异常，error=${e}`)
-      }
-
-
-        ElMessageBox.alert(`申请中，请联系 ${props.detail.did} 审批', '申请使用`)
+        } catch (e) {
+            notifyError(`❌创建申请的应用/服务异常，error=${e}`)
+        }
+        ElMessageBox.alert(`申请中，请联系 ${props.detail.owner} 审批', '申请使用`)
     } else {
       notifyError('❌请先填写申请原因')
     }
