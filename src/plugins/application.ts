@@ -53,13 +53,41 @@ export const serviceCodeMap = {
     SERVICE_CODE_AGENT: '智能体供应商',
     SERVICE_CODE_MCP: '模型上下文供应商'
 }
+export interface ApplicationMetadata {
+    owner?: string;
+    network?: string;
+    address?: string;
+    did?: string;
+    version?: number;
+    hash?: string;
+    name?: string;
+    code?: string;
+    description?: string;
+    location?: string;
+    serviceCodes?: string[];
+    avatar?: string;
+    createdAt?: string;
+    updatedAt?: string;
+    signature?: string;
+    codePackagePath?: string;
+}
+export interface ApplicationSearchCondition {
+    code?: string;
+    status?: string;
+    owner?: string;
+    name?: string;
+    keyword?: string;
+}
+
+const endpoint = import.meta.env.VITE_API_ENDPOINT
+
 class $application {
 
     /**
      * 应用中心 -> 创建应用
      * @param {*} params 
      */
-    async create(params) {
+    async create(params: ApplicationMetadata) {
         await indexedCache.insert('applications', params)
     }
     /**
@@ -67,56 +95,107 @@ class $application {
      * @param {*} did 
      * @returns 
      */
-    async myCreateList(did) {
+    async myCreateList(did: string) {
         console.log(`request did=${JSON.stringify(did)}`)
-        const res = await indexedCache.indexAll('applications', 'did', did)
+        const res = await indexedCache.indexAll('applications', 'owner', did)
         console.log(`response=${JSON.stringify(res)}`)
         return res
+    }
+
+    async myCreateDelete(uid: string) {
+        console.log(`request did=${JSON.stringify(uid)}`)
+        const res = await indexedCache.deleteByKey('applications', uid)
+        console.log(`response=${JSON.stringify(res)}`)
+        return res
+    }
+
+    async myCreateUpdate(params) {
+        return await indexedCache.updateByKey("applications", {
+            uid: params.uid,
+            ...params
+        })
     }
     /**
      * 应用中心 -> 我创建的应用详情接口
      * @param {*} uid 
      * @returns 
      */
-    async myCreateDetailByUid(uid) {
+    async myCreateDetailByUid(uid: string) {
         console.log(`uid=${uid}`)
         const res = await indexedCache.getByKey('applications', uid)
         console.log(`res=${JSON.stringify(res)}`)
         return res
     }
 
-    async myCreateDetailByDidAndVersion(did, version) {
-        console.log(`did=${did}`)
-        console.log(`version=${version}`)
-        const res = await indexedCache.cursorIndex('applications', )
+    /**
+     * 应用中心 -> 我创建的应用详情接口
+     * @param {*} uid 
+     * @returns 
+     */
+    async myCreateDeleteByUid(uid: string) {
+        console.log(`uid=${uid}`)
+        const res = await indexedCache.deleteByKey('applications', uid)
         console.log(`res=${JSON.stringify(res)}`)
         return res
     }
 
-    async search(page, pageSize, condition) {
+    async search(condition: ApplicationSearchCondition, page?: number, pageSize?: number) {
         let params: { page?: number; pageSize?: number; condition?: Record<string, any> } = {}
         params.page = page || 1
         params.pageSize = pageSize || 10
         params.condition = condition || {}
-        return await applicationProvider.search(params.page, params.pageSize, params.condition)
+        const header = {
+            "did": "xxxx"
+        }
+        const body = {
+            "header": header,
+            "body": {
+                "condition": {
+                    "code": condition.code,
+                    "owner": condition.owner,
+                    "name": condition.name,
+                    "keyword": condition.keyword,
+                    "status": condition.status
+                },
+                "page": {
+                    "page": page || 1,
+                    "pageSize": pageSize || 10
+                }
+            }
+        }
+        console.log(`body=${JSON.stringify(body)}`)
+        console.log(`endpoint=${endpoint}`)
+        const response = await fetch(endpoint + '/api/v1/application/search', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'accept': 'application/json'
+            },
+            body: JSON.stringify(body),
+        });
+        
+        if (!response.ok) {
+            throw new Error(`Failed to create post: ${response.status}`);
+        }
+
+        const r =  await response.json();
+        console.log(`r=${JSON.stringify(r)}`)
+        return r.body.applications
     }
 
-    async myApplySearch(page, pageSize, condition) {
-        let params: { page?: number; pageSize?: number; condition?: Record<string, any> } = {}
-        params.page = page || 1
-        params.pageSize = pageSize || 10
-        params.condition = condition || {}
-        return await applicationProvider.search(params.page, params.pageSize, params.condition)
-
-        // await indexedCache.cursor(TEST_TABLES[0].name, (r) => {
-        //   console.log(`total record=${JSON.stringify(r)}`);
-        // });
+    async myApplyList(applyOwner: string) {
+        console.log(`request applyOwner=${JSON.stringify(applyOwner)}`)
+        const res = await indexedCache.indexAll('applications_apply', 'applyOwner', applyOwner)
+        console.log(`response=${JSON.stringify(res)}`)
+        return res
     }
 
-    async myApplyDelete(did) {
-        return await indexedCache.deleteByKey("applications", did, (r) => {
-            console.log(`total record=${JSON.stringify(r)}`)
-        })
+    async myApplyCreate(params: ApplicationMetadata) {
+        await indexedCache.insert('applications_apply', params)
+    }
+
+    async myApplyDelete(uid: string) {
+        return await indexedCache.deleteByKey("applications_apply", uid)
     }
 
     async update(params) {
@@ -130,10 +209,6 @@ class $application {
         })
     }
 
-    async myApplyDetail(did, version) {
-        return await indexedCache.getByKey("applications", did)
-    }
-
     async createIdentity(template, password) {
         return await createIdentity(template, password)
     }
@@ -144,23 +219,102 @@ class $application {
         //   resolve('success')
         // })
     }
-    async detail(did, version) {
-        return await applicationProvider.detail(did, version)
-        // return new Promise((resolve, reject) => {
-        //   resolve({
-        //     address: "1",
-        //     avatar: "2",
-        //     code: "3",})
-        // })
+
+    /**
+     * 已上线的应用详情
+     * @param did 
+     * @param version 
+     */
+    async detail(did: string, version: number) {
+        const header = {
+            "did": "xxxx"
+        }
+        const body = {
+            "header": header,
+            "body": {
+                "did": did,
+                "version": version
+            }
+        }
+        console.log(`body=${JSON.stringify(body)}`)
+        console.log(`endpoint=${endpoint}`)
+        const response = await fetch(endpoint + '/api/v1/application/detail', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'accept': 'application/json'
+            },
+            body: JSON.stringify(body),
+        });
+        
+        if (!response.ok) {
+            throw new Error(`Failed to create post: ${response.status}`);
+        }
+
+        const r =  await response.json();
+        console.log(`r=${JSON.stringify(r)}`)
+        return r.body.application
     }
-    async offline(did, version) {
-        return await applicationProvider.offline(did, version)
+
+    async offline(did: string, version: number) {
+        const header = {
+            "did": "xxxx"
+        }
+        const body = {
+            "header": header,
+            "body": {
+                "did": did,
+                "version": version
+            }
+        }
+        console.log(`body=${JSON.stringify(body)}`)
+        console.log(`endpoint=${endpoint}`)
+        const response = await fetch(endpoint + '/api/v1/application/delete', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'accept': 'application/json'
+            },
+            body: JSON.stringify(body),
+        });
+        
+        if (!response.ok) {
+            throw new Error(`Failed to create post: ${response.status}`);
+        }
+
+        const r =  await response.json();
+        console.log(`r=${JSON.stringify(r)}`)
+        return r.body.status
     }
-    async online(did, version) {
-        return await applicationProvider.online(did, version)
-        // return new Promise((resolve, reject) => {
-        //   resolve('success')
-        // })
+
+    async online(application: ApplicationMetadata) {
+        const header = {
+            "did": "xxxx"
+        }
+        const body = {
+            "header": header,
+            "body": {
+                "application": application
+            }
+        }
+        console.log(`body=${JSON.stringify(body)}`)
+        console.log(`endpoint=${endpoint}`)
+        const response = await fetch(endpoint + '/api/v1/application/create', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'accept': 'application/json'
+            },
+            body: JSON.stringify(body),
+        });
+        
+        if (!response.ok) {
+            throw new Error(`Failed to create post: ${response.status}`);
+        }
+
+        const r =  await response.json();
+        console.log(`r=${JSON.stringify(r)}`)
+        return r.body.application
     }
     async audit(did, version, passed, signature, auditor, comment) {
         return await applicationProvider.audit(did, version, passed, signature, auditor, comment)

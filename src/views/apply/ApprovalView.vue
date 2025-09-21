@@ -87,7 +87,7 @@
             </div>
 
             <div style="width: 100%">
-                <ApprovalTable :pageTabFrom="tabIndex ? 'finishApproval' : 'waitApproval'" />
+                <ApprovalTable :pageTabFrom="tabIndex ? 'finishApproval' : 'waitApproval'" :tableData="JSON.stringify(tableData.values)" />
             </div>
         </div>
     </div>
@@ -105,9 +105,14 @@
 </template>
 
 <script lang="ts" setup>
-import { ref, reactive } from 'vue'
-import $service, { ApplyStatusMap } from '@/plugins/service'
+import { ref, reactive, onMounted, watch } from 'vue'
 import ApprovalTable from '@/views/components/ApprovalTable.vue'
+import { userInfo } from '@/plugins/account'
+import $audit, { AuditAuditDetail, AuditCommentMetadata, AuditCommentStatusEnum } from '@/plugins/audit'
+import { ApplicationMetadata } from '@/plugins/application'
+import { AuditDetailBox, useDataStore } from '@/stores/audit'
+
+const store = useDataStore()
 
 const formRef = ref(null)
 const tabIndex = ref(0)
@@ -123,43 +128,118 @@ const pagination = ref({
     total: 30
 })
 
-const handleCurrentChange = (currentPage) => {
+const handleCurrentChange = (currentPage: number) => {
     pagination.value.page = currentPage
 }
 
-const handleSizeChange = (pageSize) => {
+const handleSizeChange = (pageSize: number) => {
     pagination.value = {
         ...pagination.value,
         pageSize,
         page: 1 // 切换每页数量时重置页码
     }
 }
-const changeTab = (index) => {
+const changeTab = (index: number) => {
+    console.log(`changeTab=${index}`)
     tabIndex.value = index
     pagination.value.page = 1
+    search()
 }
-const onReset = (formEl) => {
+const onReset = (formEl: any) => {
     formEl.resetFields()
     pagination.value.page = 1
 }
+
+function allEqualTo<T>(arr: T[], value: T): boolean {
+  return arr.every(item => item === value);
+}
+
+function getState(metas?: AuditCommentMetadata[]) {
+  let status: string = "待审批";
+  if (metas === undefined || metas.length === 0) {
+    return status;
+  }
+
+  // 过滤掉 status 为 undefined 的项
+  const statusList: AuditCommentStatusEnum[] = metas
+    .map(item => item.status)
+    .filter((status): status is AuditCommentStatusEnum => status !== undefined);
+
+  if (statusList.length === 0) {
+    return status; // 如果没有有效状态，仍为“待审批”
+  }
+
+  if (statusList.includes(AuditCommentStatusEnum.COMMENTSTATUSREJECT)) {
+    status = '审批驳回';
+  } else if (allEqualTo(statusList, AuditCommentStatusEnum.COMMENTSTATUSAGREE)) {
+    status = '审批通过';
+  }
+
+  return status;
+}
+
+function cvData(auditMyApply: AuditAuditDetail) {
+    if (auditMyApply === undefined || auditMyApply.meta === undefined || auditMyApply.meta.appOrServiceMetadata === undefined || auditMyApply.meta.applicant === undefined) {
+        return null
+    }
+    const rawData = JSON.parse(auditMyApply.meta.appOrServiceMetadata);
+    const did = auditMyApply.meta.applicant.split('::')[0]
+
+    const metadata: AuditDetailBox = {
+        uid: auditMyApply.meta.uid,
+        name: rawData.name,
+        desc: rawData.description,
+        serviceType: rawData.code,
+        applicantor: did,
+        state: getState(auditMyApply.commentMeta),
+        date: auditMyApply.meta.createdAt
+    };
+    return metadata
+ 
+}
+
+function convertApplicationMetadata(auditMyApply: AuditAuditDetail[]) {
+  return auditMyApply
+    .map(cvData)
+    .filter((item): item is AuditDetailBox => item !== null) // ✅ 过滤 null 并类型收窄
+}
+
+const tableData = ref<AuditDetailBox[]>([])
+
+const search = async () => {
+    const approver = `${userInfo?.metadata?.did}::${userInfo?.metadata?.did}`
+    const auditMyApply: AuditAuditDetail[] = await $audit.search({approver: approver})
+
+    let res: AuditDetailBox[] = convertApplicationMetadata(auditMyApply)
+    console.log(`res=${JSON.stringify(res)}`)
+    if (tabIndex.value === 1) {
+        res = res.filter((s) => s.state === '审批通过' || s.state === '审批驳回')
+    }
+    if (tabIndex.value === 0) {
+        res = res.filter((s) => s.state === '待审批')
+    }
+    if (Array.isArray(res)) {
+        tableData.value = res
+        store.setItems(tableData.value)
+    } else {
+        console.warn('Expected array, but got:', res)
+        tableData.value = []
+        store.setItems(tableData.value)
+    }
+}
+
 
 /**
  * 我的审批页面，
  *
  */
 const onSubmit = () => {
-    if (pagination.value.page === 1) {
-        /**
-         * todo 学虎
-         * 待我审批，查询接口
-         * */
-    } else {
-        /**
-         * todo 学虎
-         * 审批完成 查询接口
-         */
-    }
+    search()
 }
+
+onMounted(() => {
+    search()
+})
 </script>
 <style scoped lang="less">
 .approval {

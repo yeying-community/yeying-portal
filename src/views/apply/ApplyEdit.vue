@@ -172,12 +172,6 @@ import ResultChooseModal from '@/views/components/ResultChooseModal.vue'
 import { userInfo } from '@/plugins/account'
 import { v4 as uuidv4 } from 'uuid';
 
-console.log(`apply edit userInfo=${JSON.stringify(userInfo)}`)
-
-const did: string = userInfo.metadata.did
-const version: string = userInfo.metadata.version
-console.log(`apply edit userInfo.did=${did}`)
-console.log(`apply edit userInfo.did=${version}`)
 const route = useRoute()
 const router = useRouter()
 
@@ -236,18 +230,11 @@ const rules = reactive({
     serviceCodes: [{ required: true, message: '请选择', trigger: 'blur' }],
     codePackagePath: [{ required: true, message: '请上传代码包', trigger: 'blur' }]
 })
-const getDetailInfo = async () => {
-    if (did) {
-        isEdit.value = true
 
-        /**
-         * todo 学虎 调用详情接口
-         * 进入编辑页面首先要查一下详情，回显数据
-         * 下面的myApplyDetail也是我自己写的，你可以改成你写的
-         */
-        const res = await $application.myApplyDetail(did, version)
-        // const res = await $application.detail(did, version);
-        console.log(res, '-detailRes-')
+const getDetailInfo = async () => {
+    if (route.query.uid) {
+        isEdit.value = true
+        const res = await $application.myCreateDetailByUid(route.query.uid as string)
         if (res) {
             detailInfo.value = res
             detailInfo.value.code = String(res.code)
@@ -290,23 +277,21 @@ const submitForm = async (formEl, andOnline) => {
     if (avatarChk.value == '1') {
         detailInfo.value.avatar = '1'
     }
-    await formEl.validate(async (valid, fields) => {
+    await formEl.validate(async (valid: boolean, fields) => {
         if (valid) {
             const params = JSON.parse(JSON.stringify(detailInfo.value))
             console.log(`创建应用表单参数=${JSON.stringify(params)}`)
             params.codeType = codeChk.value
-            if (did) {
-                console.log("!!!!!!!!!!!")
-                /**
-                 * todo 学虎 编辑页面-点击保存按钮调用的接口
-                 * update是我自己写的接口，你可以换一下
-                 */
-                $application.myCreateDetailByUid
-                params.uid = uuidv4()
-                params.did = did
-                params.version = version
-                params.owner = did
-                const rst = await $application.update(params)
+            if (route.query.uid) {
+                const rr = await $application.myCreateDetailByUid(route.query.uid as string)
+                rr.code = params.code
+                rr.codePackagePath = params.codePackagePath
+                rr.codeType = params.codeType
+                rr.description = params.description
+                rr.location = params.location
+                rr.name = params.name
+                rr.serviceCodes = params.serviceCodes
+                const rst = await $application.myCreateUpdate(rr)
                 console.log('submit444!', params, rst)
                 if (!andOnline) {
                     innerVisible.value = true
@@ -317,14 +302,10 @@ const submitForm = async (formEl, andOnline) => {
                      */
                 }
             } else {
-                /**
-                 * todo 学虎 新建页面-点击保存按钮调用的接口
-                 * 首先得先调用一个接口生成一个新的did，这个生成did的接口我没做
-                 * create是我自己写的接口，你可以自己换一下
-                 */
                 params.uid = uuidv4()
-                params.did = did
-                params.version = version
+                params.did = uuidv4() // 暂时先mock
+                params.version = userInfo?.metadata?.version
+                params.owner = userInfo?.metadata?.did
                 const result = await $application.create(params)
                 console.log(`result=${JSON.stringify(result)}`)
                 innerVisible.value = true
@@ -343,7 +324,6 @@ const toOnlineApply = async () => {
      * 目前调不通
      */
     const rst = await $application.online(did, version)
-    console.log(rst, '--i=onlinerrr-')
 }
 const toList = () => {
     router.push({
@@ -368,7 +348,6 @@ const changeFile = async (fileType, uploadFile) => {
     // curImg.value.size = (uploadFile.size / 1024).toFixed(1) + "M";
 
     if (namespaceId && uploadFile) {
-        console.log(uploadFile, '--uploader-')
         try {
             const uploader = await $application.uploads(uploadFile.raw, namespaceId)
 
@@ -402,7 +381,6 @@ const getUserInfo = async () => {
 }
 onMounted(() => {
     getDetailInfo()
-    // await getDetailInfo();
 })
 </script>
 <style scoped lang="less">

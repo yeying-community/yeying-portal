@@ -34,11 +34,19 @@
 
 <script lang="ts" setup>
 import { userInfo } from '@/plugins/account'
-import $auditProvider from '@/plugins/auditProvider'
+import $audit, { AuditAuditDetail, AuditCommentMetadata, AuditCommentStatusEnum } from '@/plugins/audit'
+import { generateUuid, getCurrentUtcString } from '@/utils/common';
+import { ElForm } from 'element-plus';
+import { ElMessage } from 'element-plus';
 import { ref, reactive } from 'vue'
 import { useRouter } from 'vue-router'
+import $application, { ApplicationMetadata } from '@/plugins/application'
+import { notifyError } from '@/utils/message';
+import { v4 as uuidv4 } from 'uuid';
+import { AuditDetailBox, useDataStore } from '@/stores/audit'
 
-const formRef = ref(null)
+const store = useDataStore()
+const formRef = ref<InstanceType<typeof ElForm> | null>(null);
 const form = reactive({
     result: 'passed',
     opinion: ''
@@ -53,41 +61,166 @@ const rules = reactive({
 const props = defineProps({
     applroveShow: Boolean,
     afterSubmit: Function,
-    did: String,
+    uid: String,
     closeClick: Function
 })
+
+
+function allEqualTo<T>(arr: T[], value: T): boolean {
+  return arr.every(item => item === value);
+}
+
+function getState(metas?: AuditCommentMetadata[]) {
+  let status: string = "待审批";
+  if (metas === undefined || metas.length === 0) {
+    return status;
+  }
+
+  // 过滤掉 status 为 undefined 的项
+  const statusList: AuditCommentStatusEnum[] = metas
+    .map(item => item.status)
+    .filter((status): status is AuditCommentStatusEnum => status !== undefined);
+
+  if (statusList.length === 0) {
+    return status; // 如果没有有效状态，仍为“待审批”
+  }
+
+  if (statusList.includes(AuditCommentStatusEnum.COMMENTSTATUSREJECT)) {
+    status = '审批驳回';
+  } else if (allEqualTo(statusList, AuditCommentStatusEnum.COMMENTSTATUSAGREE)) {
+    status = '审批通过';
+  }
+
+  return status;
+}
+
+function cvData(auditMyApply: AuditAuditDetail) {
+    if (auditMyApply === undefined || auditMyApply.meta === undefined || auditMyApply.meta.appOrServiceMetadata === undefined || auditMyApply.meta.applicant === undefined) {
+        return null
+    }
+    const rawData = JSON.parse(auditMyApply.meta.appOrServiceMetadata);
+    const did = auditMyApply.meta.applicant.split('::')[0]
+
+    const metadata: AuditDetailBox = {
+        uid: auditMyApply.meta.uid,
+        name: rawData.name,
+        desc: rawData.description,
+        serviceType: rawData.code,
+        applicantor: did,
+        state: getState(auditMyApply.commentMeta),
+        date: auditMyApply.meta.createdAt
+    };
+    return metadata
+ 
+}
+
+function convertApplicationMetadata(auditMyApply: AuditAuditDetail[]) {
+  return auditMyApply
+    .map(cvData)
+    .filter((item): item is AuditDetailBox => item !== null) // ✅ 过滤 null 并类型收窄
+}
+
+const tableData = ref<AuditDetailBox[]>([])
+
+const searchWaitApply = async () => {
+    const approver = `${userInfo?.metadata?.did}::${userInfo?.metadata?.did}`
+    const auditMyApply: AuditAuditDetail[] = await $audit.search({approver: approver})
+
+    let res: AuditDetailBox[] = convertApplicationMetadata(auditMyApply)
+    console.log(`res=${JSON.stringify(res)}`)
+    res = res.filter((s) => s.state === '待审批')
+    if (Array.isArray(res)) {
+        tableData.value = res
+        store.setItems(tableData.value)
+    } else {
+        console.warn('Expected array, but got:', res)
+        tableData.value = []
+        store.setItems(tableData.value)
+    }
+}
 
 /**
  * 表单提交
  */
 const submitForm = () => {
-    formRef.value.validate(async (valid) => {
+    if (formRef.value === undefined || formRef.value === null) {
+        ElMessage.error('请先选择审批结果')
+        return false
+    }
+    formRef.value.validate(async (valid: boolean) => {
         if (valid) {
             const applyResult = form.result
-            const applyOpinion = form.applyOpinion
+            const applyOpinion = form.opinion
+            console.log(`applyResult=${applyResult}`)
+            console.log(`applyOpinion=${applyOpinion}`)
+ 
+            if (applyResult === 'passed') {
+                try {
+                    const param = {
+                        uid: generateUuid(),
+                        auditId: props.uid,
+                        text: applyOpinion,
+                        status: AuditCommentStatusEnum.COMMENTSTATUSAGREE,
+                        createdAt: getCurrentUtcString(),
+                        updatedAt: getCurrentUtcString(),
+                        signature: ''
+                    }
+                    console.log(`param=${JSON.stringify(param)}`)
+                    const r: AuditCommentMetadata = await $audit.passed(param)
+                    console.log(`r=${JSON.stringify(r)}`)
 
-            const params = {
-                uid: userInfo?.metadata?.did,
-                status: applyResult,
-                applyOpinion: applyOpinion
-            }
-            // todo 调用接口成功后的操作
+                    const reasonRes = await $audit.detail(props.uid as string)
+                    console.log(`reasonRes=${JSON.stringify(reasonRes)}`)
+                    console.log(`reasonRes reason=${reasonRes.meta.reason}`)
+                    const rs = await $audit.detail(props.uid as string)
+                    const appOrService = JSON.parse(rs.meta.appOrServiceMetadata)
+                    console.log(`appOrService=${JSON.stringify(appOrService)}`)
+                    if (reasonRes.meta.reason === '上架申请') {
+                        // 创建上线记录
+                        const app = await $application.online(appOrService)
+                        console.log(`app=${app}`)
+                    } else if (reasonRes.meta.reason === '申请使用') {
+                        try {
+                            const detailRst = await $application.detail(appOrService.did, appOrService.version)
+                            if (detailRst === undefined || detailRst === null) {
+                                notifyError("❌应用不存在")
+                                return
+                            }
+                            detailRst.applyOwner = userInfo?.metadata?.did
+                            detailRst.uid = uuidv4()
 
-            // props.afterSubmit();
-            try {
-                /**
-                 *
-                 * todo 学虎
-                 * 审批确认弹窗调用的接口
-                 */
-                const auditCreate = await $auditProvider.audit(params)
-                console.log(auditCreate, '--audit-')
-            } catch (e) {
-                console.log(e, '-eee-')
+                            const r = await $application.myApplyCreate(detailRst)
+                            console.log(`r=${JSON.stringify(r)}`)
+                        } catch (e) {
+                            notifyError(`❌创建申请的应用/服务异常，error=${e}`)
+                        }
+                    }
+                    
+                } catch (e) {
+                    console.log(e)
+                }
+            } else if (applyResult === 'reject') {
+                try {
+                    const param = {
+                        uid: generateUuid(),
+                        auditId: props.uid,
+                        text: applyOpinion,
+                        status: AuditCommentStatusEnum.COMMENTSTATUSREJECT,
+                        createdAt: getCurrentUtcString(),
+                        updatedAt: getCurrentUtcString(),
+                        signature: ''
+                    }
+                    console.log(`param=${JSON.stringify(param)}`)
+                    const r: AuditCommentMetadata = await $audit.reject(param)
+                    console.log(`r=${JSON.stringify(r)}`)
+                } catch (e) {
+                    console.log(e)
+                }
             }
+            searchWaitApply()
+            props.closeClick()
         } else {
-            ElMessage.error('请先选择审批结果')
-            return false
+            notifyError('请先选择审批结果')
         }
     })
 }
