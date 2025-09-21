@@ -31,7 +31,7 @@
             <div class="bottom owner" v-if="!isOwner">
                 <div @click="toDetail" class="cursor">详情</div>
                 <el-divider direction="vertical" />
-                <div v-if="!isOwner" @click="dialogVisible = true" class="cursor">申请使用</div>
+                <div v-if="!isOwner" @click="applyUse()" class="cursor">申请使用</div>
             </div>
             <div class="bottom owner" v-else>
                 <div @click="toDetail" class="cursor">详情</div>
@@ -206,6 +206,8 @@ import ConfigServiceModal from './ConfigServiceModal.vue'
 import ResultChooseModal from './ResultChooseModal.vue'
 import { generateUuid, getCurrentUtcString } from '@/utils/common'
 import $application, { ApplicationMetadata } from '@/plugins/application'
+import { notifyError } from '@/utils/message'
+import { v4 as uuidv4 } from 'uuid';
 
 const StatusInfo = {
     online: {
@@ -378,6 +380,13 @@ const handleOfflineConfirm = () => {
             handleOffline()
         })
         .catch(() => {})
+}
+
+/**
+ * 申请使用
+ */
+const applyUse = async () => {
+    dialogVisible.value = true
 }
 
 // 上架应用

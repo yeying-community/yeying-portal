@@ -355,7 +355,6 @@ const changeFile = async (fileType, uploadFile) => {
     // curImg.value.size = (uploadFile.size / 1024).toFixed(1) + "M";
 
     if (namespaceId && uploadFile) {
-        console.log(uploadFile, '--uploader-')
         try {
             const uploader = await $application.uploads(uploadFile.raw, namespaceId)
 

@@ -15,7 +15,7 @@
     >
       <el-space direction="vertical" alignment="flex-start">
         <div>申请应用：{{ detail?.name }}</div>
-        <div>应用创建人：{{ detail?.owner }}</div>
+        <div>应用创建人：{{ detail?.did }}</div>
         <el-form-item label="申请原因" prop="reason">
           <el-input
             type="textarea"
@@ -29,7 +29,7 @@
 
     <template #footer>
       <span class="dialog-footer">
-        <el-button @click="dialogVisible = false">取消</el-button>
+        <el-button @click="props.closeClick()">取消</el-button>
         <el-button type="primary" @click="submitForm"> 确定 </el-button>
       </span>
     </template>
@@ -54,11 +54,17 @@
 
 <script lang="ts" setup>
 import { userInfo } from '@/plugins/account'
-import $auditProvider from '@/plugins/audit'
+import $audit, { AuditAuditMetadata } from '@/plugins/audit'
+import $application from '@/plugins/application'
 import ResultChooseModal from './ResultChooseModal.vue'
 import { ref, reactive } from 'vue'
 import { useRouter } from 'vue-router'
 import { SuccessFilled } from '@element-plus/icons-vue'
+import { notifyError } from '@/utils/message'
+import { v4 as uuidv4 } from 'uuid';
+import { generateUuid, getCurrentUtcString } from '@/utils/common'
+import { ElMessageBox } from 'element-plus'
+
 const innerVisible = ref(false)
 const formRef = ref(null)
 const form = reactive({
@@ -83,7 +89,7 @@ const props = defineProps({
  * 表单提交
  */
 const submitForm = () => {
-  formRef.value.validate(async (valid) => {
+  formRef.value.validate(async (valid: boolean) => {
     if (valid) {
       const applyReason = form.reason
       const params = {
@@ -93,15 +99,67 @@ const submitForm = () => {
       // todo 调用接口成功后的操作
       innerVisible.value = true
       // props.afterSubmit();
-      try {
-        const auditCreate = await $auditProvider.create(params)
-        console.log(auditCreate, '--auditCreate-')
+      // try {
+      //   const detailRst = await $application.detail(props.detail.did, props.detail.version)
+      //   if (detailRst === undefined || detailRst === null) {
+      //       notifyError("❌应用不存在")
+      //       return
+      //   }
+      //   detailRst.applyOwner = userInfo?.metadata?.did
+      //   detailRst.uid = uuidv4()
+
+      //   const r = await $application.myApplyCreate(detailRst)
+      //   console.log(`r=${JSON.stringify(r)}`)
+      // } catch (e) {
+      //   notifyError(`❌审批异常，error=${e}`)
+      // }
+
+
+        console.log(`申请使用 detail = ${JSON.stringify(props.detail)}`)
+        const detailRst = await $application.detail(props.detail.did, props.detail.version)
+        if (detailRst === undefined || detailRst === null) {
+            notifyError("应用不存在")
+            return
+        }
+
+        const applicant = `${userInfo?.metadata?.did}::${userInfo?.metadata?.did}`
+        const approver = `${props.detail.did}::${props.detail.did}`
+        const meta: AuditAuditMetadata = {
+            uid: generateUuid(),
+            appOrServiceMetadata: JSON.stringify(detailRst),
+            applicant: applicant, // 申请人身份，did::name
+            approver: approver,
+            reason: '申请使用',
+            createdAt: getCurrentUtcString(),
+            updatedAt: getCurrentUtcString(),
+            signature: 'xxx'
+        }
+        const auditR = await $audit.create(meta)
+        console.log(`auditR=${JSON.stringify(auditR)}`)
+        props.closeClick()
+
+        try {
+          const rs = await $audit.detail(props.uid as string)
+          const appOrService = JSON.parse(rs.meta.appOrServiceMetadata)
+          console.log(`appOrService=${JSON.stringify(appOrService)}`)
+          const detailRst = await $application.detail(appOrService.did, appOrService.version)
+          if (detailRst === undefined || detailRst === null) {
+              notifyError("❌应用不存在")
+              return
+          }
+          detailRst.applyOwner = userInfo?.metadata?.did
+          detailRst.uid = uuidv4()
+
+          const r = await $application.myApplyCreate(detailRst)
+          console.log(`r=${JSON.stringify(r)}`)
       } catch (e) {
-        console.log(e, '-eee-')
+          notifyError(`❌创建申请的应用/服务异常，error=${e}`)
       }
+
+
+        ElMessageBox.alert(`申请中，请联系 ${props.detail.did} 审批', '申请使用`)
     } else {
-      ElMessage.error('请先填写申请原因')
-      return false
+      notifyError('❌请先填写申请原因')
     }
   })
 }

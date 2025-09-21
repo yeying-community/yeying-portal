@@ -41,6 +41,8 @@ import { ElMessage } from 'element-plus';
 import { ref, reactive } from 'vue'
 import { useRouter } from 'vue-router'
 import $application, { ApplicationMetadata } from '@/plugins/application'
+import { notifyError } from '@/utils/message';
+import { v4 as uuidv4 } from 'uuid';
 
 const formRef = ref<InstanceType<typeof ElForm> | null>(null);
 const form = reactive({
@@ -90,10 +92,34 @@ const submitForm = () => {
                     console.log(`param=${JSON.stringify(param)}`)
                     const r: AuditCommentMetadata = await $audit.passed(param)
                     console.log(`r=${JSON.stringify(r)}`)
-                    // 创建上线记录
+
+                    const reasonRes = await $audit.detail(props.uid as string)
+                    console.log(`reasonRes=${JSON.stringify(reasonRes)}`)
+                    console.log(`reasonRes reason=${reasonRes.meta.reason}`)
                     const rs = await $audit.detail(props.uid as string)
-                    const app = await $application.online(JSON.parse(rs.meta.appOrServiceMetadata))
-                    console.log(`app=${app}`)
+                    const appOrService = JSON.parse(rs.meta.appOrServiceMetadata)
+                    console.log(`appOrService=${JSON.stringify(appOrService)}`)
+                    if (reasonRes.meta.reason === '上架申请') {
+                        // 创建上线记录
+                        const app = await $application.online(appOrService)
+                        console.log(`app=${app}`)
+                    } else if (reasonRes.meta.reason === '申请使用') {
+                        try {
+                            const detailRst = await $application.detail(appOrService.did, appOrService.version)
+                            if (detailRst === undefined || detailRst === null) {
+                                notifyError("❌应用不存在")
+                                return
+                            }
+                            detailRst.applyOwner = userInfo?.metadata?.did
+                            detailRst.uid = uuidv4()
+
+                            const r = await $application.myApplyCreate(detailRst)
+                            console.log(`r=${JSON.stringify(r)}`)
+                        } catch (e) {
+                            notifyError(`❌创建申请的应用/服务异常，error=${e}`)
+                        }
+                    }
+   
                 } catch (e) {
                     console.log(e)
                 }
@@ -117,7 +143,7 @@ const submitForm = () => {
             }
             props.closeClick()
         } else {
-            ElMessage.error('请先选择审批结果')
+            notifyError('请先选择审批结果')
         }
     })
 }

@@ -139,7 +139,7 @@ class $application {
         return res
     }
 
-    async search(page: number, pageSize: number, condition: ApplicationSearchCondition) {
+    async search(condition: ApplicationSearchCondition, page?: number, pageSize?: number) {
         let params: { page?: number; pageSize?: number; condition?: Record<string, any> } = {}
         params.page = page || 1
         params.pageSize = pageSize || 10
@@ -183,20 +183,19 @@ class $application {
         return r.body.applications
     }
 
-    async myApplySearch(page: number, pageSize: number, condition) {
-        let params: { page?: number; pageSize?: number; condition?: Record<string, any> } = {}
-        params.page = page || 1
-        params.pageSize = pageSize || 10
-        params.condition = condition || {}
-        return await applicationProvider.search(params.page, params.pageSize, params.condition)
-
-        // await indexedCache.cursor(TEST_TABLES[0].name, (r) => {
-        //   console.log(`total record=${JSON.stringify(r)}`);
-        // });
+    async myApplyList(applyOwner: string) {
+        console.log(`request applyOwner=${JSON.stringify(applyOwner)}`)
+        const res = await indexedCache.indexAll('applications_apply', 'applyOwner', applyOwner)
+        console.log(`response=${JSON.stringify(res)}`)
+        return res
     }
 
-    async myApplyDelete(did: string) {
-        return await indexedCache.deleteByKey("applications", did)
+    async myApplyCreate(params: ApplicationMetadata) {
+        await indexedCache.insert('applications_apply', params)
+    }
+
+    async myApplyDelete(uid: string) {
+        return await indexedCache.deleteByKey("applications_apply", uid)
     }
 
     async update(params) {
@@ -224,14 +223,41 @@ class $application {
         //   resolve('success')
         // })
     }
-    async detail(did, version) {
-        return await applicationProvider.detail(did, version)
-        // return new Promise((resolve, reject) => {
-        //   resolve({
-        //     address: "1",
-        //     avatar: "2",
-        //     code: "3",})
-        // })
+
+    /**
+     * 已上线的应用详情
+     * @param did 
+     * @param version 
+     */
+    async detail(did: string, version: number) {
+        const header = {
+            "did": "xxxx"
+        }
+        const body = {
+            "header": header,
+            "body": {
+                "did": did,
+                "version": version
+            }
+        }
+        console.log(`body=${JSON.stringify(body)}`)
+        console.log(`endpoint=${endpoint}`)
+        const response = await fetch(endpoint + '/api/v1/application/detail', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'accept': 'application/json'
+            },
+            body: JSON.stringify(body),
+        });
+        
+        if (!response.ok) {
+            throw new Error(`Failed to create post: ${response.status}`);
+        }
+
+        const r =  await response.json();
+        console.log(`r=${JSON.stringify(r)}`)
+        return r.body.application
     }
 
     async offline(did, version) {

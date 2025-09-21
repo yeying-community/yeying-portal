@@ -54,6 +54,7 @@ import MarketBlock from '@/views/components/MarketBlock.vue'
 import { useRouter, useRoute, RouteLocationAsPathGeneric, RouteLocationAsRelativeGeneric } from 'vue-router'
 import { userInfo } from '@/plugins/account'
 import $audit, { AuditAuditDetail, AuditAuditMetadata } from '@/plugins/audit'
+import { notifyError } from '@/utils/message'
 const did = userInfo?.metadata?.did;
 console.log(`did=${did}`)
 
@@ -122,7 +123,9 @@ function cvData(auditMyApply: AuditAuditDetail) {
 }
 
 function convertApplicationMetadata(auditMyApply: AuditAuditDetail[]) {
-    return auditMyApply.map((data) => cvData(data))
+    return auditMyApply
+        .map(data => cvData(data))
+        .filter((a): a is ApplicationMetadata => a !== undefined && a !== null)
 }
 
 const search = async () => {
@@ -130,9 +133,12 @@ const search = async () => {
         let condition = { keyword: searchVal.value, status: "APPLICATION_STATUS_ONLINE" }
 
         if (activeService.value === 'myCreate') {
-            const res = await $application.myCreateList(did || "did:ethr:0x07e4:0x02cc933db9ba636a9441c2cce025681a1f1443b5770307e13983cd76d49896c4b1")
-            console.log(`res list=${res}`)
-            // 4. 确保 res 是数组再赋值
+            if (did === undefined) {
+                notifyError('❌登录失败，did is undefined')
+                return
+            }
+            const res = await $application.myCreateList(did)
+            console.log(`myCreateList=${JSON.stringify(res)}`)
             if (Array.isArray(res)) {
                 applicationList.value = res
             } else {
@@ -142,11 +148,13 @@ const search = async () => {
             pagination.value.total = 0
             return;
         } else if (activeService.value === 'myApply') {
-            const applicant = `${userInfo?.metadata?.did}::${userInfo?.metadata?.did}`
-            const auditMyApply: AuditAuditDetail[] = await $audit.search({applicant: applicant})
-            console.log(`auditMyApply=${JSON.stringify(auditMyApply)}`)
+            if (did === undefined) {
+                notifyError('❌登录失败，did is undefined')
+                return
+            }
+            const res = await $application.myApplyList(did)
+            console.log(`auditMyApply=${JSON.stringify(res)}`)
 
-            const res: ApplicationMetadata[] = convertApplicationMetadata(auditMyApply)
             if (Array.isArray(res)) {
                 applicationList.value = res
             } else {
@@ -156,7 +164,7 @@ const search = async () => {
             pagination.value.total = 0
             return;
         }
-        const res = await $application.search(pagination.value.page, pagination.value.pageSize, condition)
+        const res = await $application.search(condition, pagination.value.page, pagination.value.pageSize)
         if (Array.isArray(res)) {
             applicationList.value = res
         } else {
@@ -166,6 +174,7 @@ const search = async () => {
         pagination.value.total = 0
     } catch (error) {
         console.error('获取应用列表失败', error)
+        notifyError('❌ 获取应用列表失败')
     }
 }
 
