@@ -236,6 +236,10 @@ const search = async () => {
 const onSubmit = () => {
     search()
 }
+
+onMounted(() => {
+    search()
+})
 </script>
 <style scoped lang="less">
 .approval {
