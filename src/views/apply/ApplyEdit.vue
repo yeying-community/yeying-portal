@@ -213,7 +213,8 @@ const detailInfo = ref<ApplicationDetail>({
     code: '',
     serviceCodes: [],
     avatar: '',
-    owner: ''
+    owner: '',
+    codePackagePath: ''
 })
 
 
@@ -261,15 +262,6 @@ const getDetailInfo = async () => {
                     : []
         }
     }
-    // else {
-
-    //     await getUserInfo()
-    //     detailInfo.value.did = userMeta.value.did
-    //     detailInfo.value.owner = userMeta.value.parent
-    //     detailInfo.value.address = userMeta.value.address
-    //     detailInfo.value.network = userMeta.value.network + ''
-    //     detailInfo.value.version = userMeta.value.version
-    // }
 }
 
 const submitForm = async (formEl, andOnline) => {
@@ -291,8 +283,8 @@ const submitForm = async (formEl, andOnline) => {
                 rr.location = params.location
                 rr.name = params.name
                 rr.serviceCodes = params.serviceCodes
-                const rst = await $application.myCreateUpdate(rr)
-                console.log('submit444!', params, rst)
+                const myCreateUpdate = await $application.myCreateUpdate(rr)
+                console.log(`myCreateUpdate=${JSON.stringify(myCreateUpdate)}`)
                 if (!andOnline) {
                     innerVisible.value = true
                 } else {

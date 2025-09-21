@@ -184,11 +184,27 @@
         :afterSubmit="afterSubmit"
         :closeClick="afterSubmit"
     />
+    <ConfigServiceModal :modalVisible="modalVisible" :cancelModal="cancelModal" />
+    <ResultChooseModal
+        v-model="innerVisible"
+        title="应用上架成功"
+        mainDesc="应用上架成功"
+        subDesc="应用已成功上架至应用市场"
+        leftBtnText="查看详情"
+        rightBtnText="返回列表"
+        :leftBtnClick="toDetail"
+        :rightBtnClick="toList"
+        :closeClick="toList"
+    >
+        <template #icon>
+            <el-icon :size="70"><SuccessFilled color="#30A46C" /></el-icon>
+        </template>
+    </ResultChooseModal>
 </template>
 <script lang="ts" setup>
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
-import $application from '@/plugins/application'
+import $service from '@/plugins/service'
 
 import dayjs from 'dayjs'
 
@@ -229,10 +245,13 @@ const StatusInfo = {
     }
 }
 
+const innerVisible = ref(false)
 const dialogVisible = ref(false)
 const modalVisible = ref(false)
 
 import { userInfo } from '@/plugins/account'
+import $audit, { AuditAuditMetadata } from '@/plugins/audit'
+import { generateUuid, getCurrentUtcString } from '@/utils/common'
 const router = useRouter()
 const props = defineProps({
     detail: Object,
@@ -246,26 +265,50 @@ const isOwner = userInfo?.metadata?.did === props.detail?.did
 const mockLineStatus = 'offline'
 const mockApplyStatus = 'success'
 
-// 取消申请
-const cancelApply = () => {}
 
-const toDelete = () => {}
+const toDelete = async () => {
+    if (props.pageFrom === 'myCreate') {
+        /**
+         * todo 学虎 我创建的-删除
+         */
+        await $service.myCreateDelete(props.detail?.uid)
+    } else {
+        /**
+         * todo 学虎 我申请的-删除
+         */
+        await $service.myApplyDelete(props.detail?.uid)
+    }
+    props.refreshCardList()
+}
 const toEdit = () => {
     router.push({
         path: '/market/service-edit',
         query: {
-            did: props.detail.did,
-            version: props.detail.version
+            uid: props.detail?.uid
         }
     })
 }
+
+/**
+ * 取消申请
+ *
+ */
+const cancelApply = () => {}
+
+const cancelModal = () => {
+    modalVisible.value = false
+}
+
+const toList = () => {
+    innerVisible.value = false
+}
+
 const exportIdentity = () => {}
 const toDetail = () => {
     router.push({
         path: '/market/service-detail',
         query: {
-            did: props.detail.did,
-            version: props.detail.version,
+            uid: props.detail?.uid,
             pageFrom: props.pageFrom
         }
     })
@@ -309,7 +352,59 @@ const handleOfflineConfirm = () => {
 }
 
 // 上架应用
-const handleOnline = () => {}
+const handleOnline = () => {
+    ElMessageBox.confirm('', {
+        message: h('p', null, [
+            h('div', { style: 'font-size:18px;color:rgba(0,0,0,0.85)' }, '你确定要上架当前服务吗？'),
+            h(
+                'div',
+                { style: 'font-size:14px;font-weight:400;color:rgba(0,0,0,0.85)' },
+                '上架后当前服务将不可再编辑修改。'
+            )
+        ]),
+        type: 'warning',
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        showClose: false,
+        customClass: 'messageBox-wrap'
+    })
+        .then(async () => {
+            /**
+             * 创建上架申请
+             * innerVisible.value = true 是上架成功后，打开一个弹窗提示用户上架成功了
+             */
+            const detailRst = await $service.myCreateDetailByUid(props.detail?.uid)
+            console.log(`detailRst=${JSON.stringify(detailRst)}`)
+            // 重复申请检查
+            const applicant = `${userInfo?.metadata?.did}::${userInfo?.metadata?.did}`
+            const approver = 'did:ethr:0x07e4:0x036bc5c8f6807d1c550b383b7c20038b1fee4e0e2e5e9bbf53db1961ad9189246e::did:ethr:0x07e4:0x036bc5c8f6807d1c550b383b7c20038b1fee4e0e2e5e9bbf53db1961ad9189246e'// 审批人身份，list[did::name]，先写死，固定的审批人，后续改成从 kv 配置表里获取
+            const searchList = await $audit.search({name: detailRst.name})
+            if (searchList.length > 0) {
+                ElMessageBox.alert('您已申请，无需重复申请', '提示')
+                .then(() => {
+                })
+                .catch(() => {
+                });
+                return
+            }
+            const meta: AuditAuditMetadata = {
+                uid: generateUuid(),
+                appOrServiceMetadata: JSON.stringify(detailRst),
+                applicant: applicant, // 申请人身份，did::name
+                approver: approver,
+                reason: '上架申请',
+                createdAt: getCurrentUtcString(),
+                updatedAt: getCurrentUtcString(),
+                signature: 'xxx'
+            }
+            const status = await $audit.create(meta)
+            if (status.code === "OK") {
+                innerVisible.value = true
+            }
+        })
+        .catch(() => {})
+}
+
 const afterSubmit = () => {
     dialogVisible.value = false
 }

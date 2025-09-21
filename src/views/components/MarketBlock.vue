@@ -296,15 +296,9 @@ const cancelApply = () => {}
  */
 const toDelete = async () => {
     if (props.pageFrom === 'myCreate') {
-        /**
-         * todo 学虎 我创建的-删除
-         */
         await $application.myCreateDelete(props.detail?.uid)
     } else {
-        /**
-         * todo 学虎 我申请的-删除
-         */
-        await $application.delete(props.detail?.did, props.detail?.version)
+        await $application.myApplyDelete(props.detail?.uid)
     }
     props.refreshCardList()
 }

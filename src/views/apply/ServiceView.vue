@@ -1,7 +1,7 @@
 <template>
   <div class="apply">
     <el-breadcrumb separator="/">
-      <el-breadcrumb-item>应用中心</el-breadcrumb-item>
+      <el-breadcrumb-item>服务中心</el-breadcrumb-item>
     </el-breadcrumb>
     <div class="top-group">
       <div class="search">
@@ -35,7 +35,7 @@
           <el-tab-pane :label="item.title" :name="item.name">
             <div class="item-group">
               <template
-                v-for="(app, index) in applicationList"
+                v-for="(app, index) in serviceList"
                 :key="index + app.name"
               >
                 <ServiceBlock
@@ -65,28 +65,36 @@
 <script lang="ts" setup>
 import { onMounted, ref, watch } from "vue";
 import { Search } from "@element-plus/icons-vue";
-import $service from "@/plugins/service";
+import $service, { ServiceMetadata } from "@/plugins/service";
 import ServiceBlock from "@/views/components/ServiceBlock.vue";
-import { useRouter } from "vue-router";
+import { useRouter, useRoute, RouteLocationAsPathGeneric, RouteLocationAsRelativeGeneric } from 'vue-router'
+import { notifyError } from "@/utils/message";
+import { userInfo } from '@/plugins/account'
 
-const searchVal = ref("");
-const activeService = ref("market");
-const applicationList = ref([]);
+const searchVal = ref<string>("");
+const activeService = ref<string>("market");
+const serviceList = ref<ServiceMetadata[]>([])
 const router = useRouter();
-const tabs = [
+interface Tab {
+  name: string;
+  title: string;
+}
+
+const tabs: Tab[] = [
   {
-    name: "market",
-    title: "应用市场",
+    name: 'market',
+    title: '服务市场',
   },
   {
-    name: "myCreate",
-    title: "我创建的",
+    name: 'myCreate',
+    title: '我创建的',
   },
   {
-    name: "myApply",
-    title: "我申请的",
+    name: 'myApply',
+    title: '我申请的',
   },
 ];
+
 
 const pagination = ref({
   pageSize: 10,
@@ -94,44 +102,66 @@ const pagination = ref({
   total: 0,
 });
 
-const handleTabClick = (tab) => {
-  activeService.value = tab.name;
+const handleTabClick = (tab: Tab) => {
+  activeService.value = tab.props.name
   pagination.value.page = 1; // 切换标签时重置页码
 };
 
 const search = async () => {
   try {
-    // 根据当前激活的标签页传递不同的查询参数
-    let condition = { keyword: searchVal.value };
+        let condition = { keyword: searchVal.value, status: "APPLICATION_STATUS_ONLINE" }
 
-    // if (activeService.value === "myCreate") {
-    //   condition = { ...condition, owner: userDid }; // 假设当前用户ID可以获取
-    // } else if (activeService.value === "myApply") {
-    //   condition = { ...condition, applicant: "当前用户ID" }; // 假设当前用户ID可以获取
-    // }
+        if (activeService.value === 'myCreate') {
+            if (userInfo?.metadata?.did === undefined) {
+                notifyError('❌登录失败，did is undefined')
+                return
+            }
+            const res = await $service.myCreateList(userInfo?.metadata?.did)
+            console.log(`myCreateList=${JSON.stringify(res)}`)
+            if (Array.isArray(res)) {
+                serviceList.value = res
+            } else {
+                console.warn('Expected array, but got:', res)
+                serviceList.value = []
+            }
+            pagination.value.total = 0
+            return;
+        } else if (activeService.value === 'myApply') {
+            if (userInfo?.metadata?.did === undefined) {
+                notifyError('❌登录失败，did is undefined')
+                return
+            }
+            const res = await $service.myApplyList(userInfo?.metadata?.did)
+            console.log(`auditMyApply=${JSON.stringify(res)}`)
 
-    const rst = await $service.search(
-      pagination.value.page,
-      pagination.value.pageSize,
-      condition
-    );
-
-    console.log(rst, "-rst-");
-
-    const { services, page } = rst.body || {};
-    applicationList.value = services || [];
-    pagination.value.total = page.total || 0;
-  } catch (error) {
-    console.error("获取应用列表失败", error);
-    // 处理错误，如显示提示信息
-  }
+            if (Array.isArray(res)) {
+                serviceList.value = res
+            } else {
+                console.warn('Expected array, but got:', res)
+                serviceList.value = []
+            }
+            pagination.value.total = 0
+            return;
+        }
+        const res = await $service.search(condition)
+        if (Array.isArray(res)) {
+            serviceList.value = res
+        } else {
+            console.warn('Expected array, but got:', res)
+            serviceList.value = []
+        }
+        pagination.value.total = 0
+    } catch (error) {
+        console.error('获取应用列表失败', error)
+        notifyError('❌ 获取应用列表失败')
+    }
 };
 
-const handleCurrentChange = (currentPage) => {
+const handleCurrentChange = (currentPage: number) => {
   pagination.value.page = currentPage;
 };
 
-const handleSizeChange = (pageSize) => {
+const handleSizeChange = (pageSize: number) => {
   pagination.value = {
     ...pagination.value,
     pageSize,
@@ -139,7 +169,7 @@ const handleSizeChange = (pageSize) => {
   };
 };
 
-const changeRouter = (url) => {
+const changeRouter = (url: string|RouteLocationAsRelativeGeneric|RouteLocationAsPathGeneric) => {
   router.push(url);
 };
 

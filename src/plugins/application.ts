@@ -1,8 +1,4 @@
-// recycle 回收站  区块提供者类，用于与区块链交互，提供数据的获取和存储功能。
-
-// import { ProviderCodeEnum } from '@yeying-community/yeying-client-ts';
-// import { ProviderCodeEnum } from '@yeying-community/yeying-web3'
-import { applicationProvider, uploader, namespaceProvider, linkProvider, indexedCache } from './account'
+import { indexedCache } from './account'
 import { setLocalStorage, getLocalStorage } from '@/utils/common'
 import { createIdentity } from '@yeying-community/yeying-web3'
 
@@ -15,6 +11,7 @@ export interface ApplicationDetail {
     serviceCodes: string[]
     avatar: string
     owner: string
+    codePackagePath: string
 }
 
 // 应用编码
