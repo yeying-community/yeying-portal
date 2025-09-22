@@ -246,8 +246,11 @@ const props = defineProps({
 })
 
 const isOwner = userInfo?.metadata?.did === props.detail?.owner
+
+// 解绑应用
 const confirmUnbind = async () => {
     await $application.unbind(props.detail?.uid)
+    props.refreshCardList()
 }
 const innerVisible = ref(false)
 const dialogVisible = ref(false)

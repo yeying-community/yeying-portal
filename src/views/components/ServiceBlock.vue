@@ -217,10 +217,11 @@ import $audit, { AuditAuditMetadata } from '@/plugins/audit'
 import $service from '@/plugins/service'
 import { generateUuid, getCurrentUtcString } from '@/utils/common'
 
+// 解绑服务
 const confirmUnbind = async () => {
     // 执行解绑逻辑
     await $service.unbind(props.detail?.uid)
-    
+    props.refreshCardList()
 }
 
 const StatusInfo = {
