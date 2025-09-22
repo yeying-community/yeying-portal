@@ -34,8 +34,8 @@ async function initializeProviders() {
     let warehouse = null
     let serviceProvider = null
     if (blockAddress) {
-        serviceProvider = await $service.search(1, 10, {"code": "SERVICE_CODE_NODE"})
-        warehouse = await $service.search(1, 10, {"code": "SERVICE_CODE_WAREHOUSE"})
+        serviceProvider = await $service.search({"code": "SERVICE_CODE_NODE"})
+        warehouse = await $service.search({"code": "SERVICE_CODE_WAREHOUSE"})
     }
     const securityAlgorithm = userInfo?.securityConfig?.algorithm as SecurityAlgorithm
     const serviceProviderOption = {

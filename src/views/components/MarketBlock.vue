@@ -173,6 +173,7 @@
         :detail="detail"
         :afterSubmit="afterSubmit"
         :closeClick="afterSubmit"
+        :operateType="operateType"
     />
     <ConfigServiceModal :modalVisible="modalVisible" :cancelModal="cancelModal" />
     <ResultChooseModal
@@ -245,12 +246,16 @@ const props = defineProps({
 })
 
 const isOwner = userInfo?.metadata?.did === props.detail?.owner
+
+// 解绑应用
 const confirmUnbind = async () => {
-    // 执行解绑逻辑
+    await $application.unbind(props.detail?.uid)
+    props.refreshCardList()
 }
 const innerVisible = ref(false)
 const dialogVisible = ref(false)
 const modalVisible = ref(false)
+const operateType = ref('application')
 
 /**
  * 应用是否上架
@@ -296,15 +301,9 @@ const cancelApply = () => {}
  */
 const toDelete = async () => {
     if (props.pageFrom === 'myCreate') {
-        /**
-         * todo 学虎 我创建的-删除
-         */
         await $application.myCreateDelete(props.detail?.uid)
     } else {
-        /**
-         * todo 学虎 我申请的-删除
-         */
-        await $application.delete(props.detail?.did, props.detail?.version)
+        await $application.myApplyDelete(props.detail?.uid)
     }
     props.refreshCardList()
 }
@@ -355,15 +354,15 @@ const handleOffline = async () => {
             type: 'success'
         })
         props.refreshCardList()
-    }
-    const applicant = `${userInfo?.metadata?.did}::${userInfo?.metadata?.did}`
-    const detail = await $audit.search({applicant: applicant})
-    const uids = detail.filter((d) => d.meta.reason === `上架申请` && d.meta.appOrServiceMetadata.includes(`"name":"${props.detail?.name}""`)).map((s) => s.meta.uid)
-    // 删除申请
-    for (const item of uids) {
-        await $audit.cancel(item)
-    }
-    
+        const applicant = `${userInfo?.metadata?.did}::${userInfo?.metadata?.did}`
+        const detail = await $audit.search({applicant: applicant})
+        const auditUids = detail.filter((d) => d.meta.appOrServiceMetadata.includes(`"name":"${props.detail?.name}"`)).map((s) => s.meta.uid)
+        console.log(`删除的audit auditUids = ${JSON.stringify(auditUids)}`)
+        // 删除申请
+        for (const item of auditUids) {
+            await $audit.cancel(item)
+        }
+    }    
 }
 
 const handleOfflineConfirm = () => {
@@ -433,6 +432,7 @@ const handleOnline = () => {
                 });
                 return
             }
+            detailRst.operateType = 'application'
             const meta: AuditAuditMetadata = {
                 uid: generateUuid(),
                 appOrServiceMetadata: JSON.stringify(detailRst),

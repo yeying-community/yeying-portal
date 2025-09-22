@@ -14,7 +14,7 @@
       label-width="100px"
     >
       <el-space direction="vertical" alignment="flex-start">
-        <div>申请应用：{{ detail?.name }}</div>
+        <div>申请应用/服务：{{ detail?.name }}</div>
         <div>应用创建人：{{ detail?.owner }}</div>
         <el-form-item label="申请原因" prop="reason">
           <el-input
@@ -38,8 +38,8 @@
   <ResultChooseModal
     v-model="innerVisible"
     title="申请使用"
-    mainDesc="应用申请中"
-    subDesc="正在等待服务所有人审批，请耐心等待"
+    mainDesc="应用/服务申请中"
+    subDesc="正在等待应用/服务所有人审批，请耐心等待"
     leftBtnText="查看详情"
     rightBtnText="返回列表"
     :leftBtnClick="toDetail"
@@ -56,6 +56,7 @@
 import { userInfo } from '@/plugins/account'
 import $audit, { AuditAuditMetadata } from '@/plugins/audit'
 import $application from '@/plugins/application'
+import $service from '@/plugins/service'
 import ResultChooseModal from './ResultChooseModal.vue'
 import { ref, reactive } from 'vue'
 import { useRouter } from 'vue-router'
@@ -83,6 +84,7 @@ const props = defineProps({
   detail: Object,
   title: String,
   closeClick: Function,
+  operateType: String
 })
 
 /**
@@ -103,22 +105,38 @@ const submitForm = () => {
       innerVisible.value = true
       // props.afterSubmit();
         console.log(`申请使用 detail = ${JSON.stringify(props.detail)}`)
-        const detailRst = await $application.detail(props.detail?.did, props.detail?.version)
-        if (detailRst === undefined || detailRst === null) {
-            notifyError("应用不存在")
+        let detailRst = null
+        if (props.operateType === `application`) {
+          detailRst = await $application.detail(props.detail?.did, props.detail?.version)
+          if (detailRst === undefined || detailRst === null) {
+              notifyError("应用不存在")
+              return
+          }
+
+          const r = await $application.myApplyList(userInfo?.metadata?.did)
+          const names: string[] = r.map((d) => d.name)
+          if (names.includes(detailRst.name)) {
+            notifyError("❌申请使用已经提交，请勿重复操作")
             return
-        }
+          }
+        } else if (props.operateType === `service`) {
+          detailRst = await $service.detail(props.detail?.did, props.detail?.version)
+          if (detailRst === undefined || detailRst === null) {
+              notifyError("❌服务不存在")
+              return
+          }
 
-        const r = await $application.myApplyList(userInfo?.metadata?.did)
-        const names: string[] = r.map((d) => d.name)
-        if (names.includes(detailRst.name)) {
-          notifyError("申请使用已经提交，请勿重复操作")
-          return
+          const r = await $service.myApplyList(userInfo?.metadata?.did)
+          const names: string[] = r.map((d) => d.name)
+          if (names.includes(detailRst.name)) {
+            notifyError("❌申请使用已经提交，请勿重复操作")
+            return
+          }
         }
-
         const applicant = `${userInfo?.metadata?.did}::${userInfo?.metadata?.did}`
         const approver = `${props.detail?.owner}::${props.detail?.owner}`
         const auditUid = generateUuid()
+        detailRst.operateType = props.operateType
         const meta: AuditAuditMetadata = {
             uid: auditUid,
             appOrServiceMetadata: JSON.stringify(detailRst),
@@ -132,21 +150,32 @@ const submitForm = () => {
         const auditR = await $audit.create(meta)
         console.log(`auditR=${JSON.stringify(auditR)}`)
         props.closeClick()
-
         try {
           const rs = await $audit.detail(auditUid)
           const appOrService = JSON.parse(rs.meta.appOrServiceMetadata)
           console.log(`appOrService=${JSON.stringify(appOrService)}`)
-          const detailRst = await $application.detail(appOrService.did, appOrService.version)
-          if (detailRst === undefined || detailRst === null) {
-              notifyError("❌应用不存在")
-              return
+          if (props.operateType === `application`) {
+            const detailRstApp = await $application.detail(appOrService.did, appOrService.version)
+            if (detailRstApp === undefined || detailRstApp === null) {
+                notifyError("❌应用不存在")
+                return
+            }
+            detailRstApp.applyOwner = userInfo?.metadata?.did
+            detailRstApp.uid = uuidv4()
+            const r = await $application.myApplyCreate(detailRstApp)
+            console.log(`r=${JSON.stringify(r)}`)
+          } else if (props.operateType === `service`) {
+            const detailRstService = await $service.detail(appOrService.did, appOrService.version)
+            if (detailRstService === undefined || detailRstService === null) {
+                notifyError("❌服务不存在")
+                return
+            }
+            detailRstService.applyOwner = userInfo?.metadata?.did
+            detailRstService.uid = uuidv4()
+            const r = await $service.myApplyCreate(detailRstService)
+            console.log(`r=${JSON.stringify(r)}`)
           }
-          detailRst.applyOwner = userInfo?.metadata?.did
-          detailRst.uid = uuidv4()
-
-          const r = await $application.myApplyCreate(detailRst)
-          console.log(`r=${JSON.stringify(r)}`)
+ 
         } catch (e) {
             notifyError(`❌创建申请的应用/服务异常，error=${e}`)
         }

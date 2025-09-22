@@ -62,9 +62,9 @@
                                         />
                                     </el-select>
                                 </el-form-item>
-                                <el-form-item label="接口代码" prop="serviceCodes">
+                                <el-form-item label="接口代码" prop="apiCodes">
                                     <el-select
-                                        v-model="detailInfo.serviceCodes"
+                                        v-model="detailInfo.apiCodes"
                                         placeholder="请选择"
                                         class="input-style"
                                         multiple
@@ -79,18 +79,26 @@
                                     <!-- <el-input v-model="detailInfo.serviceCodes" class="input-style" placeholder="请输入应用访问地址"/> -->
                                 </el-form-item>
 
-                                <el-form-item label="代理地址" prop="location">
+                                <el-form-item label="代理地址" prop="proxy">
                                     <el-input
-                                        v-model="detailInfo.location"
+                                        v-model="detailInfo.proxy"
                                         class="input-style"
                                         placeholder="请输入服务代理地址"
                                     />
                                 </el-form-item>
-                                <el-form-item label="服务地址" prop="hash">
+                                <el-form-item label="服务地址" prop="codePackagePath">
+                                    <el-input
+                                        v-model="detailInfo.codePackagePath"
+                                        class="input-style"
+                                        placeholder="请输入输入服务IP：端口（如：192.168.1.1:8080）"
+                                    />
+                                </el-form-item>
+                                <el-form-item label="代码包Hash" prop="hash">
                                     <el-input
                                         v-model="detailInfo.hash"
                                         class="input-style"
-                                        placeholder="请输入输入服务IP：端口（如：192.168.1.1:8080）"
+                                        placeholder="系统默认计算"
+                                        disabled
                                     />
                                 </el-form-item>
                             </div>
@@ -141,7 +149,6 @@
 
 <script lang="ts" setup>
 import { ref, reactive, onMounted } from 'vue'
-import $application, { codeMap, codeMapTrans, serviceCodeMap, serviceCodeMapTrans } from '@/plugins/application'
 import Uploader from '@/components/common/Uploader.vue'
 import { Upload } from '@element-plus/icons-vue'
 import { $account } from '@yeying-community/yeying-wallet'
@@ -151,6 +158,12 @@ import { ElMessageBox } from 'element-plus'
 import { h } from 'vue'
 import { SuccessFilled } from '@element-plus/icons-vue'
 import ResultChooseModal from '@/views/components/ResultChooseModal.vue'
+import { userInfo } from '@/plugins/account'
+import { v4 as uuidv4 } from 'uuid';
+import { notifyError } from '@/utils/message'
+import $service, {codeMap, serviceCodeMap, ServiceMetadata } from '@/plugins/service'
+import { getCurrentUtcString } from '@/utils/common'
+
 const route = useRoute()
 const router = useRouter()
 
@@ -209,15 +222,15 @@ const avatarChk = ref('2')
 const codeChk = ref('2')
 const avatarList = ref([])
 const codeList = ref([])
-const detailInfo = ref({
+const detailInfo = ref<ServiceMetadata>({
     name: '',
     description: '',
-    location: '',
-    hash: '',
+    proxy: '',
     code: '',
-    serviceCodes: [],
+    apiCodes: [],
     avatar: '',
-    owner: ''
+    owner: '',
+    codePackagePath: ''
 })
 
 const innerVisible = ref(false)
@@ -227,61 +240,85 @@ const handleClick = (e) => {
 }
 const rules = reactive({
     name: [{ required: true, message: '请输入', trigger: 'blur' }],
-    location: [{ required: true, message: '请输入', trigger: 'blur' }],
+    proxy: [{ required: true, message: '请输入', trigger: 'blur' }],
     avatar: [{ required: true, message: '请选择', trigger: 'blur' }],
     code: [{ required: true, message: '请选择', trigger: 'blur' }],
-    serviceCodes: [{ required: true, message: '请选择', trigger: 'blur' }],
+    apiCodes: [{ required: true, message: '请选择', trigger: 'blur' }],
     codePackagePath: [{ required: true, message: '请上传代码包', trigger: 'blur' }]
 })
 const getDetailInfo = async () => {
-    const { did, version } = route.query
-
-    if (did) {
+    if (route.query.uid) {
         isEdit.value = true
-        /**
-         *todo 学虎 服务详情接口，编辑页面进来的时候需要回填
-         */
-        const res = await $application.detail(did, version)
-        console.log(res, '-detailRes-')
+        const res = await $service.myCreateDetailByUid(route.query.uid as string)
         if (res) {
-            detailInfo.value = res.body.application
-            detailInfo.value.code = String(res.body.application.code)
-            detailInfo.value.serviceCodes = res.body.application.serviceCodes.map((v) => String(v))
+            detailInfo.value = res
+            detailInfo.value.code = String(res.code)
+            detailInfo.value.apiCodes = res.apiCodes.map((v) => String(v))
+            avatarChk.value = res.avatar === '1' ? '1' : '2'
+            avatarList.value =
+                res.avatar !== '1'
+                    ? [
+                          {
+                              name: res.avatarName,
+                              url: res.avatar
+                          }
+                      ]
+                    : []
+            codeChk.value = res.codeType
+            codeList.value =
+                res.codeType === '2'
+                    ? [
+                          {
+                              name: res.codePackageName,
+                              url: res.codePackagePath
+                          }
+                      ]
+                    : []
         }
-    } else {
-        /**
-         * 新建页面的时候需要拿到did，下面这个接口是不对的，需要改成创建did的接口
-         */
-        await getUserInfo()
-        detailInfo.value.did = userMeta.value.did
-        detailInfo.value.owner = userMeta.value.parent
-        detailInfo.value.address = userMeta.value.address
-        detailInfo.value.network = userMeta.value.network + ''
-        detailInfo.value.version = userMeta.value.version
     }
 }
 
-const submitForm = async (formEl) => {
+const submitForm = async (formEl, andOnline) => {
     if (!formEl) return
     if (avatarChk.value == '1') {
         detailInfo.value.avatar = '1'
     }
-    await formEl.validate(async (valid, fields) => {
+    await formEl.validate(async (valid: boolean, fields) => {
         if (valid) {
             const params = JSON.parse(JSON.stringify(detailInfo.value))
-            delete params.$typeName
-            params.code = codeMapTrans[params.code]
-            params.serviceCodes = params.serviceCodes.map((item) => serviceCodeMapTrans[item])
-
-            /**
-             * todo 学虎 服务新建接口
-             * 这里需要加判断，是新建还是编辑，需要在参数上区分
-             */
-            const rst = await $application.create(params)
-            console.log('submit!', params, rst)
-            innerVisible.value = true
+            params.codeType = codeChk.value
+            if (route.query.uid) {
+                const rr = await $service.myCreateDetailByUid(route.query.uid as string)
+                rr.code = params.code
+                rr.codePackagePath = params.codePackagePath
+                rr.codeType = params.codeType
+                rr.description = params.description
+                rr.proxy = params.proxy
+                rr.name = params.name
+                rr.apiCodes = params.apiCodes
+                const myCreateUpdate = await $service.myCreateUpdate(rr)
+                console.log(`myCreateUpdate=${JSON.stringify(myCreateUpdate)}`)
+                if (!andOnline) {
+                    innerVisible.value = true
+                } else {
+                    /**
+                     * todo学虎 编辑页面-上架接口
+                     * 这块走的是保存并上架的逻辑，需要调用上架接口
+                     */
+                }
+            } else {
+                params.uid = uuidv4()
+                params.did = uuidv4() // 暂时先mock
+                params.version = userInfo?.metadata?.version
+                params.owner = userInfo?.metadata?.did
+                params.createdAt = getCurrentUtcString()
+                params.updatedAt = getCurrentUtcString()
+                const createRes = await $service.create(params)
+                console.log(`createRes=${JSON.stringify(createRes)}`)
+                innerVisible.value = true
+            }
         } else {
-            console.log('error submit!', fields)
+            notifyError(`参数格式不对，${fields}`)
         }
     })
 }

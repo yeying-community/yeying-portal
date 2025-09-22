@@ -111,12 +111,11 @@ import ApplyStatus from '@/views/components/ApplyStatus.vue'
 import { WarningFilled } from '@element-plus/icons-vue'
 
 import { useRoute } from 'vue-router'
-import $application from '@/plugins/application'
+import $service from '@/plugins/service'
 import { Link } from '@element-plus/icons-vue'
 const route = useRoute()
 const urlQuery = ref({})
 const detailInfo = ref({})
-const { did = '', version = '', pageFrom = '' } = route.query || {}
 /**
  * todo 学虎，
  * 应用是否上架，这里需要调用接口查询应用的上架状态
@@ -134,13 +133,13 @@ const mockApplyStatus = 'success'
  */
 
 const detail = async () => {
-    if (pageFrom !== 'myCreate') {
-        const detailRst = await $application.detail(did, version)
-        const { application } = detailRst.body || {}
-        console.log(application, '-detailRst--')
-        detailInfo.value = application || {}
+    if (route.query.pageFrom === 'myCreate') {
+        const detailRst = await $service.myCreateDetailByUid(route.query.uid as string)
+        console.log(`detailRst=${JSON.stringify(detailRst)}`)
+        detailInfo.value = detailRst || {}
     } else {
-        const detailRst = await $application.myApplyDetail(did, version)
+        // const detailRst = await $service.myApplyDetail(did, version)
+        // detailInfo.value = detailRst || {}
     }
 }
 /**

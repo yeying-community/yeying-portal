@@ -31,12 +31,12 @@
             <div class="bottom owner" v-if="!isOwner">
                 <div @click="toDetail" class="cursor">详情</div>
                 <el-divider direction="vertical" />
-                <div v-if="!isOwner" @click="dialogVisible = true" class="cursor">申请使用</div>
+                <div v-if="!isOwner" @click="applyUse()" class="cursor">申请使用</div>
             </div>
             <div class="bottom owner" v-else>
                 <div @click="toDetail" class="cursor">详情</div>
                 <el-divider direction="vertical" />
-                <div @click="handleOfflineConfirm" class="cursor">下架应用</div>
+                <div @click="handleOfflineConfirm" class="cursor">下架服务</div>
                 <el-divider direction="vertical" />
                 <div class="bottom-more">
                     <el-dropdown placement="top-start">
@@ -49,7 +49,7 @@
                                         cancel-button-text="取消"
                                         :icon="WarningFilled"
                                         icon-color="#FB9A0E"
-                                        title="您确定要删除该应用吗？"
+                                        title="您确定要删除该服务吗？"
                                         width="220px"
                                         @confirm="toDelete"
                                     >
@@ -70,8 +70,8 @@
             <div class="bottom owner">
                 <div @click="toDetail" class="cursor">详情</div>
                 <el-divider direction="vertical" />
-                <div v-if="mockLineStatus === 'online'" @click="handleOfflineConfirm" class="cursor">下架应用</div>
-                <div v-else @click="handleOnline" class="cursor">上架应用</div>
+                <div v-if="mockLineStatus === 'online'" @click="handleOfflineConfirm" class="cursor">下架服务</div>
+                <div v-else @click="handleOnline" class="cursor">上架服务</div>
                 <el-divider direction="vertical" />
                 <div class="bottom-more">
                     <el-dropdown placement="top-start">
@@ -84,7 +84,7 @@
                                         cancel-button-text="取消"
                                         :icon="WarningFilled"
                                         icon-color="#FB9A0E"
-                                        title="您确定要删除该应用吗？"
+                                        title="您确定要删除该服务吗？"
                                         width="220px"
                                         @confirm="toDelete"
                                     >
@@ -114,7 +114,7 @@
                     cancel-button-text="取消"
                     :icon="WarningFilled"
                     icon-color="#FB9A0E"
-                    title="您确定要取消当前应用的申请吗？"
+                    title="您确定要取消当前服务的申请吗？"
                     width="220px"
                     @confirm="cancelApply"
                 >
@@ -128,7 +128,7 @@
                     title="您确定要解绑当前服务吗？"
                     subTitle="解绑后，当前服务将从当前列表移除，如需使用需重新申请。"
                     :okClick="confirmUnbind"
-                    referenceText="解绑应用"
+                    referenceText="解绑服务"
                 />
 
                 <el-divider v-if="mockApplyStatus === 'success'" direction="vertical" />
@@ -142,7 +142,7 @@
                                     cancel-button-text="取消"
                                     :icon="WarningFilled"
                                     icon-color="#FB9A0E"
-                                    title="您确定要取消当前应用的申请吗？"
+                                    title="您确定要取消当前服务的申请吗？"
                                     width="220px"
                                     @confirm="cancelApply"
                                 >
@@ -155,7 +155,7 @@
                                                 cancel-button-text="取消"
                                                 :icon="WarningFilled"
                                                 icon-color="#FB9A0E"
-                                                title="您确定要删除该应用吗？"
+                                                title="您确定要删除该服务吗？"
                                                 width="220px"
                                                 @confirm="toDelete"
                                             >
@@ -183,23 +183,45 @@
         :detail="detail"
         :afterSubmit="afterSubmit"
         :closeClick="afterSubmit"
+        :operateType="operateType"
     />
+    <ConfigServiceModal :modalVisible="modalVisible" :cancelModal="cancelModal" />
+    <ResultChooseModal
+        v-model="innerVisible"
+        title="服务申请上架"
+        mainDesc="服务申请上架"
+        subDesc="服务已申请上架，待审批"
+        leftBtnText="查看详情"
+        rightBtnText="返回列表"
+        :leftBtnClick="toDetail"
+        :rightBtnClick="toList"
+        :closeClick="toList"
+    >
+        <template #icon>
+            <el-icon :size="70"><SuccessFilled color="#30A46C" /></el-icon>
+        </template>
+    </ResultChooseModal>
 </template>
 <script lang="ts" setup>
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
-import $application from '@/plugins/application'
-
 import dayjs from 'dayjs'
-
-import { ElMessageBox } from 'element-plus'
+import { ElMessage, ElMessageBox } from 'element-plus'
 import { h } from 'vue'
 import Popover from '@/views/components/Popover.vue'
 import ApplyUseModal from './ApplyUseModal.vue'
 import ConfigServiceModal from './ConfigServiceModal.vue'
+import ResultChooseModal from './ResultChooseModal.vue'
+import { userInfo } from '@/plugins/account'
+import $audit, { AuditAuditMetadata } from '@/plugins/audit'
+import $service from '@/plugins/service'
+import { generateUuid, getCurrentUtcString } from '@/utils/common'
 
+// 解绑服务
 const confirmUnbind = async () => {
     // 执行解绑逻辑
+    await $service.unbind(props.detail?.uid)
+    props.refreshCardList()
 }
 
 const StatusInfo = {
@@ -229,10 +251,12 @@ const StatusInfo = {
     }
 }
 
+const innerVisible = ref(false)
 const dialogVisible = ref(false)
 const modalVisible = ref(false)
+const operateType = ref('service')
 
-import { userInfo } from '@/plugins/account'
+
 const router = useRouter()
 const props = defineProps({
     detail: Object,
@@ -241,59 +265,94 @@ const props = defineProps({
     pageFrom: String
 })
 
-const isOwner = userInfo?.metadata?.did === props.detail?.did
+const isOwner = userInfo?.metadata?.did === props.detail?.owner
 
 const mockLineStatus = 'offline'
 const mockApplyStatus = 'success'
 
-// 取消申请
-const cancelApply = () => {}
+/**
+ * 申请使用
+ */
+const applyUse = async () => {
+    dialogVisible.value = true
+}
 
-const toDelete = () => {}
+const toDelete = async () => {
+    if (props.pageFrom === 'myCreate') {
+        /**
+         * todo 学虎 我创建的-删除
+         */
+        await $service.myCreateDelete(props.detail?.uid)
+    } else {
+        /**
+         * todo 学虎 我申请的-删除
+         */
+        await $service.myApplyDelete(props.detail?.uid)
+    }
+    props.refreshCardList()
+}
 const toEdit = () => {
     router.push({
         path: '/market/service-edit',
         query: {
-            did: props.detail.did,
-            version: props.detail.version
+            uid: props.detail?.uid
         }
     })
 }
+
+/**
+ * 取消申请
+ *
+ */
+const cancelApply = () => {}
+
+const cancelModal = () => {
+    modalVisible.value = false
+}
+
+const toList = () => {
+    innerVisible.value = false
+}
+
 const exportIdentity = () => {}
 const toDetail = () => {
     router.push({
         path: '/market/service-detail',
         query: {
-            did: props.detail.did,
-            version: props.detail.version,
+            uid: props.detail?.uid,
             pageFrom: props.pageFrom
         }
     })
 }
 
-// 下架应用
+// 下架服务
 const handleOffline = async () => {
-    const offlinelRst = await $application.offline(props.detail.did, props.detail.version)
-    console.log(offlinelRst, '-offlinelRst')
-    const { status } = offlinelRst.body
-
-    if (status?.message === 'success') {
+    const status = await $service.offline(props.detail?.did, props.detail?.version)
+    if (status?.code === 'OK') {
         ElMessage({
             message: '已下架',
             type: 'success'
         })
         props.refreshCardList()
+        const applicant = `${userInfo?.metadata?.did}::${userInfo?.metadata?.did}`
+        const detail = await $audit.search({applicant: applicant})
+        const uids = detail.filter((d) => d.meta.appOrServiceMetadata.includes(`"name":"${props.detail?.name}"`)).map((s) => s.meta.uid)
+        console.log(`删除的audit uids = ${JSON.stringify(uids)}`)
+        // 删除申请
+        for (const item of uids) {
+            await $audit.cancel(item)
+        }
     }
 }
 
 const handleOfflineConfirm = () => {
     ElMessageBox.confirm('', {
         message: h('p', null, [
-            h('div', { style: 'font-size:18px;color:rgba(0,0,0,0.85)' }, '你确定要下架当前应用吗？'),
+            h('div', { style: 'font-size:18px;color:rgba(0,0,0,0.85)' }, '你确定要下架当前服务吗？'),
             h(
                 'div',
                 { style: 'font-size:14px;font-weight:400;color:rgba(0,0,0,0.85)' },
-                '下架后当前应用将不在应用市场展示。'
+                '下架后当前应用将不在服务市场展示。'
             )
         ]),
         type: 'warning',
@@ -309,7 +368,60 @@ const handleOfflineConfirm = () => {
 }
 
 // 上架应用
-const handleOnline = () => {}
+const handleOnline = () => {
+    ElMessageBox.confirm('', {
+        message: h('p', null, [
+            h('div', { style: 'font-size:18px;color:rgba(0,0,0,0.85)' }, '你确定要上架当前服务吗？'),
+            h(
+                'div',
+                { style: 'font-size:14px;font-weight:400;color:rgba(0,0,0,0.85)' },
+                '上架后当前服务将不可再编辑修改。'
+            )
+        ]),
+        type: 'warning',
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        showClose: false,
+        customClass: 'messageBox-wrap'
+    })
+        .then(async () => {
+            /**
+             * 创建上架申请
+             * innerVisible.value = true 是上架成功后，打开一个弹窗提示用户上架成功了
+             */
+            const detailRst = await $service.myCreateDetailByUid(props.detail?.uid)
+            console.log(`detailRst=${JSON.stringify(detailRst)}`)
+            // 重复申请检查
+            const applicant = `${userInfo?.metadata?.did}::${userInfo?.metadata?.did}`
+            const approver = 'did:ethr:0x07e4:0x036bc5c8f6807d1c550b383b7c20038b1fee4e0e2e5e9bbf53db1961ad9189246e::did:ethr:0x07e4:0x036bc5c8f6807d1c550b383b7c20038b1fee4e0e2e5e9bbf53db1961ad9189246e'// 审批人身份，list[did::name]，先写死，固定的审批人，后续改成从 kv 配置表里获取
+            const searchList = await $audit.search({name: detailRst.name})
+            if (searchList.length > 0) {
+                ElMessageBox.alert('您已申请，无需重复申请', '提示')
+                .then(() => {
+                })
+                .catch(() => {
+                });
+                return
+            }
+            detailRst.operateType = 'service'
+            const meta: AuditAuditMetadata = {
+                uid: generateUuid(),
+                appOrServiceMetadata: JSON.stringify(detailRst),
+                applicant: applicant, // 申请人身份，did::name
+                approver: approver,
+                reason: '上架申请',
+                createdAt: getCurrentUtcString(),
+                updatedAt: getCurrentUtcString(),
+                signature: 'xxx'
+            }
+            const status = await $audit.create(meta)
+            if (status.code === "OK") {
+                innerVisible.value = true
+            }
+        })
+        .catch(() => {})
+}
+
 const afterSubmit = () => {
     dialogVisible.value = false
 }
