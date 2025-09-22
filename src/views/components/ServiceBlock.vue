@@ -205,19 +205,22 @@
 <script lang="ts" setup>
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
-import $service from '@/plugins/service'
-
 import dayjs from 'dayjs'
-
 import { ElMessage, ElMessageBox } from 'element-plus'
 import { h } from 'vue'
 import Popover from '@/views/components/Popover.vue'
 import ApplyUseModal from './ApplyUseModal.vue'
 import ConfigServiceModal from './ConfigServiceModal.vue'
 import ResultChooseModal from './ResultChooseModal.vue'
+import { userInfo } from '@/plugins/account'
+import $audit, { AuditAuditMetadata } from '@/plugins/audit'
+import $service from '@/plugins/service'
+import { generateUuid, getCurrentUtcString } from '@/utils/common'
 
 const confirmUnbind = async () => {
     // 执行解绑逻辑
+    await $service.unbind(props.detail?.uid)
+    
 }
 
 const StatusInfo = {
@@ -252,9 +255,7 @@ const dialogVisible = ref(false)
 const modalVisible = ref(false)
 const operateType = ref('service')
 
-import { userInfo } from '@/plugins/account'
-import $audit, { AuditAuditMetadata } from '@/plugins/audit'
-import { generateUuid, getCurrentUtcString } from '@/utils/common'
+
 const router = useRouter()
 const props = defineProps({
     detail: Object,

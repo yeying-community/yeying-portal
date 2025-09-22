@@ -313,6 +313,10 @@ class $application {
         console.log(`r=${JSON.stringify(r)}`)
         return r.body.application
     }
+
+    async unbind(uid: string) {
+        await indexedCache.deleteByKey('services', uid)
+    }
     
     async audit(did, version, passed, signature, auditor, comment) {
         return await applicationProvider.audit(did, version, passed, signature, auditor, comment)

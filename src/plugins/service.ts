@@ -279,5 +279,9 @@ class $service {
         console.log(`r=${JSON.stringify(r)}`)
         return r.body.status
     }
+
+    async unbind(uid: string) {
+        await indexedCache.deleteByKey('services_apply', uid)
+    }
 }
 export default new $service()

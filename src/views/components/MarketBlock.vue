@@ -247,7 +247,7 @@ const props = defineProps({
 
 const isOwner = userInfo?.metadata?.did === props.detail?.owner
 const confirmUnbind = async () => {
-    // 执行解绑逻辑
+    await $application.unbind(props.detail?.uid)
 }
 const innerVisible = ref(false)
 const dialogVisible = ref(false)
