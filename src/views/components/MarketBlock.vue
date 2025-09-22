@@ -351,15 +351,15 @@ const handleOffline = async () => {
             type: 'success'
         })
         props.refreshCardList()
-    }
-    const applicant = `${userInfo?.metadata?.did}::${userInfo?.metadata?.did}`
-    const detail = await $audit.search({applicant: applicant})
-    const uids = detail.filter((d) => d.meta.reason === `上架申请` && d.meta.appOrServiceMetadata.includes(`"name":"${props.detail?.name}""`)).map((s) => s.meta.uid)
-    // 删除申请
-    for (const item of uids) {
-        await $audit.cancel(item)
-    }
-    
+        const applicant = `${userInfo?.metadata?.did}::${userInfo?.metadata?.did}`
+        const detail = await $audit.search({applicant: applicant})
+        const auditUids = detail.filter((d) => d.meta.appOrServiceMetadata.includes(`"name":"${props.detail?.name}"`)).map((s) => s.meta.uid)
+        console.log(`删除的audit auditUids = ${JSON.stringify(auditUids)}`)
+        // 删除申请
+        for (const item of auditUids) {
+            await $audit.cancel(item)
+        }
+    }    
 }
 
 const handleOfflineConfirm = () => {

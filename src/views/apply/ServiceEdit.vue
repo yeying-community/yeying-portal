@@ -62,7 +62,7 @@
                                         />
                                     </el-select>
                                 </el-form-item>
-                                <el-form-item label="接口代码" prop="serviceCodes">
+                                <el-form-item label="接口代码" prop="apiCodes">
                                     <el-select
                                         v-model="detailInfo.apiCodes"
                                         placeholder="请选择"
@@ -79,14 +79,14 @@
                                     <!-- <el-input v-model="detailInfo.serviceCodes" class="input-style" placeholder="请输入应用访问地址"/> -->
                                 </el-form-item>
 
-                                <el-form-item label="代理地址" prop="location">
+                                <el-form-item label="代理地址" prop="proxy">
                                     <el-input
                                         v-model="detailInfo.proxy"
                                         class="input-style"
                                         placeholder="请输入服务代理地址"
                                     />
                                 </el-form-item>
-                                <el-form-item label="服务地址" prop="hash">
+                                <el-form-item label="服务地址" prop="codePackagePath">
                                     <el-input
                                         v-model="detailInfo.codePackagePath"
                                         class="input-style"
@@ -161,7 +161,8 @@ import ResultChooseModal from '@/views/components/ResultChooseModal.vue'
 import { userInfo } from '@/plugins/account'
 import { v4 as uuidv4 } from 'uuid';
 import { notifyError } from '@/utils/message'
-import $service, {codeMap, serviceCodeMap } from '@/plugins/service'
+import $service, {codeMap, serviceCodeMap, ServiceMetadata } from '@/plugins/service'
+import { getCurrentUtcString } from '@/utils/common'
 
 const route = useRoute()
 const router = useRouter()
@@ -221,11 +222,10 @@ const avatarChk = ref('2')
 const codeChk = ref('2')
 const avatarList = ref([])
 const codeList = ref([])
-const detailInfo = ref({
+const detailInfo = ref<ServiceMetadata>({
     name: '',
     description: '',
     proxy: '',
-    hash: '',
     code: '',
     apiCodes: [],
     avatar: '',
@@ -240,21 +240,20 @@ const handleClick = (e) => {
 }
 const rules = reactive({
     name: [{ required: true, message: '请输入', trigger: 'blur' }],
-    location: [{ required: true, message: '请输入', trigger: 'blur' }],
+    proxy: [{ required: true, message: '请输入', trigger: 'blur' }],
     avatar: [{ required: true, message: '请选择', trigger: 'blur' }],
     code: [{ required: true, message: '请选择', trigger: 'blur' }],
-    serviceCodes: [{ required: true, message: '请选择', trigger: 'blur' }],
+    apiCodes: [{ required: true, message: '请选择', trigger: 'blur' }],
     codePackagePath: [{ required: true, message: '请上传代码包', trigger: 'blur' }]
 })
 const getDetailInfo = async () => {
     if (route.query.uid) {
         isEdit.value = true
         const res = await $service.myCreateDetailByUid(route.query.uid as string)
-        console.log(res, '-detailRes-')
         if (res) {
             detailInfo.value = res
             detailInfo.value.code = String(res.code)
-            detailInfo.value.serviceCodes = res.serviceCodes.map((v) => String(v))
+            detailInfo.value.apiCodes = res.apiCodes.map((v) => String(v))
             avatarChk.value = res.avatar === '1' ? '1' : '2'
             avatarList.value =
                 res.avatar !== '1'
@@ -294,9 +293,9 @@ const submitForm = async (formEl, andOnline) => {
                 rr.codePackagePath = params.codePackagePath
                 rr.codeType = params.codeType
                 rr.description = params.description
-                rr.location = params.location
+                rr.proxy = params.proxy
                 rr.name = params.name
-                rr.serviceCodes = params.serviceCodes
+                rr.apiCodes = params.apiCodes
                 const myCreateUpdate = await $service.myCreateUpdate(rr)
                 console.log(`myCreateUpdate=${JSON.stringify(myCreateUpdate)}`)
                 if (!andOnline) {
@@ -312,6 +311,8 @@ const submitForm = async (formEl, andOnline) => {
                 params.did = uuidv4() // 暂时先mock
                 params.version = userInfo?.metadata?.version
                 params.owner = userInfo?.metadata?.did
+                params.createdAt = getCurrentUtcString()
+                params.updatedAt = getCurrentUtcString()
                 const createRes = await $service.create(params)
                 console.log(`createRes=${JSON.stringify(createRes)}`)
                 innerVisible.value = true
