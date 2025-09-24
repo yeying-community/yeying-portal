@@ -38,7 +38,7 @@
   <ResultChooseModal
     v-model="innerVisible"
     title="申请使用"
-    mainDesc="应用/服务申请中"
+    mainDesc="应用/服务申请中,请联系应用 owner 审批"
     subDesc="正在等待应用/服务所有人审批，请耐心等待"
     leftBtnText="查看详情"
     rightBtnText="返回列表"
@@ -66,6 +66,7 @@ import { v4 as uuidv4 } from 'uuid';
 import { generateUuid, getCurrentUtcString } from '@/utils/common'
 import { ElMessageBox } from 'element-plus'
 
+const mainMsg = ref<string>()
 const innerVisible = ref(false)
 const formRef = ref(null)
 const form = reactive({
@@ -101,8 +102,6 @@ const submitForm = () => {
         sourceDid: userInfo?.metadata?.did,
         reason: applyReason,
       }
-      // todo 调用接口成功后的操作
-      innerVisible.value = true
       // props.afterSubmit();
         console.log(`申请使用 detail = ${JSON.stringify(props.detail)}`)
         let detailRst = null
@@ -174,12 +173,11 @@ const submitForm = () => {
             detailRstService.uid = uuidv4()
             const r = await $service.myApplyCreate(detailRstService)
             console.log(`r=${JSON.stringify(r)}`)
+            innerVisible.value = true
           }
- 
         } catch (e) {
             notifyError(`❌创建申请的应用/服务异常，error=${e}`)
         }
-        ElMessageBox.alert(`申请中，请联系 ${props.detail.owner} 审批', '申请使用`)
     } else {
       notifyError('❌请先填写申请原因')
     }
@@ -190,8 +188,8 @@ const toDetail = () => {
   router.push({
     path: '/market/apply-detail',
     query: {
-      did: props.detail.did,
-      version: props.detail.version,
+      did: props.detail?.did,
+      version: props.detail?.version,
     },
   })
 }
