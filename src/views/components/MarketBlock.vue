@@ -178,9 +178,9 @@
     <ConfigServiceModal :modalVisible="modalVisible" :cancelModal="cancelModal" />
     <ResultChooseModal
         v-model="innerVisible"
-        title="应用上架成功"
-        mainDesc="应用上架成功"
-        subDesc="应用已成功上架至应用市场"
+        title="应用上架申请"
+        mainDesc="应用上架申请中，联系管理员审批"
+        subDesc="应用申请上架"
         leftBtnText="查看详情"
         rightBtnText="返回列表"
         :leftBtnClick="toDetail"

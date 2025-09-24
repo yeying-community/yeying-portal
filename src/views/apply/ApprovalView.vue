@@ -81,7 +81,7 @@
 
                     <el-form-item>
                         <el-button @click="onReset(formRef)">重置</el-button>
-                        <el-button type="primary" @click="onSubmit(formRef)">查询</el-button>
+                        <el-button type="primary" @click="onSubmit()">查询</el-button>
                     </el-form-item>
                 </el-form>
             </div>
@@ -207,8 +207,9 @@ function convertApplicationMetadata(auditMyApply: AuditAuditDetail[]) {
 const tableData = ref<AuditDetailBox[]>([])
 
 const search = async () => {
+    console.log(`formInline=${JSON.stringify(formInline)}`)
     const approver = `${userInfo?.metadata?.did}::${userInfo?.metadata?.did}`
-    const auditMyApply: AuditAuditDetail[] = await $audit.search({approver: approver})
+    const auditMyApply: AuditAuditDetail[] = await $audit.search({approver: approver, name: formInline.appName})
 
     let res: AuditDetailBox[] = convertApplicationMetadata(auditMyApply)
     console.log(`res=${JSON.stringify(res)}`)
