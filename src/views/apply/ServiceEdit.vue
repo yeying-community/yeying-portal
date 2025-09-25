@@ -286,6 +286,16 @@ const submitForm = async (formEl, andOnline) => {
     await formEl.validate(async (valid: boolean, fields) => {
         if (valid) {
             const params = JSON.parse(JSON.stringify(detailInfo.value))
+            const existsList = await $service.myCreateList(userInfo?.metadata?.did)
+            console.log(`existsList=${JSON.stringify(existsList)}`)
+            if (Array.isArray(existsList)) {
+                for (const item of existsList) {
+                    if (item.name === params.name) {
+                        notifyError(`❌ 服务[${params.name}]已存在，请勿重复创建 `)
+                        return
+                    }
+                }
+            }
             params.codeType = codeChk.value
             if (route.query.uid) {
                 const rr = await $service.myCreateDetailByUid(route.query.uid as string)

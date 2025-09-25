@@ -146,7 +146,8 @@ const detailInfo = ref<ApplicationDetail>({
     code: '',
     serviceCodes: [],
     avatar: '',
-    owner: ''
+    owner: '',
+    codePackagePath: ''
 })
 const { uid: string = '', pageFrom = '' } = route.query || {}
 const innerVisible = ref(false)
