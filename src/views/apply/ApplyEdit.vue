@@ -171,6 +171,7 @@ import { SuccessFilled } from '@element-plus/icons-vue'
 import ResultChooseModal from '@/views/components/ResultChooseModal.vue'
 import { userInfo } from '@/plugins/account'
 import { v4 as uuidv4 } from 'uuid';
+import { notifyError } from '@/utils/message'
 
 const route = useRoute()
 const router = useRouter()
@@ -273,6 +274,18 @@ const submitForm = async (formEl, andOnline) => {
         if (valid) {
             const params = JSON.parse(JSON.stringify(detailInfo.value))
             console.log(`创建应用表单参数=${JSON.stringify(params)}`)
+            // 重复检查
+            console.log(`userInfo?.metadata?.did=${JSON.stringify(userInfo?.metadata?.did)}`)
+            const existsList = await $application.myCreateList(userInfo?.metadata?.did)
+            console.log(`existsList=${JSON.stringify(existsList)}`)
+            if (Array.isArray(existsList)) {
+                for (const item of existsList) {
+                    if (item.name === params.name) {
+                        notifyError(`❌ 应用[${params.name}]已存在，请勿重复创建 `)
+                        return
+                    }
+                }
+            }
             params.codeType = codeChk.value
             if (route.query.uid) {
                 const rr = await $application.myCreateDetailByUid(route.query.uid as string)

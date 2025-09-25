@@ -315,7 +315,8 @@ class $application {
     }
 
     async unbind(uid: string) {
-        await indexedCache.deleteByKey('services', uid)
+        console.log(`解绑应用=${uid}`)
+        await indexedCache.deleteByKey('applications', uid)
     }
     
     async audit(did, version, passed, signature, auditor, comment) {

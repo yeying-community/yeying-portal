@@ -38,7 +38,7 @@
   <ResultChooseModal
     v-model="innerVisible"
     title="申请使用"
-    mainDesc="应用/服务申请中,请联系应用 owner 审批"
+    mainDesc="应用/服务申请中,请联系应用/服务 owner 审批"
     subDesc="正在等待应用/服务所有人审批，请耐心等待"
     leftBtnText="查看详情"
     rightBtnText="返回列表"
