@@ -100,6 +100,7 @@ function cvData(auditMyApply: AuditAuditDetail) {
     const rawData = JSON.parse(auditMyApply.meta.appOrServiceMetadata);
     const metadata: ApplicationMetadata = {
         owner: rawData.owner,
+        ownerName: rawData.ownerName,
         did: rawData.did,
         version: rawData.version,
         hash: rawData.hash,
