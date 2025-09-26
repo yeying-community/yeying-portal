@@ -1,4 +1,5 @@
 import { indexedCache } from './account'
+import { userInfo } from '@/plugins/account'
 
 export const ApplyStatusMap = {
     1: '申请中',
@@ -77,6 +78,7 @@ export enum CommonApiCodeEnum {
 
 export interface ServiceMetadata {
     owner?: string;
+    ownerName?: string
     network?: string;
     address?: string;
     did?: string;
@@ -137,6 +139,7 @@ class $service {
     }
 
     async create(params: ServiceMetadata) {
+        params.ownerName = userInfo?.metadata?.name
         await indexedCache.insert('services', params)
     }
 
@@ -162,6 +165,7 @@ class $service {
     }
 
     async myCreateUpdate(params) {
+        params.ownerName = userInfo?.metadata?.name
         return await indexedCache.updateByKey("services", {
             uid: params.uid,
             ...params
@@ -180,6 +184,7 @@ class $service {
     }
 
     async online(service: ServiceMetadata) {
+        service.ownerName = userInfo?.metadata?.name
         const header = {
             "did": "xxxx"
         }
@@ -246,6 +251,7 @@ class $service {
     }
 
     async myApplyCreate(params: ServiceMetadata) {
+        params.ownerName = userInfo?.metadata?.name
         await indexedCache.insert('services_apply', params)
     }
 
