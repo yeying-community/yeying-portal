@@ -187,22 +187,23 @@ const submitForm = () => {
                             console.log(`service=${service}`)
                         }
         
-                    } else if (reasonRes.meta.reason === '申请使用') {
-                        try {
-                            const detailRst = await $application.detail(appOrService.did, appOrService.version)
-                            if (detailRst === undefined || detailRst === null) {
-                                notifyError("❌应用不存在")
-                                return
-                            }
-                            detailRst.applyOwner = userInfo?.metadata?.did
-                            detailRst.uid = uuidv4()
-
-                            const r = await $application.myApplyCreate(detailRst)
-                            console.log(`r=${JSON.stringify(r)}`)
-                        } catch (e) {
-                            notifyError(`❌创建申请的应用/服务异常，error=${e}`)
-                        }
                     }
+                    //  else if (reasonRes.meta.reason === '申请使用') {
+                    //     try {
+                    //         const detailRst = await $application.detail(appOrService.did, appOrService.version)
+                    //         if (detailRst === undefined || detailRst === null) {
+                    //             notifyError("❌应用不存在")
+                    //             return
+                    //         }
+                    //         detailRst.applyOwner = userInfo?.metadata?.did
+                    //         detailRst.uid = uuidv4()
+
+                    //         const r = await $application.myApplyCreate(detailRst)
+                    //         console.log(`r=${JSON.stringify(r)}`)
+                    //     } catch (e) {
+                    //         notifyError(`❌创建申请的应用/服务异常，error=${e}`)
+                    //     }
+                    // }
                     
                 } catch (e) {
                     console.log(e)

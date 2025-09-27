@@ -20,6 +20,9 @@
                         {{ dayjs(detail.createdAt).format('YYYY-MM-DD') }}</span
                     >
                 </div>
+                <div class="desc">所有者名称：
+                    {{ detail.ownerName }}
+                </div>
                 <div class="desc">
                     {{ detail.description }}
                 </div>

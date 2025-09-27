@@ -16,7 +16,7 @@
             <div v-if="urlQuery.pageFrom === 'myCreate'">
                 <div v-if="isOnline">
                     <el-button plain>导出身份</el-button>
-                    <el-button type="danger" plain>下架应用</el-button>
+                    <el-button type="danger" plain>下架服务</el-button>
                 </div>
                 <div v-else>
                     <el-popconfirm
@@ -24,7 +24,7 @@
                         cancel-button-text="取消"
                         :icon="WarningFilled"
                         icon-color="#FB9A0E"
-                        title="您确定要删除该应用吗？"
+                        title="您确定要删除该服务吗？"
                         width="220px"
                         @confirm="toDelete"
                     >
@@ -33,13 +33,13 @@
 
                     <el-button plain>导出身份</el-button>
                     <el-button plain>编辑</el-button>
-                    <el-button type="danger" plain>上架应用</el-button>
+                    <el-button type="danger" plain>上架服务</el-button>
                 </div>
             </div>
             <!-- 服务中心-我的申请的详情 -->
             <div v-if="urlQuery.pageFrom === 'myApply'">
                 <div>
-                    <el-button type="danger">解绑应用</el-button>
+                    <el-button type="danger">解绑服务</el-button>
                     <el-button plain>配置服务</el-button>
                 </div>
             </div>
@@ -48,7 +48,7 @@
         <div class="part">
             <el-row class="count-row">
                 <el-col :span="4" :xs="24"
-                    >绑定应用数:
+                    >绑定服务数:
                     <div style="font-weight: 500; font-size: 30px">{{ detailInfo.bindApplyCount || '-' }}</div></el-col
                 >
                 <el-col :span="1" :xs="24"> <el-divider direction="vertical" /></el-col>
@@ -70,7 +70,7 @@
                 <el-col :span="24">创建时间: {{ detailInfo.createTime }}</el-col>
             </el-row>
             <el-row class="part-row">
-                <el-col :span="24">应用描述: {{ detailInfo.description }}</el-col>
+                <el-col :span="24">服务描述: {{ detailInfo.description }}</el-col>
             </el-row>
         </div>
         <div class="part">
