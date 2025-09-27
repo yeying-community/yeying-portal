@@ -166,6 +166,7 @@ const search = async () => {
         const res = await $application.search(condition, pagination.value.page, pagination.value.pageSize)
         if (Array.isArray(res)) {
             applicationList.value = res
+            console.log(`applicationList=${JSON.stringify(applicationList.value)}`)
         } else {
             console.warn('Expected array, but got:', res)
             applicationList.value = []

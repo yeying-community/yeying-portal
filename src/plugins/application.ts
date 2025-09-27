@@ -292,7 +292,6 @@ class $application {
     }
 
     async online(application: ApplicationMetadata) {
-        application.ownerName = userInfo?.metadata?.name
         const header = {
             "did": "xxxx"
         }

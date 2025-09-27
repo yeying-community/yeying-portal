@@ -184,7 +184,6 @@ class $service {
     }
 
     async online(service: ServiceMetadata) {
-        service.ownerName = userInfo?.metadata?.name
         const header = {
             "did": "xxxx"
         }
