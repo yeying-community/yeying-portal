@@ -100,6 +100,7 @@ function cvData(auditMyApply: AuditAuditDetail) {
     const rawData = JSON.parse(auditMyApply.meta.appOrServiceMetadata);
     const metadata: ApplicationMetadata = {
         owner: rawData.owner,
+        ownerName: rawData.ownerName,
         did: rawData.did,
         version: rawData.version,
         hash: rawData.hash,
@@ -165,6 +166,7 @@ const search = async () => {
         const res = await $application.search(condition, pagination.value.page, pagination.value.pageSize)
         if (Array.isArray(res)) {
             applicationList.value = res
+            console.log(`applicationList=${JSON.stringify(applicationList.value)}`)
         } else {
             console.warn('Expected array, but got:', res)
             applicationList.value = []

@@ -1,6 +1,7 @@
 import { indexedCache } from './account'
 import { setLocalStorage, getLocalStorage } from '@/utils/common'
 import { createIdentity } from '@yeying-community/yeying-web3'
+import { userInfo } from '@/plugins/account'
 
 export interface ApplicationDetail {
     name: string
@@ -11,6 +12,7 @@ export interface ApplicationDetail {
     serviceCodes: string[]
     avatar: string
     owner: string
+    ownerName: string
     codePackagePath: string
 }
 
@@ -52,6 +54,7 @@ export const serviceCodeMap = {
 }
 export interface ApplicationMetadata {
     owner?: string;
+    ownerName?: string;
     network?: string;
     address?: string;
     did?: string;
@@ -85,6 +88,7 @@ class $application {
      * @param {*} params 
      */
     async create(params: ApplicationMetadata) {
+        params.ownerName = userInfo?.metadata?.name
         await indexedCache.insert('applications', params)
     }
     /**
@@ -107,6 +111,7 @@ class $application {
     }
 
     async myCreateUpdate(params) {
+        params.ownerName = userInfo?.metadata?.name
         return await indexedCache.updateByKey("applications", {
             uid: params.uid,
             ...params
@@ -188,6 +193,7 @@ class $application {
     }
 
     async myApplyCreate(params: ApplicationMetadata) {
+        params.ownerName = userInfo?.metadata?.name
         await indexedCache.insert('applications_apply', params)
     }
 
@@ -196,6 +202,7 @@ class $application {
     }
 
     async update(params) {
+        params.ownerName = userInfo?.metadata?.name
         // return await applicationProvider.create(params);
         // return new Promise((resolve, reject) => {
         //   resolve(params)
