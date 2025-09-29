@@ -12,6 +12,8 @@ import {
 import { $account } from '@yeying-community/yeying-wallet'
 import $service from "@/plugins/service";
 import { Identity, SecurityAlgorithm } from '@yeying-community/yeying-web3';
+import $minio  from "@/plugins/minio";
+
 
 let namespaceProvider = null
 let uploader = null
