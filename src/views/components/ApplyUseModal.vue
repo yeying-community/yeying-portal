@@ -139,12 +139,18 @@ const submitForm = () => {
         const meta: AuditAuditMetadata = {
             uid: auditUid,
             appOrServiceMetadata: JSON.stringify(detailRst),
+            auditType: '',
             applicant: applicant, // 申请人身份，did::name
             approver: approver,
             reason: '申请使用',
             createdAt: getCurrentUtcString(),
             updatedAt: getCurrentUtcString(),
             signature: 'xxx'
+        }
+        if (props.operateType === `application`) {
+          meta.auditType = 'application'
+        } else if (props.operateType === `service`) {
+          meta.auditType = 'service'
         }
         const auditR = await $audit.create(meta)
         console.log(`auditR=${JSON.stringify(auditR)}`)

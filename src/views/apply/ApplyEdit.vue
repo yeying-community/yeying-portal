@@ -40,7 +40,7 @@
                                 <div v-else>
                                     <img
                                         class="mr-1 w-7 h-7"
-                                        src="../../assets/img/apply_default.png"
+                                        :src="imageUrl"
                                         style="border-radius: 8px"
                                     />
                                 </div>
@@ -173,6 +173,9 @@ import { userInfo } from '@/plugins/account'
 import { v4 as uuidv4 } from 'uuid';
 import { notifyError } from '@/utils/message'
 
+const defaultAvatar = import.meta.env.VITE_MINIO_AVATAR
+const imageUrl = ref(defaultAvatar);
+
 const route = useRoute()
 const router = useRouter()
 
@@ -215,6 +218,7 @@ const detailInfo = ref<ApplicationDetail>({
     serviceCodes: [],
     avatar: '',
     owner: '',
+    ownerName: '',
     codePackagePath: ''
 })
 
@@ -268,7 +272,7 @@ const getDetailInfo = async () => {
 const submitForm = async (formEl, andOnline) => {
     if (!formEl) return
     if (avatarChk.value == '1') {
-        detailInfo.value.avatar = '1'
+        detailInfo.value.avatar = defaultAvatar
     }
     await formEl.validate(async (valid: boolean, fields) => {
         if (valid) {
@@ -295,6 +299,8 @@ const submitForm = async (formEl, andOnline) => {
                 rr.description = params.description
                 rr.location = params.location
                 rr.name = params.name
+                rr.owner = userInfo?.metadata?.did
+                rr.ownerName = userInfo?.metadata?.name
                 rr.serviceCodes = params.serviceCodes
                 const myCreateUpdate = await $application.myCreateUpdate(rr)
                 console.log(`myCreateUpdate=${JSON.stringify(myCreateUpdate)}`)
@@ -311,6 +317,7 @@ const submitForm = async (formEl, andOnline) => {
                 params.did = uuidv4() // 暂时先mock
                 params.version = userInfo?.metadata?.version
                 params.owner = userInfo?.metadata?.did
+                params.ownerName = userInfo?.metadata?.name
                 const result = await $application.create(params)
                 console.log(`result=${JSON.stringify(result)}`)
                 innerVisible.value = true

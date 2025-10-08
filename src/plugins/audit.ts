@@ -1,6 +1,7 @@
 export interface AuditAuditMetadata {
     uid?: string;
     appOrServiceMetadata?: string;
+    auditType?: string
     applicant?: string;
     approver?: string;
     reason?: string;

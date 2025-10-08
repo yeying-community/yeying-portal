@@ -411,6 +411,7 @@ const handleOnline = () => {
             const meta: AuditAuditMetadata = {
                 uid: generateUuid(),
                 appOrServiceMetadata: JSON.stringify(detailRst),
+                auditType: 'service',
                 applicant: applicant, // 申请人身份，did::name
                 approver: approver,
                 reason: '上架申请',

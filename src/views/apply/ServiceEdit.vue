@@ -42,7 +42,7 @@
                                 <div v-else>
                                     <img
                                         class="mr-1 w-7 h-7"
-                                        src="../../assets/img/apply_default.png"
+                                        :src="imageUrl"
                                         style="border-radius: 8px"
                                     />
                                 </div>
@@ -164,6 +164,8 @@ import { notifyError } from '@/utils/message'
 import $service, {codeMap, serviceCodeMap, ServiceMetadata } from '@/plugins/service'
 import { getCurrentUtcString } from '@/utils/common'
 
+const defaultAvatar = import.meta.env.VITE_MINIO_AVATAR
+const imageUrl = ref(defaultAvatar);
 const route = useRoute()
 const router = useRouter()
 
@@ -230,6 +232,7 @@ const detailInfo = ref<ServiceMetadata>({
     apiCodes: [],
     avatar: '',
     owner: '',
+    ownerName: '',
     codePackagePath: ''
 })
 
@@ -281,7 +284,7 @@ const getDetailInfo = async () => {
 const submitForm = async (formEl, andOnline) => {
     if (!formEl) return
     if (avatarChk.value == '1') {
-        detailInfo.value.avatar = '1'
+        detailInfo.value.avatar = defaultAvatar
     }
     await formEl.validate(async (valid: boolean, fields) => {
         if (valid) {
@@ -306,6 +309,8 @@ const submitForm = async (formEl, andOnline) => {
                 rr.proxy = params.proxy
                 rr.name = params.name
                 rr.apiCodes = params.apiCodes
+                rr.owner = userInfo?.metadata?.did
+                rr.ownerName = userInfo?.metadata?.name
                 const myCreateUpdate = await $service.myCreateUpdate(rr)
                 console.log(`myCreateUpdate=${JSON.stringify(myCreateUpdate)}`)
                 if (!andOnline) {
@@ -321,6 +326,7 @@ const submitForm = async (formEl, andOnline) => {
                 params.did = uuidv4() // 暂时先mock
                 params.version = userInfo?.metadata?.version
                 params.owner = userInfo?.metadata?.did
+                params.ownerName = userInfo?.metadata?.name
                 params.createdAt = getCurrentUtcString()
                 params.updatedAt = getCurrentUtcString()
                 const createRes = await $service.create(params)

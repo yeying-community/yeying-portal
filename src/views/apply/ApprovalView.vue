@@ -189,7 +189,7 @@ function cvData(auditMyApply: AuditAuditDetail) {
         uid: auditMyApply.meta.uid,
         name: rawData.name,
         desc: rawData.description,
-        serviceType: rawData.code,
+        serviceType: auditMyApply.meta.auditType,
         applicantor: did,
         state: getState(auditMyApply.commentMeta),
         date: auditMyApply.meta.createdAt
