@@ -172,6 +172,7 @@ import ResultChooseModal from '@/views/components/ResultChooseModal.vue'
 import { userInfo } from '@/plugins/account'
 import { v4 as uuidv4 } from 'uuid';
 import { notifyError } from '@/utils/message'
+import $minio  from "@/plugins/minio";
 
 const defaultAvatar = import.meta.env.VITE_MINIO_AVATAR
 const imageUrl = ref(defaultAvatar);
@@ -271,9 +272,7 @@ const getDetailInfo = async () => {
 
 const submitForm = async (formEl, andOnline) => {
     if (!formEl) return
-    if (avatarChk.value == '1') {
-        detailInfo.value.avatar = defaultAvatar
-    }
+    detailInfo.value.avatar = imageUrl.value
     await formEl.validate(async (valid: boolean, fields) => {
         if (valid) {
             const params = JSON.parse(JSON.stringify(detailInfo.value))
@@ -346,7 +345,7 @@ const submitFormAndOnline = (formEl) => {
     submitForm(formEl, true)
 }
 const changeFileAvatar = (uploadFile) => {
-    console.log(uploadFile, '--uploader-666')
+    console.log(uploadFile)
     changeFile(1, uploadFile)
 }
 const changeFileCode = (uploadFile) => {
@@ -354,37 +353,59 @@ const changeFileCode = (uploadFile) => {
 }
 
 const changeFile = async (fileType, uploadFile) => {
-    const namespaceId = await $application.getNameSpaceId()
+    // const namespaceId = await $application.getNameSpaceId()
 
     // curImg.value.name = uploadFile.name;
     // curImg.value.size = (uploadFile.size / 1024).toFixed(1) + "M";
 
-    if (namespaceId && uploadFile) {
-        try {
-            const uploader = await $application.uploads(uploadFile.raw, namespaceId)
+    // if (namespaceId && uploadFile) {
+    //     try {
+    //         const uploader = await $application.uploads(uploadFile.raw, namespaceId)
 
-            const params = {
-                namespaceId,
-                hash: uploader.hash,
-                type: 1,
-                duration: 3600,
-                name: uploader.name
-            }
+    //         const params = {
+    //             namespaceId,
+    //             hash: uploader.hash,
+    //             type: 1,
+    //             duration: 3600,
+    //             name: uploader.name
+    //         }
 
-            const linkInfo = await $application.createLink(params)
-            const url = linkInfo && linkInfo.url && linkInfo.url.url
-            if (fileType == 1) {
-                detailInfo.value.avatar = url
-                detailInfo.value.avatarName = uploadFile.name
-            } else {
-                detailInfo.value.codePackagePath = url
-                detailInfo.value.codePackageName = uploadFile.name
-                detailInfo.value.hash = uploader.hash
-            }
-        } catch (error) {
-            console.log(error)
-        }
+    //         const linkInfo = await $application.createLink(params)
+    //         const url = linkInfo && linkInfo.url && linkInfo.url.url
+    //         if (fileType == 1) {
+    //             detailInfo.value.avatar = url
+    //             detailInfo.value.avatarName = uploadFile.name
+    //         } else {
+    //             detailInfo.value.codePackagePath = url
+    //             detailInfo.value.codePackageName = uploadFile.name
+    //             detailInfo.value.hash = uploader.hash
+    //         }
+    //     } catch (error) {
+    //         console.log(error)
+    //     }
+    // }
+
+    const presignedUrl = await $minio.getUploadUrl(uploadFile.name)
+    console.log(`presignedUrl=${presignedUrl}`)
+
+    // 2. 使用预签名 URL 上传文件
+    const uploadRes = await fetch(presignedUrl, {
+      method: 'PUT',
+      body: uploadFile.value,
+      headers: {
+        'Content-Type': fileType || 'application/octet-stream',
+      },
+    });
+
+    console.log(`uploadRes.status=${uploadRes.status}`)
+    if (uploadRes.status !== 200) {
+        console.error(`文件上传失败=${uploadRes.status} - ${uploadRes.json}`)
+        notifyError(`文件上传失败=${uploadRes.status} - ${uploadRes.json}`)
+        return
     }
+    imageUrl.value = uploadFile.name
+    
+
 }
 const getUserInfo = async () => {
     const info = await $account.getActiveIdentity()
