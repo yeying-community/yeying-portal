@@ -11,7 +11,7 @@ import {
 
 import { $account } from '@yeying-community/yeying-wallet'
 import $service from "@/plugins/service";
-import { Identity, SecurityAlgorithm } from '@yeying-community/yeying-web3';
+import { createIdentity, Identity, IdentityApplicationExtend, IdentityCodeEnum, IdentityTemplate, NetworkTypeEnum, SecurityAlgorithm, serializeIdentityToJson, verifyIdentity } from '@yeying-community/yeying-web3';
 import $minio  from "@/plugins/minio";
 
 
@@ -90,6 +90,46 @@ async function initializeProviders() {
 
     auditProvider = new AuditProvider(serviceProviderOption)
     serviceCenterProvider = new ServiceProvider(serviceProviderOption)
+}
+
+/**
+ * 生成身份
+ * @param code 
+ * @param serviceCodes 
+ * @param location 
+ * @param hash 
+ * @param name 
+ * @param description 
+ * @param avatar 
+ * @param password 
+ * @returns 
+ */
+export async function generateIdentity(code: string, serviceCodes: string, location: string, hash: string, name: string, description: string, avatar: string, password: string) {
+    const extend = IdentityApplicationExtend.create({
+        code: code,
+        serviceCodes: serviceCodes,
+        location: location,
+        hash: hash
+    })
+
+    const template: IdentityTemplate = {
+        language: "LANGUAGE_CODE_ZH_CH",
+        parent: "",
+        network: NetworkTypeEnum.NETWORK_TYPE_YEYING,
+        code: IdentityCodeEnum.IDENTITY_CODE_APPLICATION,
+        name: name,
+        description: description,
+        avatar: avatar,
+        extend: extend,
+    }
+
+    const identity = await createIdentity(template, password)
+    const success = await verifyIdentity(identity)
+    if (!success) {
+        throw new Error("create identity error")
+    }
+    // return serializeIdentityToJson(identity)
+    return identity
 }
 
 export {

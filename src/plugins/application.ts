@@ -14,6 +14,8 @@ export interface ApplicationDetail {
     owner: string
     ownerName: string
     codePackagePath: string
+    password: string
+    password2: string
 }
 
 // 应用编码

@@ -7,6 +7,8 @@ interface ImportMetaEnv {
   readonly VITE_MINIO_SECRET_KEY: string
   readonly VITE_MINIO_BUCKET: string
   readonly VITE_MINIO_AVATAR: string
+  readonly VITE_MINIO_HTTP_PROTOCOL: string
+  readonly VITE_MINIO_PORT: string
 }
 
 interface ImportMeta {

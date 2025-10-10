@@ -18,6 +18,12 @@
                                 <el-form-item label="服务名称" prop="name">
                                     <el-input v-model="detailInfo.name" class="input-style" placeholder="请输入" />
                                 </el-form-item>
+                                <el-form-item label="身份密码" prop="password">
+                                    <el-input v-model="detailInfo.password" type="password" class="input-style" placeholder="请输入" />
+                                </el-form-item>
+                                <el-form-item label="身份密码确认" prop="password2">
+                                    <el-input v-model="detailInfo.password2" type="password" class="input-style" placeholder="请输入" />
+                                </el-form-item>
                                 <el-form-item label="服务描述" prop="description">
                                     <el-input
                                         v-model="detailInfo.description"
@@ -158,7 +164,7 @@ import { ElMessageBox } from 'element-plus'
 import { h } from 'vue'
 import { SuccessFilled } from '@element-plus/icons-vue'
 import ResultChooseModal from '@/views/components/ResultChooseModal.vue'
-import { userInfo } from '@/plugins/account'
+import { generateIdentity, userInfo } from '@/plugins/account'
 import { v4 as uuidv4 } from 'uuid';
 import { notifyError } from '@/utils/message'
 import $service, {codeMap, serviceCodeMap, ServiceMetadata } from '@/plugins/service'
@@ -166,7 +172,13 @@ import { getCurrentUtcString } from '@/utils/common'
 import $minio  from "@/plugins/minio";
 
 const defaultAvatar = import.meta.env.VITE_MINIO_AVATAR
-const imageUrl = ref(defaultAvatar);
+const protocol = import.meta.env.VITE_MINIO_HTTP_PROTOCOL
+const endpoint = import.meta.env.VITE_MINIO_ENDPOINT
+const port = import.meta.env.VITE_MINIO_PORT
+const bucket = import.meta.env.VITE_MINIO_BUCKET
+const prefixURL = `${protocol}${endpoint}:${port}/${bucket}`
+const imageUrl = ref(`${prefixURL}/${defaultAvatar}`);
+
 const route = useRoute()
 const router = useRouter()
 
@@ -234,7 +246,9 @@ const detailInfo = ref<ServiceMetadata>({
     avatar: '',
     owner: '',
     ownerName: '',
-    codePackagePath: ''
+    codePackagePath: '',
+    password: '',
+    password2: ''
 })
 
 const innerVisible = ref(false)
@@ -244,6 +258,8 @@ const handleClick = (e) => {
 }
 const rules = reactive({
     name: [{ required: true, message: '请输入', trigger: 'blur' }],
+    password: [{ required: true, message: '请输入', trigger: 'blur' }],
+    password2: [{ required: true, message: '请输入', trigger: 'blur' }],
     proxy: [{ required: true, message: '请输入', trigger: 'blur' }],
     avatar: [{ required: true, message: '请选择', trigger: 'blur' }],
     code: [{ required: true, message: '请选择', trigger: 'blur' }],
@@ -321,9 +337,14 @@ const submitForm = async (formEl, andOnline) => {
                      */
                 }
             } else {
+                if (params.password !== params.password2) {
+                    notifyError("2次密码输入不一致")
+                    return
+                }
                 params.uid = uuidv4()
-                params.did = uuidv4() // 暂时先mock
-                params.version = userInfo?.metadata?.version
+                const identity = await generateIdentity(params.code, params.apiCodes, params.location, params.hash, params.name, params.description,params.avatar, params.password)
+                params.did = identity.metadata?.did
+                params.version = identity?.metadata?.version
                 params.owner = userInfo?.metadata?.did
                 params.ownerName = userInfo?.metadata?.name
                 params.createdAt = getCurrentUtcString()

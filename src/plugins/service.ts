@@ -94,6 +94,9 @@ export interface ServiceMetadata {
     updatedAt?: string;
     signature?: string;
     codePackagePath?: string;
+    password: string
+    password2: string
+
 }
 
 
