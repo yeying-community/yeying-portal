@@ -251,6 +251,8 @@ const detailInfo = ref<ServiceMetadata>({
     password2: ''
 })
 
+const codeUrl = ref(detailInfo.value.codePackagePath)
+
 const innerVisible = ref(false)
 const userMeta = ref({})
 const handleClick = (e) => {
@@ -301,6 +303,7 @@ const getDetailInfo = async () => {
 const submitForm = async (formEl, andOnline) => {
     if (!formEl) return
     detailInfo.value.avatar = imageUrl.value
+    detailInfo.value.codePackagePath = codeUrl.value
     await formEl.validate(async (valid: boolean, fields) => {
         if (valid) {
             const params = JSON.parse(JSON.stringify(detailInfo.value))
@@ -415,7 +418,7 @@ const changeFile = async (fileType, uploadFile) => {
       method: 'PUT',
       body: uploadFile.value,
       headers: {
-        'Content-Type': fileType || 'application/octet-stream',
+        'Content-Type': 'application/octet-stream',
       },
     });
 
@@ -425,7 +428,11 @@ const changeFile = async (fileType, uploadFile) => {
         notifyError(`文件上传失败=${uploadRes.status} - ${uploadRes.json}`)
         return
     }
-    imageUrl.value = uploadFile.name
+    if (fileType === 1) {
+        imageUrl.value = uploadFile.name
+    } else if (fileType === 2) {
+        codeUrl.value = uploadFile.name
+    }
     
 }
 
