@@ -18,6 +18,12 @@
                                 <el-form-item label="服务名称" prop="name">
                                     <el-input v-model="detailInfo.name" class="input-style" placeholder="请输入" />
                                 </el-form-item>
+                                <el-form-item label="身份密码" prop="password">
+                                    <el-input v-model="detailInfo.password" type="password" class="input-style" placeholder="请输入" />
+                                </el-form-item>
+                                <el-form-item label="身份密码确认" prop="password2">
+                                    <el-input v-model="detailInfo.password2" type="password" class="input-style" placeholder="请输入" />
+                                </el-form-item>
                                 <el-form-item label="服务描述" prop="description">
                                     <el-input
                                         v-model="detailInfo.description"
@@ -42,7 +48,7 @@
                                 <div v-else>
                                     <img
                                         class="mr-1 w-7 h-7"
-                                        src="../../assets/img/apply_default.png"
+                                        :src="imageUrl"
                                         style="border-radius: 8px"
                                     />
                                 </div>
@@ -158,11 +164,20 @@ import { ElMessageBox } from 'element-plus'
 import { h } from 'vue'
 import { SuccessFilled } from '@element-plus/icons-vue'
 import ResultChooseModal from '@/views/components/ResultChooseModal.vue'
-import { userInfo } from '@/plugins/account'
+import { generateIdentity, userInfo } from '@/plugins/account'
 import { v4 as uuidv4 } from 'uuid';
 import { notifyError } from '@/utils/message'
 import $service, {codeMap, serviceCodeMap, ServiceMetadata } from '@/plugins/service'
 import { getCurrentUtcString } from '@/utils/common'
+import $minio  from "@/plugins/minio";
+
+const defaultAvatar = import.meta.env.VITE_MINIO_AVATAR
+const protocol = import.meta.env.VITE_MINIO_HTTP_PROTOCOL
+const endpoint = import.meta.env.VITE_MINIO_ENDPOINT
+const port = import.meta.env.VITE_MINIO_PORT
+const bucket = import.meta.env.VITE_MINIO_BUCKET
+const prefixURL = `${protocol}${endpoint}:${port}/${bucket}`
+const imageUrl = ref(`${prefixURL}/${defaultAvatar}`);
 
 const route = useRoute()
 const router = useRouter()
@@ -230,8 +245,13 @@ const detailInfo = ref<ServiceMetadata>({
     apiCodes: [],
     avatar: '',
     owner: '',
-    codePackagePath: ''
+    ownerName: '',
+    codePackagePath: '',
+    password: '',
+    password2: ''
 })
+
+const codeUrl = ref(detailInfo.value.codePackagePath)
 
 const innerVisible = ref(false)
 const userMeta = ref({})
@@ -240,6 +260,8 @@ const handleClick = (e) => {
 }
 const rules = reactive({
     name: [{ required: true, message: '请输入', trigger: 'blur' }],
+    password: [{ required: true, message: '请输入', trigger: 'blur' }],
+    password2: [{ required: true, message: '请输入', trigger: 'blur' }],
     proxy: [{ required: true, message: '请输入', trigger: 'blur' }],
     avatar: [{ required: true, message: '请选择', trigger: 'blur' }],
     code: [{ required: true, message: '请选择', trigger: 'blur' }],
@@ -280,9 +302,8 @@ const getDetailInfo = async () => {
 
 const submitForm = async (formEl, andOnline) => {
     if (!formEl) return
-    if (avatarChk.value == '1') {
-        detailInfo.value.avatar = '1'
-    }
+    detailInfo.value.avatar = imageUrl.value
+    detailInfo.value.codePackagePath = codeUrl.value
     await formEl.validate(async (valid: boolean, fields) => {
         if (valid) {
             const params = JSON.parse(JSON.stringify(detailInfo.value))
@@ -306,6 +327,8 @@ const submitForm = async (formEl, andOnline) => {
                 rr.proxy = params.proxy
                 rr.name = params.name
                 rr.apiCodes = params.apiCodes
+                rr.owner = userInfo?.metadata?.did
+                rr.ownerName = userInfo?.metadata?.name
                 const myCreateUpdate = await $service.myCreateUpdate(rr)
                 console.log(`myCreateUpdate=${JSON.stringify(myCreateUpdate)}`)
                 if (!andOnline) {
@@ -317,10 +340,16 @@ const submitForm = async (formEl, andOnline) => {
                      */
                 }
             } else {
+                if (params.password !== params.password2) {
+                    notifyError("2次密码输入不一致")
+                    return
+                }
                 params.uid = uuidv4()
-                params.did = uuidv4() // 暂时先mock
-                params.version = userInfo?.metadata?.version
+                const identity = await generateIdentity(params.code, params.apiCodes, params.location, params.hash, params.name, params.description,params.avatar, params.password)
+                params.did = identity.metadata?.did
+                params.version = identity?.metadata?.version
                 params.owner = userInfo?.metadata?.did
+                params.ownerName = userInfo?.metadata?.name
                 params.createdAt = getCurrentUtcString()
                 params.updatedAt = getCurrentUtcString()
                 const createRes = await $service.create(params)
@@ -351,36 +380,60 @@ const handleAvatarUpdate = (newFiles) => {
     avatarList.value = newFiles
 }
 const changeFile = async (fileType, uploadFile) => {
-    const namespaceId = await $application.getNameSpaceId()
+    // const namespaceId = await $application.getNameSpaceId()
 
     // curImg.value.name = uploadFile.name;
     // curImg.value.size = (uploadFile.size / 1024).toFixed(1) + "M";
 
-    if (namespaceId && uploadFile) {
-        console.log(uploadFile, '--uploader-')
-        try {
-            const uploader = await $application.uploads(uploadFile.raw, namespaceId)
+    // if (namespaceId && uploadFile) {
+    //     console.log(uploadFile, '--uploader-')
+    //     try {
+    //         const uploader = await $application.uploads(uploadFile.raw, namespaceId)
 
-            const params = {
-                namespaceId,
-                hash: uploader.hash,
-                type: 1,
-                duration: 3600,
-                name: uploader.name
-            }
+    //         const params = {
+    //             namespaceId,
+    //             hash: uploader.hash,
+    //             type: 1,
+    //             duration: 3600,
+    //             name: uploader.name
+    //         }
 
-            const linkInfo = await $application.createLink(params)
-            const url = linkInfo && linkInfo.url && linkInfo.url.url
-            if (fileType == 1) {
-                detailInfo.value.avatar = url
-            } else {
-                detailInfo.value.codePackagePath = url
-                detailInfo.value.hash = uploader.hash
-            }
-        } catch (error) {
-            console.log(error)
-        }
+    //         const linkInfo = await $application.createLink(params)
+    //         const url = linkInfo && linkInfo.url && linkInfo.url.url
+    //         if (fileType == 1) {
+    //             detailInfo.value.avatar = url
+    //         } else {
+    //             detailInfo.value.codePackagePath = url
+    //             detailInfo.value.hash = uploader.hash
+    //         }
+    //     } catch (error) {
+    //         console.log(error)
+    //     }
+    // }
+    const presignedUrl = await $minio.getUploadUrl(uploadFile.name)
+    console.log(`presignedUrl=${presignedUrl}`)
+
+    // 2. 使用预签名 URL 上传文件
+    const uploadRes = await fetch(presignedUrl, {
+      method: 'PUT',
+      body: uploadFile.value,
+      headers: {
+        'Content-Type': 'application/octet-stream',
+      },
+    });
+
+    console.log(`uploadRes.status=${uploadRes.status}`)
+    if (uploadRes.status !== 200) {
+        console.error(`文件上传失败=${uploadRes.status} - ${uploadRes.json}`)
+        notifyError(`文件上传失败=${uploadRes.status} - ${uploadRes.json}`)
+        return
     }
+    if (fileType === 1) {
+        imageUrl.value = uploadFile.name
+    } else if (fileType === 2) {
+        codeUrl.value = uploadFile.name
+    }
+    
 }
 
 const getUserInfo = async () => {

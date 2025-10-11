@@ -427,7 +427,7 @@ const handleOnline = () => {
             const applicant = `${userInfo?.metadata?.did}::${userInfo?.metadata?.did}`
             const approver = 'did:ethr:0x07e4:0x036bc5c8f6807d1c550b383b7c20038b1fee4e0e2e5e9bbf53db1961ad9189246e::did:ethr:0x07e4:0x036bc5c8f6807d1c550b383b7c20038b1fee4e0e2e5e9bbf53db1961ad9189246e'// 审批人身份，list[did::name]，先写死，固定的审批人，后续改成从 kv 配置表里获取
             let searchList = await $audit.search({name: detailRst.name})
-            searchList = searchList.filter((a) => a.meta.applicant === applicant && a.meta.appOrServiceMetadata.includes(`"operateType":"service"`))
+            searchList = searchList.filter((a) => a.meta.applicant === applicant && a.meta.appOrServiceMetadata.includes(`"operateType":"application"`))
             if (searchList.length > 0) {
                 ElMessageBox.alert('您已申请，无需重复申请', '提示')
                 .then(() => {
@@ -440,6 +440,7 @@ const handleOnline = () => {
             const meta: AuditAuditMetadata = {
                 uid: generateUuid(),
                 appOrServiceMetadata: JSON.stringify(detailRst),
+                auditType: 'application',
                 applicant: applicant, // 申请人身份，did::name
                 approver: approver,
                 reason: '上架申请',
